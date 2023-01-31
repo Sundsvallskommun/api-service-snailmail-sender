@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>se.sundsvall.dept44</groupId>
+        <artifactId>dept44-service-parent</artifactId>
+        <version>1.26</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+
+    <groupId>se.sundsvall</groupId>
+    <artifactId>api-service-snailmail-sender</artifactId>
+    <version>1.2</version>
+    <name>api-service-snailmail-sender</name>
+
+    <properties>
+        <!-- Pipeline properties -->
+        <docker.image.name>ms-snailmail-sender</docker.image.name>
+        <published.container.port.sandbox>9077</published.container.port.sandbox>
+        <published.container.port.test>9077</published.container.port.test>
+        <published.container.port.production>9077</published.container.port.production>
+        <!-- Generated sources properties -->
+        <openapi-generator-maven-plugin>6.2.1</openapi-generator-maven-plugin>
+        <generated-sources-path>${project.build.directory}/generated-sources</generated-sources-path>
+        <generated-sources-java-path>src/main/java</generated-sources-java-path>
+    </properties>
+    <dependencies>
+        <!-- Test -->
+        <dependency>
+            <groupId>se.sundsvall.dept44</groupId>
+            <artifactId>dept44-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- Framework -->
+        <dependency>
+            <groupId>se.sundsvall.dept44</groupId>
+            <artifactId>dept44-starter-feign</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>se.sundsvall.dept44</groupId>
+            <artifactId>dept44-common-validators</artifactId>
+        </dependency>
+        <!-- Other -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+                <version>${openapi-generator-maven-plugin}</version>
+                <executions>
+                    <execution>
+                        <id>email-sender-api</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/src/generated/email-sender-api.yml</inputSpec>
+                            <output>${generated-sources-path}</output>
+                            <generatorName>spring</generatorName>
+                            <generateApis>false</generateApis>
+                            <configOptions>
+                                <sourceFolder>${generated-sources-java-path}</sourceFolder>
+                                <generateSupportingFiles>false</generateSupportingFiles>
+                                <dateLibrary>java8</dateLibrary>
+                                <apiPackage>generated</apiPackage>
+                                <modelPackage>generated.se.sundsvall.emailsender</modelPackage>
+                                <openApiNullable>false</openApiNullable>
+                                <generatePom>false</generatePom>
+                                <useBeanValidation>true</useBeanValidation>
+                                <useSwaggerAnnotations>true</useSwaggerAnnotations>
+                                <interfaceOnly>true</interfaceOnly>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>citizen-api</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/src/generated/citizen-api.yml</inputSpec>
+                            <output>${generated-sources-path}</output>
+                            <generatorName>spring</generatorName>
+                            <generateApis>false</generateApis>
+                            <configOptions>
+                                <sourceFolder>${generated-sources-java-path}</sourceFolder>
+                                <generateSupportingFiles>false</generateSupportingFiles>
+                                <dateLibrary>java8</dateLibrary>
+                                <apiPackage>generated</apiPackage>
+                                <modelPackage>generated.se.sundsvall.citizen</modelPackage>
+                                <openApiNullable>false</openApiNullable>
+                                <generatePom>false</generatePom>
+                                <useBeanValidation>true</useBeanValidation>
+                                <useSwaggerAnnotations>true</useSwaggerAnnotations>
+                                <interfaceOnly>true</interfaceOnly>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>add-generated-source</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${generated-sources-path}/${generated-sources-java-path}
+                                </source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>**/generated/**</exclude>
+                        <exclude>**/se/sundsvall/snailmail/Application*</exclude>
+                        <exclude>**/se/sundsvall/snailmail/integration/**/**Properties*</exclude>
+                        <exclude>**/se/sundsvall/snailmail/integration/**/**Configuration**</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

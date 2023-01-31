@@ -1,0 +1,395 @@
+openapi: 3.0.1
+info:
+  title: Citizen API
+  version: v1
+paths:
+  '/citizen/api-docs':
+    get:
+      tags:
+        - Citizen
+      summary: OpenAPI specification
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+            text/json:
+              schema:
+                type: string
+  '/citizen/{personId}':
+    get:
+      tags:
+        - Citizen
+      summary: Show information about specific citizen
+      parameters:
+        - name: personId
+          in: path
+          description: ID for specific citizen
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/Citizen'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Citizen'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/Citizen'
+        '404':
+          description: Not Found
+        '500':
+          description: Server Error
+        '503':
+          description: Server Error
+  '/citizen/extended/{personId}':
+    get:
+      tags:
+        - Citizen
+      summary: Show extended information about specific citizen
+      parameters:
+        - name: personId
+          in: path
+          description: ID for specific citizen
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: verbose
+          in: query
+          description: 'If true, returns more information'
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/CitizenExtended'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CitizenExtended'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/CitizenExtended'
+        '404':
+          description: Not Found
+        '500':
+          description: Server Error
+        '503':
+          description: Server Error
+  '/citizen/changedaddress':
+    get:
+      tags:
+        - Citizen
+      summary: Show citizens that have moved since the given date
+      parameters:
+        - name: changedDateFrom
+          in: query
+          description: From-date for move.
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CitizenWithChangedAddress'
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CitizenWithChangedAddress'
+            text/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CitizenWithChangedAddress'
+        '404':
+          description: Not Found
+        '500':
+          description: Server Error
+        '503':
+          description: Server Error
+  '/person/{personnumber}/guid':
+    get:
+      tags:
+        - Person
+      parameters:
+        - name: personnumber
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+                format: uuid
+            application/json:
+              schema:
+                type: string
+                format: uuid
+            text/json:
+              schema:
+                type: string
+                format: uuid
+  '/person/guid':
+    post:
+      tags:
+        - Person
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModelPostPerson'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/ModelPostPerson'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/ModelPostPerson'
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+                format: uuid
+            application/json:
+              schema:
+                type: string
+                format: uuid
+            text/json:
+              schema:
+                type: string
+                format: uuid
+  '/person/internal/{personnumber}/guid':
+    get:
+      tags:
+        - Person
+      parameters:
+        - name: personnumber
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+                format: uuid
+            application/json:
+              schema:
+                type: string
+                format: uuid
+            text/json:
+              schema:
+                type: string
+                format: uuid
+components:
+  schemas:
+    Citizen:
+      type: object
+      properties:
+        personId:
+          type: string
+          format: uuid
+        givenname:
+          type: string
+          nullable: true
+        lastname:
+          type: string
+          nullable: true
+        nrDate:
+          type: string
+          nullable: true
+        addresses:
+          type: array
+          items:
+            $ref: '#/components/schemas/CitizenAddress'
+          nullable: true
+      additionalProperties: false
+    CitizenAddress:
+      type: object
+      properties:
+        status:
+          type: string
+          nullable: true
+        nrDate:
+          type: string
+          format: date-time
+          nullable: true
+        realEstateDescription:
+          type: string
+          nullable: true
+        co:
+          type: string
+          nullable: true
+        address:
+          type: string
+          nullable: true
+        addressArea:
+          type: string
+          nullable: true
+        addressNumber:
+          type: string
+          nullable: true
+        addressLetter:
+          type: string
+          nullable: true
+        appartmentNumber:
+          type: string
+          nullable: true
+        postalCode:
+          type: string
+          nullable: true
+        city:
+          type: string
+          nullable: true
+        county:
+          type: string
+          nullable: true
+        municipality:
+          type: string
+          nullable: true
+        country:
+          type: string
+          nullable: true
+        emigrated:
+          type: boolean
+          nullable: true
+        addressType:
+          type: string
+          nullable: true
+        xCoordLocal:
+          type: number
+          format: double
+          nullable: true
+        yCoordLocal:
+          type: number
+          format: double
+          nullable: true
+      additionalProperties: false
+    CitizenExtended:
+      type: object
+      properties:
+        personId:
+          type: string
+          format: uuid
+        givenname:
+          type: string
+          nullable: true
+        lastname:
+          type: string
+          nullable: true
+        gender:
+          type: string
+          nullable: true
+        civilStatus:
+          type: string
+          nullable: true
+        nrDate:
+          type: string
+          nullable: true
+        addresses:
+          type: array
+          items:
+            $ref: '#/components/schemas/CitizenAddress'
+          nullable: true
+      additionalProperties: false
+    CitizenWithChangedAddress:
+      type: object
+      properties:
+        personId:
+          type: string
+          format: uuid
+        personNumber:
+          type: string
+          nullable: true
+        classified:
+          type: string
+          nullable: true
+        unRegCode:
+          type: string
+          nullable: true
+        unRegDate:
+          type: string
+          format: date-time
+          nullable: true
+        gender:
+          type: string
+          nullable: true
+        givenname:
+          type: string
+          nullable: true
+        lastname:
+          type: string
+          nullable: true
+        typeOfSchool:
+          type: string
+          nullable: true
+        custodianFor:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustodyChildrenPupil'
+          nullable: true
+        addresses:
+          type: array
+          items:
+            $ref: '#/components/schemas/CitizenAddress'
+          nullable: true
+      additionalProperties: false
+    CustodyChildrenPupil:
+      type: object
+      properties:
+        personnumber:
+          type: string
+          nullable: true
+        typeOfSchool:
+          type: string
+          nullable: true
+        unRegCode:
+          type: string
+          nullable: true
+        unRegDate:
+          type: string
+          format: date-time
+          nullable: true
+      additionalProperties: false
+    ModelPostPerson:
+      type: object
+      properties:
+        personalNumber:
+          type: string
+          nullable: true
+      additionalProperties: false
+tags:
+  - name: Citizen
+    description: Handles information about Citizens
+  - name: Person
+    description: Handles ID:s for citizens
