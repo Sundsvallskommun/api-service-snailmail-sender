@@ -16,7 +16,7 @@ import org.zalando.problem.Problem;
 import se.sundsvall.snailmail.api.model.SendSnailMailRequest;
 import se.sundsvall.snailmail.service.SnailMailService;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 @RestController
 @Validated
