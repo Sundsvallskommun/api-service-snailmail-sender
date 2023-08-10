@@ -42,8 +42,7 @@ class CitizenIntegrationTest {
         
         var response = citizenIntegration.getCitizen("someId");
         
-        assertThat(response).isNotNull();
-        assertThat(response).isEqualTo(citizen).usingRecursiveComparison();
+        assertThat(response).isNotNull().usingRecursiveComparison().isEqualTo(citizen);
         
         verify(client, times(1)).getCitizen(any(String.class));
         verifyNoMoreInteractions(client);
