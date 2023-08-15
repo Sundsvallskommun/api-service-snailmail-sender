@@ -3,7 +3,6 @@ package openapi;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import net.javacrumbs.jsonunit.core.Option;
-import net.javacrumbs.jsonunit.core.internal.Options;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,6 +16,7 @@ import se.sundsvall.dept44.util.ResourceUtils;
 import se.sundsvall.snailmail.Application;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;
 
 @ActiveProfiles("it")
 @SpringBootTest(
@@ -49,7 +49,7 @@ class OpenApiSpecificationIT {
         String currentOpenApiSpecification = getCurrentOpenApiSpecification();
 
         assertThatJson(toJson(existingOpenApiSpecification))
-                .withOptions(new Options(Option.IGNORING_ARRAY_ORDER))
+                .withOptions(IGNORING_ARRAY_ORDER)
                 .whenIgnoringPaths("servers")
                 .isEqualTo(toJson(currentOpenApiSpecification));
     }
