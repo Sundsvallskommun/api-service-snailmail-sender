@@ -4,8 +4,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,7 +16,7 @@ import org.zalando.problem.Problem;
 import se.sundsvall.snailmail.api.model.SendSnailMailRequest;
 import se.sundsvall.snailmail.service.SnailMailService;
 
-import jakarta.validation.Valid;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
 @Validated
@@ -29,28 +29,15 @@ public class SnailMailResource {
         this.snailMailService = snailMailService;
     }
 
-    @PostMapping
+    @PostMapping(consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Create snailmail")
-    @ApiResponses({
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Successful Operation"
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Bad Request",
-                    content = @Content(schema = @Schema(implementation = Problem.class))
-            ),
-            @ApiResponse(
-                    responseCode = "500",
-                    description = "Internal Server Error",
-                    content = @Content(schema = @Schema(implementation = Problem.class))
-            )
-    })
-    ResponseEntity<?> sendSnailMail(
+    @ApiResponse(responseCode = "200", description = "Successful Operation", useReturnTypeSchema = true)
+    @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(schema = @Schema(implementation = Problem.class)))
+    @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Problem.class)))
+    ResponseEntity<Void> sendSnailMail(
             @Valid @RequestBody SendSnailMailRequest request) {
+
         snailMailService.sendSnailMail(request);
         return ResponseEntity.ok().build();
-
     }
 }

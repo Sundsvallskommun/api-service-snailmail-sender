@@ -14,7 +14,7 @@ import static apptest.CommonStubs.stubForAccessToken;
         files = "classpath:/EmailSenderIT/",
         classes = Application.class
 )
-public class EmailSenderIT extends AbstractAppTest {
+class EmailSenderIT extends AbstractAppTest {
 
     @BeforeEach
     void setUp() {

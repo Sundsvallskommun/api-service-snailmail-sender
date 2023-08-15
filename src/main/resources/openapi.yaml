@@ -40,10 +40,6 @@ paths:
                 $ref: '#/components/schemas/Problem'
         "200":
           description: Successful Operation
-          content:
-            '*/*':
-              schema:
-                type: object
   /api-docs:
     get:
       tags:
