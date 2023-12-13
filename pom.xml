@@ -5,15 +5,13 @@
     <parent>
         <groupId>se.sundsvall.dept44</groupId>
         <artifactId>dept44-service-parent</artifactId>
-        <version>3.4</version>
+        <version>4.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-
     <groupId>se.sundsvall</groupId>
     <artifactId>api-service-snailmail-sender</artifactId>
     <version>1.2</version>
     <name>api-service-snailmail-sender</name>
-
     <properties>
         <!-- Pipeline properties -->
         <docker.image.name>ms-snailmail-sender</docker.image.name>
@@ -22,7 +20,6 @@
         <!-- Generated sources properties -->
         <openapi-generator-maven-plugin>7.1.0</openapi-generator-maven-plugin>
         <generated-sources-path>${project.build.directory}/generated-sources</generated-sources-path>
-        <generated-sources-java-path>src/main/java</generated-sources-java-path>
     </properties>
     <dependencies>
         <!-- Test -->
@@ -64,10 +61,10 @@
                             <output>${generated-sources-path}</output>
                             <generatorName>spring</generatorName>
                             <generateApis>false</generateApis>
+                            <generateSupportingFiles>false</generateSupportingFiles>
                             <configOptions>
                                 <useSpringBoot3>true</useSpringBoot3>
-                                <sourceFolder>${generated-sources-java-path}</sourceFolder>
-                                <generateSupportingFiles>false</generateSupportingFiles>
+                                <sourceFolder>models</sourceFolder>
                                 <dateLibrary>java8</dateLibrary>
                                 <apiPackage>generated</apiPackage>
                                 <modelPackage>generated.se.sundsvall.emailsender</modelPackage>
@@ -79,7 +76,6 @@
                             </configOptions>
                         </configuration>
                     </execution>
-
                     <execution>
                         <id>citizen-api</id>
                         <goals>
@@ -90,10 +86,10 @@
                             <output>${generated-sources-path}</output>
                             <generatorName>spring</generatorName>
                             <generateApis>false</generateApis>
+                            <generateSupportingFiles>false</generateSupportingFiles>
                             <configOptions>
                                 <useSpringBoot3>true</useSpringBoot3>
-                                <sourceFolder>${generated-sources-java-path}</sourceFolder>
-                                <generateSupportingFiles>false</generateSupportingFiles>
+                                <sourceFolder>models</sourceFolder>
                                 <dateLibrary>java8</dateLibrary>
                                 <apiPackage>generated</apiPackage>
                                 <modelPackage>generated.se.sundsvall.citizen</modelPackage>
@@ -107,7 +103,6 @@
                     </execution>
                 </executions>
             </plugin>
-
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
@@ -120,14 +115,12 @@
                         </goals>
                         <configuration>
                             <sources>
-                                <source>${generated-sources-path}/${generated-sources-java-path}
-                                </source>
+                                <source>${generated-sources-path}/models</source>
                             </sources>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
-
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
@@ -142,5 +135,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

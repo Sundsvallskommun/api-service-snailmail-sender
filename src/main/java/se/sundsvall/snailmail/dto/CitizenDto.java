@@ -12,11 +12,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class CitizenDto {
 
-    private String givenName;
-    private String lastName;
-    private String street;
-    private String apartment;
-    private String careOf;
-    private String city;
-    private String postalCode;
+	private String givenName;
+	private String lastName;
+	private String street;
+	private String apartment;
+	private String careOf;
+	private String city;
+	private String postalCode;
 }
