@@ -2,6 +2,8 @@ package se.sundsvall.snailmail.dto;
 
 import java.util.List;
 
+import se.sundsvall.snailmail.api.model.EnvelopeType;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,6 +28,7 @@ public class SnailMailDto {
 		private final String content;
 		private final String name;
 		private final String contentType;
+		private final EnvelopeType envelopeType;
 	}
 
 }
