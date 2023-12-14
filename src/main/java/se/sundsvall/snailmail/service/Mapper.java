@@ -33,6 +33,7 @@ public final class Mapper {
 			.withContent(attachment.getContent())
 			.withName(attachment.getName())
 			.withContentType(attachment.getContentType())
+			.withSendAsWindowedEnvelope(attachment.getSendAsWindowedEnvelope())
 			.build();
 	}
 

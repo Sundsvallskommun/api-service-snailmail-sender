@@ -26,6 +26,7 @@ public class SnailMailDto {
 		private final String content;
 		private final String name;
 		private final String contentType;
+		private final Boolean sendAsWindowedEnvelope;
 	}
 
 }
