@@ -1,0 +1,9 @@
+openapi:
+  name: api-service-snailmail-sender
+  title: SnailMailSender
+  version: '@project.version@'
+spring:
+  application:
+    name: api-snailmail-sender
+  main:
+    banner-mode: 'off'
