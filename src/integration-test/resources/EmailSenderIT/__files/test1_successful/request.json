@@ -6,7 +6,7 @@
       "content": "aGVsbG8gd29ybGQK",
       "name": "test.txt",
       "contentType": "text/plain",
-      "sendAsWindowedEnvelope": false
+      "envelopeType": "PLAIN"
     }
   ]
 }

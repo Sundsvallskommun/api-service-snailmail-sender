@@ -17,7 +17,7 @@ class SendSnailMailRequestTest {
 					.withName("someName")
 					.withContentType("someContentType")
 					.withContent("someContent")
-					.withSendAsWindowedEnvelope(true)
+					.withEnvelopeType(EnvelopeType.PLAIN)
 				.build()))
 			.build();
 
@@ -28,7 +28,7 @@ class SendSnailMailRequestTest {
 			assertThat(attachments.getFirst().getName()).isEqualTo("someName");
 			assertThat(attachments.getFirst().getContent()).isEqualTo("someContent");
 			assertThat(attachments.getFirst().getContentType()).isEqualTo("someContentType");
-			assertThat(attachments.getFirst().getSendAsWindowedEnvelope()).isTrue();
+			assertThat(attachments.getFirst().getEnvelopeType()).isEqualByComparingTo(EnvelopeType.PLAIN);
 		});
 	}
 }

@@ -3,11 +3,12 @@ package se.sundsvall.snailmail.service;
 import java.util.List;
 import java.util.Optional;
 
-import generated.se.sundsvall.citizen.Citizen;
-import generated.se.sundsvall.citizen.CitizenAddress;
 import se.sundsvall.snailmail.api.model.SendSnailMailRequest;
 import se.sundsvall.snailmail.dto.CitizenDto;
 import se.sundsvall.snailmail.dto.SnailMailDto;
+
+import generated.se.sundsvall.citizen.Citizen;
+import generated.se.sundsvall.citizen.CitizenAddress;
 
 public final class Mapper {
 
@@ -33,7 +34,7 @@ public final class Mapper {
 			.withContent(attachment.getContent())
 			.withName(attachment.getName())
 			.withContentType(attachment.getContentType())
-			.withSendAsWindowedEnvelope(attachment.getSendAsWindowedEnvelope())
+			.withEnvelopeType(attachment.getEnvelopeType())
 			.build();
 	}
 

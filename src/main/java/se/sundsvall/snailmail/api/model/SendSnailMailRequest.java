@@ -44,7 +44,7 @@ public class SendSnailMailRequest {
 		@NotBlank
 		private String contentType;
 
-		@Schema(description = "If the letter to send should be placed in a windowed envelope", example = "true")
-		private Boolean sendAsWindowedEnvelope;
+		@Schema(description = "The envelope type for the letter", example = "WINDOWED")
+		private EnvelopeType envelopeType;
 	}
 }

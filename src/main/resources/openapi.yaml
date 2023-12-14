@@ -26,20 +26,20 @@ paths:
               $ref: '#/components/schemas/SendSnailMailRequest'
         required: true
       responses:
-        "400":
-          description: Bad Request
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/Problem'
+        "200":
+          description: Successful Operation
         "500":
           description: Internal Server Error
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/Problem'
-        "200":
-          description: Successful Operation
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Problem'
   /api-docs:
     get:
       tags:
@@ -77,10 +77,13 @@ components:
           type: string
           description: The attachment content type
           example: text/plain
-        sendAsWindowedEnvelope:
-          type: boolean
-          description: If the letter to send should be placed in a windowed envelope
-          example: true
+        envelopeType:
+          type: string
+          description: The envelope type for the letter
+          example: WINDOWED
+          enum:
+            - WINDOWED
+            - PLAIN
       description: Attachments
     SendSnailMailRequest:
       required:

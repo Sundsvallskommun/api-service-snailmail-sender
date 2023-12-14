@@ -1,13 +1,13 @@
 package se.sundsvall.snailmail;
 
+import java.util.List;
+
+import se.sundsvall.snailmail.api.model.EnvelopeType;
 import se.sundsvall.snailmail.api.model.SendSnailMailRequest;
 import se.sundsvall.snailmail.dto.SnailMailDto;
 import se.sundsvall.snailmail.integration.emailsender.EmailSenderIntegrationProperties;
 
-import java.util.List;
-
 public final class TestDataFactory {
-
 
     public static SnailMailDto buildSnailMailDto() {
 
@@ -18,6 +18,7 @@ public final class TestDataFactory {
                         .withContent("someContent")
                         .withName("someName")
                         .withContentType("someContentType")
+                        .withEnvelopeType(EnvelopeType.PLAIN)
                         .build()))
                 .build();
     }
@@ -31,6 +32,7 @@ public final class TestDataFactory {
                         .withContent("someContent")
                         .withName("someName")
                         .withContentType("someContentType")
+                        .withEnvelopeType(EnvelopeType.PLAIN)
                         .build()))
                 .build();
     }
@@ -46,8 +48,6 @@ public final class TestDataFactory {
                         .build()))
                 .build();
     }
-
-
 
     public static EmailSenderIntegrationProperties buildEmailProperties() {
 
@@ -79,8 +79,7 @@ public final class TestDataFactory {
                 .withContent("someContent")
                 .withContentType("someContentType")
                 .withName("someName")
+                .withEnvelopeType(EnvelopeType.PLAIN)
                 .build();
     }
-
-
 }
