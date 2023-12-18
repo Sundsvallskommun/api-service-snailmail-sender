@@ -11,14 +11,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.zalando.problem.Problem;
 
+import se.sundsvall.snailmail.api.model.SendSnailMailRequest;
+import se.sundsvall.snailmail.service.SnailMailService;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import se.sundsvall.snailmail.api.model.SendSnailMailRequest;
-import se.sundsvall.snailmail.service.SnailMailService;
 
 @RestController
 @Validated
