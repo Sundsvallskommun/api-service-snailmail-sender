@@ -1,10 +1,12 @@
 package se.sundsvall.snailmail.dto;
 
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
+
+import se.sundsvall.snailmail.api.model.EnvelopeType;
 
 class SnailMailDtoTest {
 
@@ -19,6 +21,7 @@ class SnailMailDtoTest {
                                 .withName("someName")
                                 .withContent("someContent")
                                 .withContentType("someContentType")
+                                .withEnvelopeType(EnvelopeType.PLAIN)
                                 .build()
                 ))
                 .withCitizenDto(CitizenDto.builder().build())
@@ -30,9 +33,10 @@ class SnailMailDtoTest {
         assertThat(request.getDepartment()).isEqualTo("someDepartment");
         assertThat(request.getAttachments()).satisfies(attachments -> {
             assertThat(attachments).hasSize(1);
-            assertThat(attachments.get(0).getName()).isEqualTo("someName");
-            assertThat(attachments.get(0).getContent()).isEqualTo("someContent");
-            assertThat(attachments.get(0).getContentType()).isEqualTo("someContentType");
+            assertThat(attachments.getFirst().getName()).isEqualTo("someName");
+            assertThat(attachments.getFirst().getContent()).isEqualTo("someContent");
+            assertThat(attachments.getFirst().getContentType()).isEqualTo("someContentType");
+            assertThat(attachments.getFirst().getEnvelopeType()).isEqualByComparingTo(EnvelopeType.PLAIN);
         });
     }
 }

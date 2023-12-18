@@ -43,5 +43,8 @@ public class SendSnailMailRequest {
 		@Schema(description = "The attachment content type", example = "text/plain")
 		@NotBlank
 		private String contentType;
+
+		@Schema(description = "The envelope type for the letter", example = "WINDOWED")
+		private EnvelopeType envelopeType;
 	}
 }
