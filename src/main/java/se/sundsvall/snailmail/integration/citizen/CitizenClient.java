@@ -19,7 +19,6 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 @CircuitBreaker(name = CitizenIntegration.INTEGRATION_NAME)
 interface CitizenClient {
 
-	@PostMapping(path ="/citizen/batch", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+	@PostMapping(path = "/batch", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
 	List<CitizenExtended> getCitizens(@RequestParam(name = "ShowClassified") final boolean showClassified, @RequestBody final List<String> personId);
-
 }
