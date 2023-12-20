@@ -45,9 +45,9 @@ class CitizenIntegrationTest {
 		final var response = citizenIntegration.getCitizens(List.of(uuid1.toString(), uuid2.toString()));
 
 		assertThat(response)
-				.hasSize(2)
-				.extracting(CitizenExtended::getPersonId)
-				.containsExactly(uuid1, uuid2);
+			.hasSize(2)
+			.extracting(CitizenExtended::getPersonId)
+			.containsExactly(uuid1, uuid2);
 
 		verify(citizenMock).getCitizens(false, List.of(uuid1.toString(), uuid2.toString()));
 		verifyNoMoreInteractions(citizenMock);
@@ -57,15 +57,13 @@ class CitizenIntegrationTest {
 	void getCitizenThrowingException() {
 		final var uuid1 = randomUUID();
 		final var uuid2 = randomUUID();
-		final var citizen1 = buildCitizen(uuid1);
-		final var citizen2 = buildCitizen(uuid2);
 
 		when(citizenMock.getCitizens(eq(false), anyList()))
-				.thenThrow(Problem.builder()
+			.thenThrow(Problem.builder()
 				.withStatus(Status.BAD_GATEWAY)
 				.withCause(Problem.builder()
-						.withStatus(Status.BAD_GATEWAY)
-						.build())
+					.withStatus(Status.BAD_GATEWAY)
+					.build())
 				.build());
 
 		assertThatExceptionOfType(ThrowableProblem.class)
