@@ -1,17 +1,24 @@
 package se.sundsvall.snailmail.integration.citizen;
 
-import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-import generated.se.sundsvall.citizen.Citizen;
+import java.util.List;
+
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import generated.se.sundsvall.citizen.CitizenExtended;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 
 @FeignClient(
 	name = CitizenIntegration.INTEGRATION_NAME,
 	url = "${integration.citizen.base-url}",
 	configuration = CitizenIntegrationConfiguration.class)
+@CircuitBreaker(name = CitizenIntegration.INTEGRATION_NAME)
 interface CitizenClient {
 
-	@GetMapping("/citizen/{personId}")
-	Citizen getCitizen(@PathVariable("personId") final String personId);
+	@PostMapping(path = "/batch", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+	List<CitizenExtended> getCitizens(@RequestParam(name = "ShowClassified") final boolean showClassified, @RequestBody final List<String> personId);
 }
