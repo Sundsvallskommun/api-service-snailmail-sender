@@ -28,12 +28,12 @@ class SnailMailResourceTest {
 
 	@Test
 	void sendSnailMail() {
-		doNothing().when(mockSnailMailService).sendSnailMail(any(SendSnailMailRequest.class));
+		doNothing().when(mockSnailMailService).saveSnailMailForBatch(any(SendSnailMailRequest.class));
 
 		final var response = snailMailResource.sendSnailMail(buildSendSnailMailRequest());
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-		verify(mockSnailMailService, times(1)).sendSnailMail(any(SendSnailMailRequest.class));
+		verify(mockSnailMailService, times(1)).saveSnailMailForBatch(any(SendSnailMailRequest.class));
 
 	}
 }

@@ -20,6 +20,8 @@ public class SnailMailDto {
 	private List<AttachmentDto> attachments;
 	private String department;
 	private String deviation;
+	private String batchId;
+	private String partyId;
 
 	@Getter
 	@AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -30,5 +32,4 @@ public class SnailMailDto {
 		private final String contentType;
 		private final EnvelopeType envelopeType;
 	}
-
 }

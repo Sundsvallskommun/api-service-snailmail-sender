@@ -23,7 +23,7 @@ import jakarta.validation.Valid;
 
 @RestController
 @Validated
-@RequestMapping("/send/snailmail")
+@RequestMapping("/send")
 @Tag(name = "SnailMailSender", description = "SnailMailSender")
 public class SnailMailResource {
 
@@ -33,14 +33,13 @@ public class SnailMailResource {
 		this.snailMailService = snailMailService;
 	}
 
-	@PostMapping(consumes = APPLICATION_JSON_VALUE)
+	@PostMapping(path = "/snailmail", consumes = APPLICATION_JSON_VALUE)
 	@Operation(summary = "Create snailmail")
 	@ApiResponse(responseCode = "200", description = "Successful Operation", useReturnTypeSchema = true)
 	@ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(schema = @Schema(implementation = Problem.class)))
 	@ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Problem.class)))
 	ResponseEntity<Void> sendSnailMail(@Valid @RequestBody SendSnailMailRequest request) {
-
-		snailMailService.sendSnailMail(request);
+		snailMailService.saveSnailMailForBatch(request);
 		return ok().build();
 	}
 }

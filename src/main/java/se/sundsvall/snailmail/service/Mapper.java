@@ -9,24 +9,26 @@ import se.sundsvall.snailmail.dto.SnailMailDto;
 
 import generated.se.sundsvall.citizen.CitizenAddress;
 import generated.se.sundsvall.citizen.CitizenExtended;
+import io.micrometer.common.util.StringUtils;
 
 public final class Mapper {
-
-	private static final String CURRENT = "Current";
 
 	private Mapper() {}
 
 	public static SnailMailDto toSnailMailDto(SendSnailMailRequest request, CitizenExtended citizen) {
 
 		return SnailMailDto.builder()
-			.withCitizenDto(Mapper.toCitizenDto(Optional.ofNullable(citizen).orElse(new CitizenExtended())))
-			.withDepartment(request.getDepartment())
-			.withDeviation(request.getDeviation())
-			.withAttachments(Optional.ofNullable(request.getAttachments()).orElse(List.of()).stream()
-				.map(Mapper::toAttachmentDto)
-				.toList())
-			.build();
-
+				.withCitizenDto(Optional.ofNullable(citizen)
+						.map(Mapper::toCitizenDto)
+						.orElse(CitizenDto.builder().build()))
+				.withDepartment(request.getDepartment())
+				.withDeviation(request.getDeviation())
+				.withBatchId(request.getBatchId())
+				.withAttachments(Optional.ofNullable(request.getAttachments())
+						.orElse(List.of()).stream()
+						.map(Mapper::toAttachmentDto)
+						.toList())
+				.build();
 	}
 
 	public static SnailMailDto.AttachmentDto toAttachmentDto(SendSnailMailRequest.Attachment attachment) {
@@ -39,13 +41,12 @@ public final class Mapper {
 	}
 
 	private static CitizenDto toCitizenDto(CitizenExtended citizen) {
-
 		final var address = Optional.ofNullable(citizen.getAddresses()).orElse(List.of()).stream()
-			.filter(address1 -> CURRENT.equals(address1.getStatus()))
 			.findFirst()
 			.orElse(new CitizenAddress());
 
 		return CitizenDto.builder()
+			.withPersonId(citizen.getPersonId().toString())
 			.withLastName(citizen.getLastname())
 			.withGivenName(citizen.getGivenname())
 			.withApartment(address.getAppartmentNumber())

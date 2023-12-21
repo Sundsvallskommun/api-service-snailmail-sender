@@ -28,7 +28,7 @@ class SnailMailServiceTest {
 	@Test
 	void sendMail() {
 		doNothing().when(mockEmailSenderIntegration).sendEmail(any());
-		snailMailService.sendSnailMail(buildSendSnailMailRequest());
+		snailMailService.saveSnailMailForBatch(buildSendSnailMailRequest());
 		verify(mockEmailSenderIntegration, times(1)).sendEmail(any(SnailMailDto.class));
 		verifyNoMoreInteractions(mockEmailSenderIntegration);
 	}

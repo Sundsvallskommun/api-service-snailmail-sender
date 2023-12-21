@@ -10,6 +10,7 @@ class CitizenDtoTest {
     void testBuilder() {
 
         var dto = CitizenDto.builder()
+                .withPersonId("somePersonId")
                 .withGivenName("someGivenName")
                 .withLastName("someLastName")
                 .withStreet("someStreetName")
@@ -20,6 +21,7 @@ class CitizenDtoTest {
                 .build();
 
         assertThat(dto).isNotNull();
+        assertThat(dto.getPersonId()).isEqualTo("somePersonId");
         assertThat(dto.getGivenName()).isEqualTo("someGivenName");
         assertThat(dto.getLastName()).isEqualTo("someLastName");
         assertThat(dto.getStreet()).isEqualTo("someStreetName");

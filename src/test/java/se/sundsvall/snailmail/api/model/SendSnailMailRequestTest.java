@@ -10,7 +10,6 @@ class SendSnailMailRequestTest {
 
 	@Test
 	void testBuilder() {
-
 		final var request = SendSnailMailRequest.builder()
 			.withAttachments(List.of(
 				SendSnailMailRequest.Attachment.builder()
@@ -19,9 +18,17 @@ class SendSnailMailRequestTest {
 					.withContent("someContent")
 					.withEnvelopeType(EnvelopeType.PLAIN)
 				.build()))
+				.withDepartment("someDepartment")
+				.withPartyId("somePartyId")
+				.withBatchId("someBatchId")
+				.withDeviation("someDeviation")
 			.build();
 
 		assertThat(request).isNotNull();
+		assertThat(request.getDepartment()).isEqualTo("someDepartment");
+		assertThat(request.getPartyId()).isEqualTo("somePartyId");
+		assertThat(request.getBatchId()).isEqualTo("someBatchId");
+		assertThat(request.getDeviation()).isEqualTo("someDeviation");
 		assertThat(request.getAttachments()).satisfies(attachments -> {
 			assertThat(attachments).hasSize(1);
 			assertThat(attachments).hasSize(1);

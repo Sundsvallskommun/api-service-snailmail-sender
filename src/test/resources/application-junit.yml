@@ -18,6 +18,16 @@ integration:
       name: someName
       replyTo: someReplyAddress
     token-uri: http://token.url
+  samba:
+    host: localhost
+    port: 389
+    domain: WORKGROUP
+    username: someUsername
+    password: somePassword
+    share: /someShare/
+    connect-timeout: PT5S
+    response-timeout: PT10S
+
 spring:
   main:
     banner-mode: 'off'
