@@ -17,7 +17,7 @@ paths:
     post:
       tags:
         - SnailMailSender
-      summary: Create snailmail
+      summary: Prepare snail mail for batch
       operationId: sendSnailMail
       requestBody:
         content:
@@ -26,20 +26,20 @@ paths:
               $ref: '#/components/schemas/SendSnailMailRequest'
         required: true
       responses:
-        "200":
-          description: Successful Operation
-        "400":
-          description: Bad Request
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/Problem'
         "500":
           description: Internal Server Error
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/Problem'
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Problem'
+        "200":
+          description: Successful Operation
   /api-docs:
     get:
       tags:
@@ -75,6 +75,7 @@ components:
         contentType:
           type: string
           description: The attachment content type
+          example: application/pdf
           enum:
             - application/pdf
         envelopeType:
@@ -102,6 +103,7 @@ components:
         batchId:
           type: string
           description: Batch id to be used for creating a csv-file
+          example: 6a5c3d04-412d-11ec-973a-0242ac130043
         partyId:
           type: string
           description: Party id for the person the letter should be sent to

@@ -34,7 +34,7 @@ public class SnailMailResource {
 	}
 
 	@PostMapping(path = "/snailmail", consumes = APPLICATION_JSON_VALUE)
-	@Operation(summary = "Create snailmail")
+	@Operation(summary = "Prepare snail mail for batch")
 	@ApiResponse(responseCode = "200", description = "Successful Operation", useReturnTypeSchema = true)
 	@ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(schema = @Schema(implementation = Problem.class)))
 	@ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Problem.class)))

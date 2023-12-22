@@ -10,13 +10,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import generated.se.sundsvall.citizen.CitizenExtended;
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 
 @FeignClient(
 	name = CitizenIntegration.INTEGRATION_NAME,
 	url = "${integration.citizen.base-url}",
 	configuration = CitizenIntegrationConfiguration.class)
-@CircuitBreaker(name = CitizenIntegration.INTEGRATION_NAME)
 interface CitizenClient {
 
 	/**

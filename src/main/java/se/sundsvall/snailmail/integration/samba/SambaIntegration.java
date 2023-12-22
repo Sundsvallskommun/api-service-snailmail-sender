@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import se.sundsvall.snailmail.dto.SnailMailDto;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import jcifs.CIFSContext;
 import jcifs.context.SingletonContext;
 import jcifs.smb.NtlmPasswordAuthenticator;
@@ -22,6 +23,7 @@ import jcifs.smb.SmbFile;
 import jcifs.smb.SmbFileOutputStream;
 
 @Component
+@CircuitBreaker(name = "sambaIntegration")
 @EnableConfigurationProperties(SambaIntegrationProperties.class)
 public class SambaIntegration {
 

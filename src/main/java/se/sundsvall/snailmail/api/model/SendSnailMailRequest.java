@@ -30,7 +30,7 @@ public class SendSnailMailRequest {
 	private String deviation;
 
 	@NotBlank
-	@Schema(description = "Batch id to be used for creating a csv-file")
+	@Schema(description = "Batch id to be used for creating a csv-file", example = "6a5c3d04-412d-11ec-973a-0242ac130043")
 	private String batchId;
 
 	@Schema(description = "Party id for the person the letter should be sent to", example = "6a5c3d04-412d-11ec-973a-0242ac130003")
@@ -54,7 +54,7 @@ public class SendSnailMailRequest {
 		private String name;
 
 		@OneOf("application/pdf")
-		@Schema(description = "The attachment content type", allowableValues = {"application/pdf"})
+		@Schema(description = "The attachment content type", example ="application/pdf", allowableValues = {"application/pdf"})
 		private String contentType;
 
 		@Schema(description = "The envelope type for the letter", example = "WINDOWED")
