@@ -11,12 +11,7 @@ import jakarta.validation.ConstraintValidatorContext;
 
 public class ValidFolderNameValidator implements ConstraintValidator<ValidFolderName, String> {
 
-	private static final List<Character> INVALID_WINDOWS_SPECIFIC_CHARS = List.of('"', '*', '<', '>', '?', '|', '/', '\\', ':');
-
-	@Override
-	public void initialize(ValidFolderName constraintAnnotation) {
-		ConstraintValidator.super.initialize(constraintAnnotation);
-	}
+	private static final List<Character> INVALID_FOLDER_CHARS = List.of('"', '*', '<', '>', '?', '|', '/', '\\', ':');
 
 	@Override
 	public boolean isValid(String value, ConstraintValidatorContext context) {
@@ -24,8 +19,11 @@ public class ValidFolderNameValidator implements ConstraintValidator<ValidFolder
 			return false;
 		}
 
-		return INVALID_WINDOWS_SPECIFIC_CHARS.stream()
-				.noneMatch(character -> value.contains(character.toString()))
-				&& isValidPath(value);
+		return INVALID_FOLDER_CHARS.stream()
+				.noneMatch(character ->
+						value.contains(character.toString()) //Doesn't contain invalid characters
+						|| value.endsWith(" ")	//Doesn't end with space
+						|| value.endsWith(".")	//Doesn't end with dot
+				&& isValidPath(value));
 	}
 }

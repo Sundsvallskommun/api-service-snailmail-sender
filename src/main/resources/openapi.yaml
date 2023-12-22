@@ -5,7 +5,7 @@ info:
   license:
     name: MIT License
     url: https://opensource.org/licenses/MIT
-  version: "1.3"
+  version: "2.0"
 servers:
   - url: http://localhost:8080
     description: Generated server url
@@ -28,14 +28,14 @@ paths:
       responses:
         "200":
           description: Successful Operation
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/Problem'
-        "400":
-          description: Bad Request
+        "500":
+          description: Internal Server Error
           content:
             '*/*':
               schema:
@@ -61,7 +61,6 @@ components:
     Attachment:
       required:
         - content
-        - contentType
         - name
       type: object
       properties:
@@ -76,7 +75,8 @@ components:
         contentType:
           type: string
           description: The attachment content type
-          example: text/plain
+          enum:
+            - application/pdf
         envelopeType:
           type: string
           description: The envelope type for the letter
@@ -87,6 +87,7 @@ components:
       description: Attachments
     SendSnailMailRequest:
       required:
+        - batchId
         - department
       type: object
       properties:
@@ -98,6 +99,13 @@ components:
           type: string
           description: If the letter to send deviates from the standard
           example: A3 Ritning
+        batchId:
+          type: string
+          description: Batch id to be used for creating a csv-file
+        partyId:
+          type: string
+          description: Party id for the person the letter should be sent to
+          example: 6a5c3d04-412d-11ec-973a-0242ac130003
         attachments:
           type: array
           description: Attachments

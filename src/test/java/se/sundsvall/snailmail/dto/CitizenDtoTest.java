@@ -1,8 +1,8 @@
 package se.sundsvall.snailmail.dto;
 
-import org.junit.jupiter.api.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.jupiter.api.Test;
 
 class CitizenDtoTest {
 
@@ -10,7 +10,7 @@ class CitizenDtoTest {
     void testBuilder() {
 
         var dto = CitizenDto.builder()
-                .withPersonId("somePersonId")
+                .withPartyId("somePartyId")
                 .withGivenName("someGivenName")
                 .withLastName("someLastName")
                 .withStreet("someStreetName")
@@ -21,7 +21,7 @@ class CitizenDtoTest {
                 .build();
 
         assertThat(dto).isNotNull();
-        assertThat(dto.getPersonId()).isEqualTo("somePersonId");
+        assertThat(dto.getPartyId()).isEqualTo("somePartyId");
         assertThat(dto.getGivenName()).isEqualTo("someGivenName");
         assertThat(dto.getLastName()).isEqualTo("someLastName");
         assertThat(dto.getStreet()).isEqualTo("someStreetName");

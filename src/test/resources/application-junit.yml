@@ -20,7 +20,7 @@ integration:
     token-uri: http://token.url
   samba:
     host: localhost
-    port: 389
+    port: 445
     domain: WORKGROUP
     username: someUsername
     password: somePassword

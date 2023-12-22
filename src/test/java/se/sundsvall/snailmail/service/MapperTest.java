@@ -26,7 +26,7 @@ class MapperTest {
 		assertThat(snailMailDto.getAttachments().getFirst().getEnvelopeType()).isEqualTo(EnvelopeType.PLAIN);
 
 		assertThat(snailMailDto.getCitizenDto()).isNotNull();
-		assertThat(UUID.fromString(snailMailDto.getCitizenDto().getPersonId())).isNotNull();
+		assertThat(UUID.fromString(snailMailDto.getCitizenDto().getPartyId())).isNotNull();
 		assertThat(snailMailDto.getCitizenDto().getGivenName()).isEqualTo("Kalle");
 		assertThat(snailMailDto.getCitizenDto().getLastName()).isEqualTo("Anka");
 		assertThat(snailMailDto.getCitizenDto().getStreet()).isEqualTo("Ankeborgsvägen 1");

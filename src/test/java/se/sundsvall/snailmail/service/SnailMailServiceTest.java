@@ -1,35 +1,70 @@
 package se.sundsvall.snailmail.service;
 
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+import static se.sundsvall.snailmail.TestDataFactory.buildCitizenExtended;
 import static se.sundsvall.snailmail.TestDataFactory.buildSendSnailMailRequest;
+
+import java.io.IOException;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.zalando.problem.ThrowableProblem;
 
 import se.sundsvall.snailmail.dto.SnailMailDto;
+import se.sundsvall.snailmail.integration.citizen.CitizenIntegration;
 import se.sundsvall.snailmail.integration.emailsender.EmailSenderIntegration;
+import se.sundsvall.snailmail.integration.samba.SambaIntegration;
+
+import generated.se.sundsvall.citizen.CitizenExtended;
 
 @ExtendWith(MockitoExtension.class)
 class SnailMailServiceTest {
 
 	@Mock
-	private EmailSenderIntegration mockEmailSenderIntegration;
+	private SambaIntegration mockSambaIntegration;
+
+	@Mock
+	private CitizenIntegration mockCitizenIntegration;
 
 	@InjectMocks
 	private SnailMailService snailMailService;
 
 	@Test
-	void sendMail() {
-		doNothing().when(mockEmailSenderIntegration).sendEmail(any());
-		snailMailService.saveSnailMailForBatch(buildSendSnailMailRequest());
-		verify(mockEmailSenderIntegration, times(1)).sendEmail(any(SnailMailDto.class));
-		verifyNoMoreInteractions(mockEmailSenderIntegration);
+	void testSaveSnailMailForBatch() throws IOException {
+		final var request = buildSendSnailMailRequest();
+
+		when(mockCitizenIntegration.getCitizen(request.getPartyId())).thenReturn(buildCitizenExtended());
+		doNothing().when(mockSambaIntegration).writeBatchDataToSambaShare(any(SnailMailDto.class));
+
+		snailMailService.saveSnailMailForBatch(request);
+
+		verify(mockCitizenIntegration).getCitizen(request.getPartyId());
+		verify(mockSambaIntegration).writeBatchDataToSambaShare(any(SnailMailDto.class));
+		verifyNoMoreInteractions(mockCitizenIntegration, mockSambaIntegration);
+	}
+
+	@Test
+	void testSaveSnailMailForBatch_throwsExceptionWhenWritingToSamba() throws IOException {
+		final var request = buildSendSnailMailRequest();
+
+		when(mockCitizenIntegration.getCitizen(request.getPartyId())).thenReturn(buildCitizenExtended());
+		doThrow(IOException.class).when(mockSambaIntegration).writeBatchDataToSambaShare(any(SnailMailDto.class));
+
+		assertThatExceptionOfType(ThrowableProblem.class).isThrownBy(() -> snailMailService.saveSnailMailForBatch(request));
+
+		verify(mockCitizenIntegration, times(1)).getCitizen(request.getPartyId());
+		verify(mockSambaIntegration, times(1)).writeBatchDataToSambaShare(any(SnailMailDto.class));
+		verifyNoMoreInteractions(mockCitizenIntegration, mockSambaIntegration);
 	}
 }

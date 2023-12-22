@@ -14,3 +14,12 @@ integration:
       name: someName
       replyTo: someReplyAddress
     token-uri: http://localhost:${wiremock.server.port}/token
+  samba:
+    host: localhost
+    port: 445
+    domain: WORKGROUP
+    username: someUsername
+    password: somePassword
+    share: /someShare/
+    connect-timeout: PT5S
+    response-timeout: PT10S

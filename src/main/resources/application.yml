@@ -11,5 +11,4 @@ logbook:
   exclusionfilters:
     # Exclude base64-encoded content from incoming requests.
     jsonPath:
-      #'$..content': '[ base64]'
       '$.attachments[*].content': '[ base64]'

@@ -76,7 +76,7 @@ public final class TestDataFactory {
                 .withDepartment("someDepartment")
                 .withDeviation("someDeviation")
                 .withBatchId("someBatchId")
-                .withPartyId("somePartyId")
+                .withPartyId("544ff3ae-e3c4-451f-bee5-d5ed480451f7")
                 .withAttachments(List.of(buildAttachmentList()))
                 .build();
     }

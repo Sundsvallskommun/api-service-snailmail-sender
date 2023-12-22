@@ -18,27 +18,16 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import se.sundsvall.snailmail.Application;
 
-//TODO Make a samba container work
 @Testcontainers
 @ActiveProfiles("junit")
 @SpringBootTest(classes = Application.class, webEnvironment = RANDOM_PORT)
 class SambaIntegrationTest {
 
-	@Container
+	//TODO Make it work with testcontainers
+	/*@Container
 	public static DockerComposeContainer<?> environment =
 			new DockerComposeContainer<>(new File("src/test/resources/docker/docker-compose.yml"))
 					.withExposedService("samba", 1445, Wait.forListeningPort())
 					.withStartupTimeout(java.time.Duration.ofSeconds(60))
-					.withLocalCompose(true);
-
-	@Autowired
-	private SambaIntegration sambaIntegration;
-
-	@Test
-	@Disabled
-	void test() {
-		Integer mappedPort = environment.getServicePort("samba_1", 1445);
-		System.out.println(mappedPort);
-		assertThat(sambaIntegration).isNotNull();
-	}
+					.withLocalCompose(true);*/
 }

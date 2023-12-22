@@ -9,14 +9,12 @@ import se.sundsvall.snailmail.dto.SnailMailDto;
 
 import generated.se.sundsvall.citizen.CitizenAddress;
 import generated.se.sundsvall.citizen.CitizenExtended;
-import io.micrometer.common.util.StringUtils;
 
 public final class Mapper {
 
 	private Mapper() {}
 
-	public static SnailMailDto toSnailMailDto(SendSnailMailRequest request, CitizenExtended citizen) {
-
+	public static SnailMailDto toSnailMailDto(final SendSnailMailRequest request, final CitizenExtended citizen) {
 		return SnailMailDto.builder()
 				.withCitizenDto(Optional.ofNullable(citizen)
 						.map(Mapper::toCitizenDto)
@@ -31,7 +29,7 @@ public final class Mapper {
 				.build();
 	}
 
-	public static SnailMailDto.AttachmentDto toAttachmentDto(SendSnailMailRequest.Attachment attachment) {
+	public static SnailMailDto.AttachmentDto toAttachmentDto(final SendSnailMailRequest.Attachment attachment) {
 		return SnailMailDto.AttachmentDto.builder()
 			.withContent(attachment.getContent())
 			.withName(attachment.getName())
@@ -40,13 +38,13 @@ public final class Mapper {
 			.build();
 	}
 
-	private static CitizenDto toCitizenDto(CitizenExtended citizen) {
+	private static CitizenDto toCitizenDto(final CitizenExtended citizen) {
 		final var address = Optional.ofNullable(citizen.getAddresses()).orElse(List.of()).stream()
 			.findFirst()
 			.orElse(new CitizenAddress());
 
 		return CitizenDto.builder()
-			.withPersonId(citizen.getPersonId().toString())
+			.withPartyId(citizen.getPersonId().toString())
 			.withLastName(citizen.getLastname())
 			.withGivenName(citizen.getGivenname())
 			.withApartment(address.getAppartmentNumber())
