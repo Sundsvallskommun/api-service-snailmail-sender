@@ -18,16 +18,29 @@ integration:
       name: someName
       replyTo: someReplyAddress
     token-uri: http://token.url
-  samba:
-    host: localhost
-    port: 445
-    domain: WORKGROUP
-    username: someUsername
-    password: somePassword
-    share: /someShare/
-    connect-timeout: PT5S
-    response-timeout: PT10S
-
 spring:
   main:
     banner-mode: 'off'
+spring:
+  datasource:
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+    url: jdbc:tc:mariadb:10.6.14:///
+  flyway:
+    enabled: false
+  jpa:
+    properties:
+      jakarta:
+        persistence:
+          schema-generation:
+            database:
+              action: create
+  security:
+    oauth2:
+      client:
+        provider:
+          citizen:
+            token-uri: http://token.url
+        registration:
+          citizen:
+            client-id: the-client-id
+            client-secret: the-client-secret

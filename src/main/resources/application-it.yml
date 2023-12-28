@@ -1,0 +1,37 @@
+integration:
+  citizen:
+    base-url: http://localhost:${wiremock.server.port}/citizen
+spring:
+  datasource:
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+    url: jdbc:tc:mariadb:10.6.14:///
+  flyway:
+    enabled: false
+  jpa:
+    properties:
+      jakarta:
+        persistence:
+          schema-generation:
+            database:
+              action: create
+  security:
+    oauth2:
+      client:
+        provider:
+          citizen:
+            token-uri: http://localhost:${wiremock.server.port:}/api-gateway/token
+        registration:
+          citizen:
+            authorization-grant-type: client_credentials
+            provider: citizen
+            client-id: the-client-id
+            client-secret: the-client-secret
+  samba:
+    host: localhost
+    port: 445
+    domain: WORKGROUP
+    username: someUsername
+    password: somePassword
+    share: /someShare/
+    connect-timeout: PT5S
+    response-timeout: PT10S
