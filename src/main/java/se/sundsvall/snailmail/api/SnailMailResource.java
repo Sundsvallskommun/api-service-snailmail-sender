@@ -3,6 +3,8 @@ package se.sundsvall.snailmail.api;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.ResponseEntity.ok;
 
+import jakarta.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,7 +21,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 
 @RestController
 @Validated
@@ -38,8 +39,9 @@ public class SnailMailResource {
 	@ApiResponse(responseCode = "200", description = "Successful Operation", useReturnTypeSchema = true)
 	@ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(schema = @Schema(implementation = Problem.class)))
 	@ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Problem.class)))
-	ResponseEntity<Void> sendSnailMail(@Valid @RequestBody SendSnailMailRequest request) {
-		snailMailService.saveSnailMailForBatch(request);
+	ResponseEntity<Void> sendSnailMail(@Valid @RequestBody final SendSnailMailRequest request) {
+		snailMailService.sendSnailMail(request);
 		return ok().build();
 	}
+
 }

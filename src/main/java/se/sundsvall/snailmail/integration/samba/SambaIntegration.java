@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-import se.sundsvall.snailmail.dto.SnailMailDto;
+import se.sundsvall.snailmail.api.model.SendSnailMailRequest;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import jcifs.CIFSContext;
@@ -30,19 +30,21 @@ public class SambaIntegration {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SambaIntegration.class);
 
 	private final Gson gson = new GsonBuilder().create();
+
 	private final CIFSContext context;
+
 	private final String shareUrl;
 
 	public SambaIntegration(final SambaIntegrationProperties properties) {
 		// Initialize the JCIFS context
 		SingletonContext.getInstance();
 		context = SingletonContext.getInstance()
-				.withCredentials(new NtlmPasswordAuthenticator(properties.domain(), properties.username(), properties.password()));
+			.withCredentials(new NtlmPasswordAuthenticator(properties.domain(), properties.username(), properties.password()));
 
 		shareUrl = String.format("smb://%s:%d%s", properties.host(), properties.port(), properties.share());
 	}
 
-	public void writeBatchDataToSambaShare(final SnailMailDto snailMailDto) throws IOException {
+	public void writeBatchDataToSambaShare(final SendSnailMailRequest snailMailDto) throws IOException {
 		final var batchPath = shareUrl + snailMailDto.getBatchId();
 		final var departmentPath = batchPath + File.separator + snailMailDto.getDepartment();
 
@@ -56,23 +58,24 @@ public class SambaIntegration {
 
 	/**
 	 * Save citizen data including the file content.
+	 *
 	 * @param snailMailDto to save to disk
 	 * @throws IOException if something goes wrong during communication with the samba share
 	 */
-	private void saveSnailMailDtoMetaData(final SnailMailDto snailMailDto, final String departmentPath) throws IOException {
-		final var citizenFile =  departmentPath + File.separator + snailMailDto.getCitizenDto().getPartyId() + ".json";
+	private void saveSnailMailDtoMetaData(final SendSnailMailRequest snailMailDto, final String departmentPath) throws IOException {
+		final var citizenFile = departmentPath + File.separator + snailMailDto.getPartyId() + ".json";
 
-		try (var destinationFile = new SmbFile(citizenFile, context)) {
+		try (final var destinationFile = new SmbFile(citizenFile, context)) {
 			//Will always overwrite the file if it exists, e.g. if an update comes for a user / batch
-			try (var smbFileOutputStream = new SmbFileOutputStream(destinationFile)) {
+			try (final var smbFileOutputStream = new SmbFileOutputStream(destinationFile)) {
 				smbFileOutputStream.write(gson.toJson(snailMailDto).getBytes(StandardCharsets.UTF_8));
 				smbFileOutputStream.flush();
 			}
 		}
 	}
 
-	private void createBatchFolder(final String folder) throws SmbException, MalformedURLException {
-		try (SmbFile batchFolderFile = new SmbFile(folder, context)) {
+	void createBatchFolder(final String folder) throws SmbException, MalformedURLException {
+		try (final SmbFile batchFolderFile = new SmbFile(folder, context)) {
 			if (!batchFolderFile.exists()) {
 				LOGGER.info("Batchfolder: {}, doesn't exist, creating it.", batchFolderFile);
 				batchFolderFile.mkdir();
@@ -80,12 +83,13 @@ public class SambaIntegration {
 		}
 	}
 
-	private void createDepartmentFolder(final String folder) throws SmbException, MalformedURLException {
-		try (SmbFile departmentFolderFile = new SmbFile(folder, context)) {
+	void createDepartmentFolder(final String folder) throws SmbException, MalformedURLException {
+		try (final SmbFile departmentFolderFile = new SmbFile(folder, context)) {
 			if (!departmentFolderFile.exists()) {
 				LOGGER.info("Departmentfolder: {}, doesn't exist, creating it.", departmentFolderFile);
 				departmentFolderFile.mkdir();
 			}
 		}
 	}
+
 }

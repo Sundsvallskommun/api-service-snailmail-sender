@@ -1,26 +1,16 @@
 integration:
   citizen:
     base-url: http://citizen.url
-    client-id: someClientId
-    client-secret: someClientSecret
-    connect-timeout: 9s
-    read-timeout: 10s
-    token-uri: http://token.url
-  email-sender:
-    base-url: http://emailsender.url
-    client-id: someClientId
-    client-secret: someClientSecret
-    connect-timeout: 7s
-    email-address: some@email.com
-    read-timeout: 8s
-    sender:
-      address: some@email.com
-      name: someName
-      replyTo: someReplyAddress
-    token-uri: http://token.url
-spring:
-  main:
-    banner-mode: 'off'
+  samba:
+    host: localhost
+    port: 445
+    domain: WORKGROUP
+    username: someUsername
+    password: somePassword
+    share: /someShare/
+    connect-timeout: PT5S
+    response-timeout: PT10S
+
 spring:
   datasource:
     driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver

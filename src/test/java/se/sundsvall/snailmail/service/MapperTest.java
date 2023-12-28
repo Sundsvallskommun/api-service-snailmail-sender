@@ -2,44 +2,102 @@ package se.sundsvall.snailmail.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.UUID;
+import java.util.Collections;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import se.sundsvall.snailmail.TestDataFactory;
 import se.sundsvall.snailmail.api.model.EnvelopeType;
+import se.sundsvall.snailmail.api.model.SendSnailMailRequest;
+import se.sundsvall.snailmail.integration.db.model.Batch;
+import se.sundsvall.snailmail.integration.db.model.Department;
+
+import generated.se.sundsvall.citizen.CitizenAddress;
+import generated.se.sundsvall.citizen.CitizenExtended;
 
 class MapperTest {
 
 	@Test
-	void testToSnailMailDto_withPopulatedCitizenObjectAndAttachment() {
-		var snailMailDto = Mapper.toSnailMailDto(TestDataFactory.buildSendSnailMailRequest(), TestDataFactory.buildCitizenExtended());
+	void toRequestShouldMapCorrectly() {
+		final var deviation = "deviation";
+		final var sendSnailMailRequest = SendSnailMailRequest.builder().withDeviation(deviation).build();
+		final var citizen = new CitizenExtended();
+		final var department = new Department();
 
-		assertThat(snailMailDto.getBatchId()).isEqualTo("someBatchId");
-		assertThat(snailMailDto.getDepartment()).isEqualTo("someDepartment");
-		assertThat(snailMailDto.getDeviation()).isEqualTo("someDeviation");
+		final var result = Mapper.toRequest(sendSnailMailRequest, citizen, department);
 
-		assertThat(snailMailDto.getAttachments()).hasSize(1);
-		assertThat(snailMailDto.getAttachments().getFirst().getContent()).isEqualTo("base64");
-		assertThat(snailMailDto.getAttachments().getFirst().getName()).isEqualTo("filename.pdf");
-		assertThat(snailMailDto.getAttachments().getFirst().getContentType()).isEqualTo("application/pdf");
-		assertThat(snailMailDto.getAttachments().getFirst().getEnvelopeType()).isEqualTo(EnvelopeType.PLAIN);
-
-		assertThat(snailMailDto.getCitizenDto()).isNotNull();
-		assertThat(UUID.fromString(snailMailDto.getCitizenDto().getPartyId())).isNotNull();
-		assertThat(snailMailDto.getCitizenDto().getGivenName()).isEqualTo("Kalle");
-		assertThat(snailMailDto.getCitizenDto().getLastName()).isEqualTo("Anka");
-		assertThat(snailMailDto.getCitizenDto().getStreet()).isEqualTo("Ankeborgsvägen 1");
-		assertThat(snailMailDto.getCitizenDto().getApartment()).isEqualTo("LGH 123");
-		assertThat(snailMailDto.getCitizenDto().getCareOf()).isEqualTo("Kajsa Anka");
-		assertThat(snailMailDto.getCitizenDto().getCity()).isEqualTo("ANKEBORG");
-		assertThat(snailMailDto.getCitizenDto().getPostalCode()).isEqualTo("123 45");
+		assertThat(result).isNotNull();
+		assertThat(result.getDepartment()).isEqualTo(department);
+		assertThat(result.getDeviation()).isEqualTo(deviation);
 	}
 
 	@Test
-	void testToSnailMailDto_withEmptyCitizenObject_shouldHaveEmptyCitizenDto() {
-		//No need to test it all again, only verify citizenDto is empty.
-		var snailMailDto = Mapper.toSnailMailDto(TestDataFactory.buildSendSnailMailRequest(), null);
-		assertThat(snailMailDto.getCitizenDto()).isNotNull();
+	void toAttachmentShouldMapCorrectly() {
+		final var content = "content";
+		final var name = "name";
+		final var contentType = "contentType";
+		final var envelopeType = EnvelopeType.WINDOWED;
+		final var sendSnailMailRequestAttachment = SendSnailMailRequest.Attachment.builder()
+			.withContent(content)
+			.withName(name)
+			.withContentType(contentType)
+			.withEnvelopeType(envelopeType)
+			.build();
+
+		final var result = Mapper.toAttachment(sendSnailMailRequestAttachment);
+
+		assertThat(result).isNotNull();
+		assertThat(result.getContent()).isEqualTo(content);
+		assertThat(result.getName()).isEqualTo(name);
+		assertThat(result.getContentType()).isEqualTo(contentType);
+		assertThat(result.getEnvelopeType()).isEqualTo(envelopeType);
 	}
+
+	@Test
+	void toDepartmentShouldMapCorrectly() {
+		final var departmentName = "Department Name";
+		final var batch = new Batch();
+
+		final var result = Mapper.toDepartment(departmentName, batch);
+
+		assertThat(result).isNotNull();
+		assertThat(result.getName()).isEqualTo(departmentName);
+		assertThat(result.getBatch()).isEqualTo(batch);
+	}
+
+	@Test
+	void toRecipientShouldMapCorrectlyWhenCitizenIsNull() {
+		final CitizenExtended citizen = null;
+
+		final var result = Mapper.toRecipient(citizen);
+
+		assertThat(result).isNull();
+	}
+
+	@Test
+	void toRecipientShouldMapCorrectlyWhenCitizenHasNoAddresses() {
+		final var citizen = new CitizenExtended()
+			.addresses(Collections.emptyList());
+
+		final var result = Mapper.toRecipient(citizen);
+
+		assertThat(result).isNull();
+	}
+
+	@Test
+	void toRecipientShouldMapCorrectlyWhenCitizenHasAddresses() {
+		final var givenName = "John";
+		final var lastName = "Doe";
+		final var citizen = new CitizenExtended()
+			.givenname(givenName)
+			.lastname(lastName)
+			.addresses(List.of(new CitizenAddress()));
+
+		final var result = Mapper.toRecipient(citizen);
+
+		assertThat(result).isNotNull();
+		assertThat(result.getGivenName()).isEqualTo(givenName);
+		assertThat(result.getLastName()).isEqualTo(lastName);
+	}
+
 }
