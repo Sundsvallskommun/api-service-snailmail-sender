@@ -1,11 +1,13 @@
 package se.sundsvall.snailmail.integration.db.model;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 import se.sundsvall.snailmail.api.model.EnvelopeType;
 
@@ -19,6 +21,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "attachment")
 public class Attachment {
 
 	@Id
@@ -26,7 +29,7 @@ public class Attachment {
 	private Long id;
 
 	@ManyToOne
-	@JoinColumn(name = "request_id")
+	@JoinColumn(name = "request_id", foreignKey = @ForeignKey(name = "fk_attachment_request"))
 	private Request request;
 
 	private String content;

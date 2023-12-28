@@ -5,11 +5,10 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import se.sundsvall.snailmail.Application;
 
-@Testcontainers
+//@Testcontainers
 @ActiveProfiles("junit")
 @SpringBootTest(classes = Application.class, webEnvironment = RANDOM_PORT)
 class SambaIntegrationTest {

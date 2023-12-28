@@ -15,14 +15,14 @@ spring:
     driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
     url: jdbc:tc:mariadb:10.6.14:///
   flyway:
-    enabled: false
+    enabled: true
   jpa:
     properties:
       jakarta:
         persistence:
           schema-generation:
             database:
-              action: create
+              action: validate
   security:
     oauth2:
       client:
