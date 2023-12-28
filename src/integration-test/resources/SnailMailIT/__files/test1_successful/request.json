@@ -1,12 +1,12 @@
 {
-  "department":"dummy",
+  "department": "dummy",
   "partyId": "58f96da8-6d76-4fa6-bb92-64f71fdc6aa5",
   "batchId": "58f96da8-6d76-4fa6-bb92-64f71fdc6aa6",
   "attachments": [
     {
       "content": "aGVsbG8gd29ybGQK",
       "name": "test.txt",
-      "contentType": "text/plain",
+      "contentType": "application/pdf",
       "envelopeType": "PLAIN"
     }
   ]

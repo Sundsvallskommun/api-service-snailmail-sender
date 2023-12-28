@@ -26,7 +26,7 @@ public interface CitizenClient {
 	 * @param personId the personId
 	 * @return a {@link CitizenExtended}
 	 */
-	@GetMapping(path = "/citizen/{personId}?ShowClassified=false", produces = TEXT_PLAIN_VALUE, consumes = APPLICATION_JSON_VALUE)
+	@GetMapping(path = "/{personId}?ShowClassified=false", produces = TEXT_PLAIN_VALUE, consumes = APPLICATION_JSON_VALUE)
 	Optional<CitizenExtended> getCitizen(@PathVariable(name = "personId") String personId);
 
 }
