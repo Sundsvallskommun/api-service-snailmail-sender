@@ -7,6 +7,7 @@ import java.io.IOException;
 import org.springframework.stereotype.Service;
 import org.zalando.problem.Problem;
 
+import se.sundsvall.dept44.util.jacoco.ExcludeFromJacocoGeneratedCoverageReport;
 import se.sundsvall.snailmail.api.model.SendSnailMailRequest;
 import se.sundsvall.snailmail.integration.citizen.CitizenIntegration;
 import se.sundsvall.snailmail.integration.db.BatchRepository;
@@ -22,32 +23,19 @@ public class SnailMailService {
 
 	private final DepartmentRepository departmentRepository;
 
+	private final RequestRepository requestRepository;
+
 	private final SambaIntegration sambaIntegration;
 
 	private final CitizenIntegration citizenIntegration;
 
-	private final RequestRepository requestRepository;
 
 	public SnailMailService(final SambaIntegration sambaIntegration, final BatchRepository batchRepository, final DepartmentRepository departmentRepository, final RequestRepository requestRepository, final CitizenIntegration citizenIntegration) {
-		this.sambaIntegration = sambaIntegration;
 		this.batchRepository = batchRepository;
 		this.departmentRepository = departmentRepository;
 		this.requestRepository = requestRepository;
+		this.sambaIntegration = sambaIntegration;
 		this.citizenIntegration = citizenIntegration;
-	}
-
-
-	public void saveSnailMailForBatch(final SendSnailMailRequest request) {
-
-		try {
-			sambaIntegration.writeBatchDataToSambaShare(request);
-		} catch (final IOException e) {
-			throw Problem.builder()
-				.withTitle("Failed when writing files to samba share")
-				.withStatus(INTERNAL_SERVER_ERROR)
-				.withDetail(e.getMessage())
-				.build();
-		}
 	}
 
 	public void sendSnailMail(final SendSnailMailRequest request) {
@@ -62,5 +50,14 @@ public class SnailMailService {
 		final var citizen = citizenIntegration.getCitizen(request.getPartyId());
 		requestRepository.save(Mapper.toRequest(request, citizen, department));
 	}
+
+
+	@ExcludeFromJacocoGeneratedCoverageReport
+	public void sendBatch(final String batchId) {
+		//Should create CSVs for batch and put them in the samba share
+		// Implemented in different story
+	}
+
+
 
 }

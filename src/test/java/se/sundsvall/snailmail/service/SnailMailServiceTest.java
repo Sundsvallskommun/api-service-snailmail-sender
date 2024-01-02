@@ -1,17 +1,14 @@
 package se.sundsvall.snailmail.service;
 
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static se.sundsvall.snailmail.TestDataFactory.buildCitizenExtended;
 import static se.sundsvall.snailmail.TestDataFactory.buildSendSnailMailRequest;
 
-import java.io.IOException;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -19,9 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.zalando.problem.ThrowableProblem;
 
-import se.sundsvall.snailmail.api.model.SendSnailMailRequest;
 import se.sundsvall.snailmail.integration.citizen.CitizenIntegration;
 import se.sundsvall.snailmail.integration.db.BatchRepository;
 import se.sundsvall.snailmail.integration.db.DepartmentRepository;
@@ -47,7 +42,7 @@ class SnailMailServiceTest {
 	private RequestRepository requestRepositoryMock;
 
 	@Mock
-	private SambaIntegration mockSambaIntegration;
+	private SambaIntegration sambaIntegrationMock;
 
 	@InjectMocks
 	private SnailMailService snailMailService;
@@ -66,6 +61,7 @@ class SnailMailServiceTest {
 		verify(requestRepositoryMock, times(1)).save(any());
 		verify(citizenIntegrationMock, times(1)).getCitizen(any(String.class));
 		verifyNoMoreInteractions(batchRepositoryMock, departmentRepositoryMock, requestRepositoryMock, citizenIntegrationMock);
+		verifyNoInteractions(sambaIntegrationMock);
 
 	}
 
@@ -84,6 +80,7 @@ class SnailMailServiceTest {
 		verify(requestRepositoryMock, times(1)).save(any(Request.class));
 		verify(citizenIntegrationMock, times(1)).getCitizen(any(String.class));
 		verifyNoMoreInteractions(batchRepositoryMock, departmentRepositoryMock, requestRepositoryMock, citizenIntegrationMock);
+		verifyNoInteractions(sambaIntegrationMock);
 
 	}
 
@@ -101,6 +98,7 @@ class SnailMailServiceTest {
 		verify(requestRepositoryMock, times(1)).save(any(Request.class));
 		verify(citizenIntegrationMock, times(1)).getCitizen(any(String.class));
 		verifyNoMoreInteractions(batchRepositoryMock, departmentRepositoryMock, requestRepositoryMock, citizenIntegrationMock);
+		verifyNoInteractions(sambaIntegrationMock);
 
 	}
 
@@ -120,6 +118,7 @@ class SnailMailServiceTest {
 		verify(requestRepositoryMock, times(1)).save(any(Request.class));
 		verify(citizenIntegrationMock, times(1)).getCitizen(any(String.class));
 		verifyNoMoreInteractions(batchRepositoryMock, departmentRepositoryMock, requestRepositoryMock, citizenIntegrationMock);
+		verifyNoInteractions(sambaIntegrationMock);
 
 	}
 
@@ -139,31 +138,8 @@ class SnailMailServiceTest {
 		verify(requestRepositoryMock, times(1)).save(any(Request.class));
 		verify(citizenIntegrationMock, times(1)).getCitizen(any(String.class));
 		verifyNoMoreInteractions(batchRepositoryMock, departmentRepositoryMock, requestRepositoryMock, citizenIntegrationMock);
+		verifyNoInteractions(sambaIntegrationMock);
 
-	}
-
-	@Test
-	void testSaveSnailMailForBatch() throws IOException {
-		final var request = buildSendSnailMailRequest();
-
-		doNothing().when(mockSambaIntegration).writeBatchDataToSambaShare(any(SendSnailMailRequest.class));
-
-		snailMailService.saveSnailMailForBatch(request);
-
-		verify(mockSambaIntegration).writeBatchDataToSambaShare(any(SendSnailMailRequest.class));
-		verifyNoMoreInteractions(citizenIntegrationMock, mockSambaIntegration);
-	}
-
-	@Test
-	void testSaveSnailMailForBatch_throwsExceptionWhenWritingToSamba() throws IOException {
-		final var request = buildSendSnailMailRequest();
-
-		doThrow(IOException.class).when(mockSambaIntegration).writeBatchDataToSambaShare(any(SendSnailMailRequest.class));
-
-		assertThatExceptionOfType(ThrowableProblem.class).isThrownBy(() -> snailMailService.saveSnailMailForBatch(request));
-
-		verify(mockSambaIntegration, times(1)).writeBatchDataToSambaShare(any(SendSnailMailRequest.class));
-		verifyNoMoreInteractions(citizenIntegrationMock, mockSambaIntegration);
 	}
 
 }

@@ -1,13 +1,13 @@
 openapi: 3.0.1
 info:
   title: SnailMailSender
-  contact: {}
+  contact: { }
   license:
     name: MIT License
     url: https://opensource.org/licenses/MIT
   version: "2.0"
 servers:
-  - url: http://localhost:8080
+  - url: http://localhost:56637
     description: Generated server url
 tags:
   - name: SnailMailSender
@@ -26,14 +26,45 @@ paths:
               $ref: '#/components/schemas/SendSnailMailRequest'
         required: true
       responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - $ref: '#/components/schemas/ConstraintViolation'
         "500":
           description: Internal Server Error
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/Problem'
+        "200":
+          description: Successful Operation
+  /send/batch/{batchId}:
+    post:
+      tags:
+        - SnailMailSender
+      summary: Send batch
+      operationId: sendBatch
+      parameters:
+        - name: batchId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
         "400":
           description: Bad Request
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - $ref: '#/components/schemas/ConstraintViolation'
+        "500":
+          description: Internal Server Error
           content:
             '*/*':
               schema:
@@ -116,10 +147,6 @@ components:
     Problem:
       type: object
       properties:
-        title:
-          type: string
-        detail:
-          type: string
         instance:
           type: string
           format: uri
@@ -132,6 +159,10 @@ components:
             type: object
         status:
           $ref: '#/components/schemas/StatusType'
+        title:
+          type: string
+        detail:
+          type: string
     StatusType:
       type: object
       properties:
@@ -140,4 +171,59 @@ components:
           format: int32
         reasonPhrase:
           type: string
-  securitySchemes: {}
+    ConstraintDescriptorObject:
+      type: object
+      properties:
+        annotation:
+          type: object
+        attributes:
+          type: object
+          additionalProperties:
+            type: object
+        messageTemplate:
+          type: string
+        validationAppliesTo:
+          type: string
+          enum:
+            - IMPLICIT
+            - RETURN_VALUE
+            - PARAMETERS
+        valueUnwrapping:
+          type: string
+          enum:
+            - DEFAULT
+            - UNWRAP
+            - SKIP
+        composingConstraints:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/ConstraintDescriptorObject'
+        reportAsSingleViolation:
+          type: boolean
+    ConstraintViolation:
+      type: object
+      properties:
+        message:
+          type: string
+        leafBean:
+          type: object
+        rootBean:
+          type: object
+        invalidValue:
+          type: object
+        messageTemplate:
+          type: string
+        propertyPath:
+          $ref: '#/components/schemas/Path'
+        executableParameters:
+          type: array
+          items:
+            type: object
+        executableReturnValue:
+          type: object
+        constraintDescriptor:
+          $ref: '#/components/schemas/ConstraintDescriptorObject'
+    Path:
+      type: object
+  securitySchemes: { }
