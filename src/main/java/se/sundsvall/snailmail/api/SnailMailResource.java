@@ -27,7 +27,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @Validated
-@RequestMapping("/send/snailmail")
+@RequestMapping("/send")
 @Tag(name = "SnailMailSender", description = "SnailMailSender")
 @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(schema = @Schema(oneOf = {Problem.class, ConstraintViolation.class})))
 @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Problem.class)))
@@ -39,8 +39,8 @@ public class SnailMailResource {
 		this.snailMailService = snailMailService;
 	}
 
-	@PostMapping(consumes = APPLICATION_JSON_VALUE)
-	@Operation(summary = "Create snailmail")
+	@PostMapping(path = "/snailmail", consumes = APPLICATION_JSON_VALUE)
+	@Operation(summary = "Prepare snail mail for batch")
 	@ApiResponse(responseCode = "200", description = "Successful Operation", useReturnTypeSchema = true)
 	ResponseEntity<Void> sendSnailMail(@Valid @RequestBody final SendSnailMailRequest request) {
 

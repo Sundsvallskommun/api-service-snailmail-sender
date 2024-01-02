@@ -5,9 +5,9 @@ info:
   license:
     name: MIT License
     url: https://opensource.org/licenses/MIT
-  version: "1.3"
+  version: "2.0"
 servers:
-  - url: http://localhost:54940
+  - url: http://localhost:56637
     description: Generated server url
 tags:
   - name: SnailMailSender
@@ -17,7 +17,7 @@ paths:
     post:
       tags:
         - SnailMailSender
-      summary: Create snailmail
+      summary: Prepare snail mail for batch
       operationId: sendSnailMail
       requestBody:
         content:
@@ -42,7 +42,7 @@ paths:
                 $ref: '#/components/schemas/Problem'
         "200":
           description: Successful Operation
-  /send/snailmail/batch/{batchId}:
+  /send/batch/{batchId}:
     post:
       tags:
         - SnailMailSender
@@ -92,7 +92,6 @@ components:
     Attachment:
       required:
         - content
-        - contentType
         - name
       type: object
       properties:
@@ -107,7 +106,9 @@ components:
         contentType:
           type: string
           description: The attachment content type
-          example: text/plain
+          example: application/pdf
+          enum:
+            - application/pdf
         envelopeType:
           type: string
           description: The envelope type for the letter
@@ -118,6 +119,7 @@ components:
       description: Attachments
     SendSnailMailRequest:
       required:
+        - batchId
         - department
       type: object
       properties:
@@ -129,6 +131,14 @@ components:
           type: string
           description: If the letter to send deviates from the standard
           example: A3 Ritning
+        batchId:
+          type: string
+          description: Batch id to be used for creating a csv-file
+          example: 6a5c3d04-412d-11ec-973a-0242ac130043
+        partyId:
+          type: string
+          description: Party id for the person the letter should be sent to
+          example: 6a5c3d04-412d-11ec-973a-0242ac130003
         attachments:
           type: array
           description: Attachments
@@ -170,13 +180,6 @@ components:
           type: object
           additionalProperties:
             type: object
-        composingConstraints:
-          uniqueItems: true
-          type: array
-          items:
-            $ref: '#/components/schemas/ConstraintDescriptorObject'
-        reportAsSingleViolation:
-          type: boolean
         messageTemplate:
           type: string
         validationAppliesTo:
@@ -191,11 +194,28 @@ components:
             - DEFAULT
             - UNWRAP
             - SKIP
+        composingConstraints:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/ConstraintDescriptorObject'
+        reportAsSingleViolation:
+          type: boolean
     ConstraintViolation:
       type: object
       properties:
         message:
           type: string
+        leafBean:
+          type: object
+        rootBean:
+          type: object
+        invalidValue:
+          type: object
+        messageTemplate:
+          type: string
+        propertyPath:
+          $ref: '#/components/schemas/Path'
         executableParameters:
           type: array
           items:
@@ -204,16 +224,6 @@ components:
           type: object
         constraintDescriptor:
           $ref: '#/components/schemas/ConstraintDescriptorObject'
-        rootBean:
-          type: object
-        leafBean:
-          type: object
-        invalidValue:
-          type: object
-        messageTemplate:
-          type: string
-        propertyPath:
-          $ref: '#/components/schemas/Path'
     Path:
       type: object
   securitySchemes: { }

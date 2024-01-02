@@ -43,6 +43,8 @@ class SnailMailResourceTest {
 			.uri("/send/snailmail")
 			.bodyValue(SendSnailMailRequest.builder()
 				.withDepartment("department")
+				.withPartyId(UUID.randomUUID().toString())
+				.withBatchId(UUID.randomUUID().toString())
 				.build())
 			.exchange()
 			.expectStatus()
@@ -61,7 +63,7 @@ class SnailMailResourceTest {
 
 		//ACT
 		webTestClient.post()
-			.uri("/send/snailmail/batch/" + uuid)
+			.uri("/send/batch/" + uuid)
 			.exchange()
 			.expectStatus()
 			.isOk();
@@ -76,7 +78,7 @@ class SnailMailResourceTest {
 
 		//ACT
 		final var response = webTestClient.post()
-			.uri("/send/snailmail/batch/abc")
+			.uri("/send/batch/abc")
 			.exchange()
 			.expectStatus()
 			.isBadRequest()

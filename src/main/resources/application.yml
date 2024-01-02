@@ -7,3 +7,8 @@ spring:
     name: api-snailmail-sender
   main:
     banner-mode: 'off'
+logbook:
+  exclusionfilters:
+    # Exclude base64-encoded content from incoming requests.
+    jsonPath:
+      '$.attachments[*].content': '[ base64]'

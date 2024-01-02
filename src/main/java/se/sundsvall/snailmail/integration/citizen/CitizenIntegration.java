@@ -1,8 +1,9 @@
 package se.sundsvall.snailmail.integration.citizen;
 
-import java.util.List;
+import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
 
 import org.springframework.stereotype.Component;
+import org.zalando.problem.Problem;
 
 import generated.se.sundsvall.citizen.CitizenExtended;
 
@@ -17,11 +18,16 @@ public class CitizenIntegration {
     }
 
     /**
-     * Get citizens by personIds
-     * @param personIds list of personIds
-     * @return a list of {@link CitizenExtended}
+     * Fetch a citizen by partyId
+     * @param partyId the partyId
+     * @return a {@link CitizenExtended}
      */
-    public List<CitizenExtended> getCitizens(final List<String> personIds) {
-        return client.getCitizens(false, personIds);    //false to never fetch classified citizens
+    public CitizenExtended getCitizen(final String partyId) {
+        return client.getCitizen(partyId)
+                .orElseThrow(() -> Problem.builder()
+                        .withTitle("No citizen data found")
+                        .withStatus(INTERNAL_SERVER_ERROR)
+                        .withDetail("Failed to fetch citizen data from Citizen API")
+                        .build());
     }
 }

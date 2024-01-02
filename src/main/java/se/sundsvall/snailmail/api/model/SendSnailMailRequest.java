@@ -2,6 +2,10 @@ package se.sundsvall.snailmail.api.model;
 
 import java.util.List;
 
+import se.sundsvall.dept44.common.validators.annotation.OneOf;
+import se.sundsvall.dept44.common.validators.annotation.ValidUuid;
+import se.sundsvall.snailmail.api.validation.ValidFolderName;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -18,11 +22,20 @@ import lombok.NoArgsConstructor;
 public class SendSnailMailRequest {
 
 	@NotBlank
+	@ValidFolderName
 	@Schema(description = "Department and unit that should be billed", example = "SBK(Gatuavdelningen, Trafiksektionen)")
 	private String department;
 
 	@Schema(description = "If the letter to send deviates from the standard", example = "A3 Ritning")
 	private String deviation;
+
+	@NotBlank
+	@Schema(description = "Batch id to be used for creating a csv-file", example = "6a5c3d04-412d-11ec-973a-0242ac130043")
+	private String batchId;
+
+	@Schema(description = "Party id for the person the letter should be sent to", example = "6a5c3d04-412d-11ec-973a-0242ac130003")
+	@ValidUuid
+	private String partyId;
 
 	@Schema(description = "Attachments")
 	private List<@Valid Attachment> attachments;
@@ -40,8 +53,8 @@ public class SendSnailMailRequest {
 		@NotBlank
 		private String name;
 
-		@Schema(description = "The attachment content type", example = "text/plain")
-		@NotBlank
+		@OneOf("application/pdf")
+		@Schema(description = "The attachment content type", example ="application/pdf", allowableValues = {"application/pdf"})
 		private String contentType;
 
 		@Schema(description = "The envelope type for the letter", example = "WINDOWED")

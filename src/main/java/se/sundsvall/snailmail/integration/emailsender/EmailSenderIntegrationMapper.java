@@ -29,7 +29,7 @@ public class EmailSenderIntegrationMapper {
             return null;
         }
 
-        var attachments = Optional.ofNullable(snailMailDto.getAttachments()).stream()
+        final var attachments = Optional.ofNullable(snailMailDto.getAttachments()).stream()
                 .flatMap(Collection::stream)
                 .map(attachment -> new Attachment()
                         .content(attachment.getContent())
