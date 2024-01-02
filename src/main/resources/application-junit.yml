@@ -1,0 +1,46 @@
+integration:
+  citizen:
+    base-url: http://citizen.url
+  samba:
+    host: localhost
+    port: 445
+    domain: WORKGROUP
+    username: someUsername
+    password: somePassword
+    share: /someShare/
+    connect-timeout: PT5S
+    response-timeout: PT10S
+
+spring:
+  datasource:
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+    url: jdbc:tc:mariadb:10.6.14:///
+  flyway:
+    enabled: true
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+        hbm2ddl:
+          schema-generation:
+            script:
+              append: false
+      jakarta:
+        persistence:
+          schema-generation:
+            create-source: metadata
+            database:
+              action: update
+            scripts:
+              action: create
+              create-target: target/database/generated-schema.sql
+  security:
+    oauth2:
+      client:
+        provider:
+          citizen:
+            token-uri: http://token.url
+        registration:
+          citizen:
+            client-id: the-client-id
+            client-secret: the-client-secret

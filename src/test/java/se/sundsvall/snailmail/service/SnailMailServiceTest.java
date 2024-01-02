@@ -1,67 +1,144 @@
 package se.sundsvall.snailmail.service;
 
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static se.sundsvall.snailmail.TestDataFactory.buildCitizenExtended;
 import static se.sundsvall.snailmail.TestDataFactory.buildSendSnailMailRequest;
 
-import java.io.IOException;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.zalando.problem.ThrowableProblem;
 
-import se.sundsvall.snailmail.dto.SnailMailDto;
 import se.sundsvall.snailmail.integration.citizen.CitizenIntegration;
+import se.sundsvall.snailmail.integration.db.BatchRepository;
+import se.sundsvall.snailmail.integration.db.DepartmentRepository;
+import se.sundsvall.snailmail.integration.db.RequestRepository;
+import se.sundsvall.snailmail.integration.db.model.Batch;
+import se.sundsvall.snailmail.integration.db.model.Department;
+import se.sundsvall.snailmail.integration.db.model.Request;
 import se.sundsvall.snailmail.integration.samba.SambaIntegration;
 
 @ExtendWith(MockitoExtension.class)
 class SnailMailServiceTest {
 
 	@Mock
-	private SambaIntegration mockSambaIntegration;
+	private CitizenIntegration citizenIntegrationMock;
 
 	@Mock
-	private CitizenIntegration mockCitizenIntegration;
+	private BatchRepository batchRepositoryMock;
+
+	@Mock
+	private DepartmentRepository departmentRepositoryMock;
+
+	@Mock
+	private RequestRepository requestRepositoryMock;
+
+	@Mock
+	private SambaIntegration sambaIntegrationMock;
 
 	@InjectMocks
 	private SnailMailService snailMailService;
 
 	@Test
-	void sendSnailMail() throws IOException {
-		final var request = buildSendSnailMailRequest();
+	void sendMail() {
 
-		when(mockCitizenIntegration.getCitizen(request.getPartyId())).thenReturn(buildCitizenExtended());
-		doNothing().when(mockSambaIntegration).writeBatchDataToSambaShare(any(SnailMailDto.class));
+		when(batchRepositoryMock.findById(any(String.class))).thenReturn(Optional.ofNullable(Batch.builder().build()));
+		when(departmentRepositoryMock.findByName(any(String.class))).thenReturn(Optional.ofNullable(Department.builder().build()));
+		when(citizenIntegrationMock.getCitizen(any(String.class))).thenReturn(buildCitizenExtended());
 
-		snailMailService.sendSnailMail(request);
+		snailMailService.sendSnailMail(buildSendSnailMailRequest());
 
-		verify(mockCitizenIntegration).getCitizen(request.getPartyId());
-		verify(mockSambaIntegration).writeBatchDataToSambaShare(any(SnailMailDto.class));
-		verifyNoMoreInteractions(mockCitizenIntegration, mockSambaIntegration);
+		verify(batchRepositoryMock).findById(any(String.class));
+		verify(departmentRepositoryMock).findByName(any(String.class));
+		verify(requestRepositoryMock).save(any());
+		verify(citizenIntegrationMock).getCitizen(any(String.class));
+		verifyNoMoreInteractions(batchRepositoryMock, departmentRepositoryMock, requestRepositoryMock, citizenIntegrationMock);
+		verifyNoInteractions(sambaIntegrationMock);
+
 	}
 
 	@Test
-	void sendSnailMail_throwsExceptionWhenWritingToSamba() throws IOException {
-		final var request = buildSendSnailMailRequest();
+	void sendMailWithNewBatch() {
 
-		when(mockCitizenIntegration.getCitizen(request.getPartyId())).thenReturn(buildCitizenExtended());
-		doThrow(IOException.class).when(mockSambaIntegration).writeBatchDataToSambaShare(any(SnailMailDto.class));
+		when(batchRepositoryMock.findById(any(String.class))).thenReturn(Optional.empty());
+		when(departmentRepositoryMock.findByName(any(String.class))).thenReturn(Optional.ofNullable(Department.builder().build()));
+		when(citizenIntegrationMock.getCitizen(any(String.class))).thenReturn(buildCitizenExtended());
 
-		assertThatExceptionOfType(ThrowableProblem.class).isThrownBy(() -> snailMailService.sendSnailMail(request));
+		snailMailService.sendSnailMail(buildSendSnailMailRequest());
 
-		verify(mockCitizenIntegration, times(1)).getCitizen(request.getPartyId());
-		verify(mockSambaIntegration, times(1)).writeBatchDataToSambaShare(any(SnailMailDto.class));
-		verifyNoMoreInteractions(mockCitizenIntegration, mockSambaIntegration);
+		verify(batchRepositoryMock).findById(any(String.class));
+		verify(batchRepositoryMock).save(any(Batch.class));
+		verify(departmentRepositoryMock).findByName(any(String.class));
+		verify(requestRepositoryMock).save(any(Request.class));
+		verify(citizenIntegrationMock).getCitizen(any(String.class));
+		verifyNoMoreInteractions(batchRepositoryMock, departmentRepositoryMock, requestRepositoryMock, citizenIntegrationMock);
+		verifyNoInteractions(sambaIntegrationMock);
+
+	}
+
+	@Test
+	void sendMailWithNewDepartment() {
+
+		when(batchRepositoryMock.findById(any(String.class))).thenReturn(Optional.ofNullable(Batch.builder().build()));
+		when(departmentRepositoryMock.findByName(any(String.class))).thenReturn(Optional.empty());
+		when(citizenIntegrationMock.getCitizen(any(String.class))).thenReturn(buildCitizenExtended());
+		snailMailService.sendSnailMail(buildSendSnailMailRequest());
+
+		verify(batchRepositoryMock).findById(any(String.class));
+		verify(departmentRepositoryMock).findByName(any(String.class));
+		verify(departmentRepositoryMock).save(any(Department.class));
+		verify(requestRepositoryMock).save(any(Request.class));
+		verify(citizenIntegrationMock).getCitizen(any(String.class));
+		verifyNoMoreInteractions(batchRepositoryMock, departmentRepositoryMock, requestRepositoryMock, citizenIntegrationMock);
+		verifyNoInteractions(sambaIntegrationMock);
+
+	}
+
+	@Test
+	void sendMailWithNewBatchAndDepartment() {
+
+		when(batchRepositoryMock.findById(any(String.class))).thenReturn(Optional.empty());
+		when(departmentRepositoryMock.findByName(any(String.class))).thenReturn(Optional.empty());
+		when(citizenIntegrationMock.getCitizen(any(String.class))).thenReturn(buildCitizenExtended());
+
+		snailMailService.sendSnailMail(buildSendSnailMailRequest());
+
+		verify(batchRepositoryMock).findById(any(String.class));
+		verify(batchRepositoryMock).save(any(Batch.class));
+		verify(departmentRepositoryMock).findByName(any(String.class));
+		verify(departmentRepositoryMock).save(any(Department.class));
+		verify(requestRepositoryMock).save(any(Request.class));
+		verify(citizenIntegrationMock).getCitizen(any(String.class));
+		verifyNoMoreInteractions(batchRepositoryMock, departmentRepositoryMock, requestRepositoryMock, citizenIntegrationMock);
+		verifyNoInteractions(sambaIntegrationMock);
+
+	}
+
+	@Test
+	void sendMailWithNewBatchAndDepartmentAndCitizen() {
+
+		when(batchRepositoryMock.findById(any(String.class))).thenReturn(Optional.empty());
+		when(departmentRepositoryMock.findByName(any(String.class))).thenReturn(Optional.empty());
+		when(citizenIntegrationMock.getCitizen(any(String.class))).thenReturn(null);
+
+		snailMailService.sendSnailMail(buildSendSnailMailRequest());
+
+		verify(batchRepositoryMock).findById(any(String.class));
+		verify(batchRepositoryMock).save(any(Batch.class));
+		verify(departmentRepositoryMock).findByName(any(String.class));
+		verify(departmentRepositoryMock).save(any(Department.class));
+		verify(requestRepositoryMock).save(any(Request.class));
+		verify(citizenIntegrationMock).getCitizen(any(String.class));
+		verifyNoMoreInteractions(batchRepositoryMock, departmentRepositoryMock, requestRepositoryMock, citizenIntegrationMock);
+		verifyNoInteractions(sambaIntegrationMock);
+
 	}
 
 }

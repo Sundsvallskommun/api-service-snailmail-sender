@@ -7,6 +7,17 @@ spring:
     name: api-snailmail-sender
   main:
     banner-mode: 'off'
+  security:
+    oauth2:
+      client:
+        registration:
+          citizen:
+            authorization-grant-type: client_credentials
+            provider: citizen
+integration:
+  citizen:
+    connect-timeout: 5
+    read-timeout: 30
 logbook:
   exclusionfilters:
     # Exclude base64-encoded content from incoming requests.

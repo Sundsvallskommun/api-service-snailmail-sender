@@ -3,8 +3,7 @@ package se.sundsvall.snailmail.integration.citizen;
 import static java.util.UUID.randomUUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -55,8 +54,9 @@ class CitizenIntegrationTest {
 
 		when(citizenMock.getCitizen(uuid.toString())).thenReturn(Optional.empty());
 
+		final var stringUuid = uuid.toString();
 		assertThatExceptionOfType(ThrowableProblem.class)
-			.isThrownBy(() -> citizenIntegration.getCitizen(uuid.toString()))
+			.isThrownBy(() -> citizenIntegration.getCitizen(stringUuid))
 			.satisfies(problem -> {
 				assertThat(problem.getStatus()).isEqualTo(Status.INTERNAL_SERVER_ERROR);
 				assertThat(problem.getDetail()).isEqualTo("Failed to fetch citizen data from Citizen API");
@@ -65,30 +65,30 @@ class CitizenIntegrationTest {
 
 	@Test
 	void getCitizenThrowingException() {
-		final var uuid = randomUUID();
-		final var citizenExtended = buildCitizen(uuid);
+		final var uuid1 = randomUUID();
 
-		when(citizenMock.getCitizen(uuid.toString()))
-				.thenThrow(Problem.builder()
+		when(citizenMock.getCitizen(any(String.class)))
+			.thenThrow(Problem.builder()
 				.withStatus(Status.BAD_GATEWAY)
 				.withCause(Problem.builder()
 					.withStatus(Status.BAD_GATEWAY)
 					.build())
 				.build());
 
+		final var stringUuid = uuid1.toString();
 		assertThatExceptionOfType(ThrowableProblem.class)
-			.isThrownBy(() -> citizenIntegration.getCitizen(uuid.toString()))
+			.isThrownBy(() -> citizenIntegration.getCitizen(stringUuid))
 			.satisfies(problem -> {
 				assertThat(problem.getStatus()).isEqualTo(Status.BAD_GATEWAY);
 				assertThat(problem.getCause()).isNotNull();
 				assertThat(problem.getCause().getStatus()).isEqualTo(Status.BAD_GATEWAY);
 			});
 
-		verify(citizenMock).getCitizen(uuid.toString());
+		verify(citizenMock).getCitizen(uuid1.toString());
 		verifyNoMoreInteractions(citizenMock);
 	}
 
-	private CitizenExtended buildCitizen(UUID uuid) {
+	private CitizenExtended buildCitizen(final UUID uuid) {
 		return new CitizenExtended()
 			.givenname("someGivenName")
 			.lastname("someLastName")
@@ -105,4 +105,5 @@ class CitizenIntegrationTest {
 					.city("someCity")
 					.country("someCountry")));
 	}
+
 }

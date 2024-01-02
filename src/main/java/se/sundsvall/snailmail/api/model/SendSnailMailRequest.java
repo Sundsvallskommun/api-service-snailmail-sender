@@ -2,23 +2,25 @@ package se.sundsvall.snailmail.api.model;
 
 import java.util.List;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+
 import se.sundsvall.dept44.common.validators.annotation.OneOf;
 import se.sundsvall.dept44.common.validators.annotation.ValidUuid;
 import se.sundsvall.snailmail.api.validation.ValidFolderName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Getter
+
+@Data
 @Builder(setterPrefix = "with")
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PACKAGE)
 public class SendSnailMailRequest {
 
 	@NotBlank
@@ -40,11 +42,12 @@ public class SendSnailMailRequest {
 	@Schema(description = "Attachments")
 	private List<@Valid Attachment> attachments;
 
-	@Getter
+	@Data
 	@NoArgsConstructor
 	@AllArgsConstructor(access = AccessLevel.PACKAGE)
 	@Builder(setterPrefix = "with")
 	public static class Attachment {
+
 		@Schema(description = "The attachment (file) content as a BASE64-encoded string", example = "aGVsbG8gd29ybGQK")
 		@NotBlank
 		private String content;
@@ -54,10 +57,12 @@ public class SendSnailMailRequest {
 		private String name;
 
 		@OneOf("application/pdf")
-		@Schema(description = "The attachment content type", example ="application/pdf", allowableValues = {"application/pdf"})
+		@Schema(description = "The attachment content type", example = "application/pdf", allowableValues = {"application/pdf"})
 		private String contentType;
 
 		@Schema(description = "The envelope type for the letter", example = "WINDOWED")
 		private EnvelopeType envelopeType;
+
 	}
+
 }
