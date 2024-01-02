@@ -3,6 +3,7 @@ package se.sundsvall.snailmail.api;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.ResponseEntity.ok;
 
+import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
@@ -28,7 +29,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Validated
 @RequestMapping("/send/snailmail")
 @Tag(name = "SnailMailSender", description = "SnailMailSender")
-@ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(schema = @Schema(implementation = Problem.class)))
+@ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(schema = @Schema(oneOf = {Problem.class, ConstraintViolation.class})))
 @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Problem.class)))
 public class SnailMailResource {
 

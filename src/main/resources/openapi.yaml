@@ -7,7 +7,7 @@ info:
     url: https://opensource.org/licenses/MIT
   version: "1.3"
 servers:
-  - url: http://localhost:53546
+  - url: http://localhost:54940
     description: Generated server url
 tags:
   - name: SnailMailSender
@@ -31,7 +31,9 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/Problem'
+                oneOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - $ref: '#/components/schemas/ConstraintViolation'
         "500":
           description: Internal Server Error
           content:
@@ -58,7 +60,9 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/Problem'
+                oneOf:
+                  - $ref: '#/components/schemas/Problem'
+                  - $ref: '#/components/schemas/ConstraintViolation'
         "500":
           description: Internal Server Error
           content:
@@ -143,18 +147,73 @@ components:
           type: object
           additionalProperties:
             type: object
+        status:
+          $ref: '#/components/schemas/StatusType'
         title:
           type: string
         detail:
           type: string
-        status:
-          $ref: '#/components/schemas/StatusType'
     StatusType:
       type: object
       properties:
-        reasonPhrase:
-          type: string
         statusCode:
           type: integer
           format: int32
+        reasonPhrase:
+          type: string
+    ConstraintDescriptorObject:
+      type: object
+      properties:
+        annotation:
+          type: object
+        attributes:
+          type: object
+          additionalProperties:
+            type: object
+        composingConstraints:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/ConstraintDescriptorObject'
+        reportAsSingleViolation:
+          type: boolean
+        messageTemplate:
+          type: string
+        validationAppliesTo:
+          type: string
+          enum:
+            - IMPLICIT
+            - RETURN_VALUE
+            - PARAMETERS
+        valueUnwrapping:
+          type: string
+          enum:
+            - DEFAULT
+            - UNWRAP
+            - SKIP
+    ConstraintViolation:
+      type: object
+      properties:
+        message:
+          type: string
+        executableParameters:
+          type: array
+          items:
+            type: object
+        executableReturnValue:
+          type: object
+        constraintDescriptor:
+          $ref: '#/components/schemas/ConstraintDescriptorObject'
+        rootBean:
+          type: object
+        leafBean:
+          type: object
+        invalidValue:
+          type: object
+        messageTemplate:
+          type: string
+        propertyPath:
+          $ref: '#/components/schemas/Path'
+    Path:
+      type: object
   securitySchemes: { }

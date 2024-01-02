@@ -3,7 +3,6 @@ package se.sundsvall.snailmail.api;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.groups.Tuple.tuple;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
@@ -50,7 +49,7 @@ class SnailMailResourceTest {
 			.isOk();
 
 		// VERIFY
-		verify(mockSnailMailService, times(1)).sendSnailMail(any(SendSnailMailRequest.class));
+		verify(mockSnailMailService).sendSnailMail(any(SendSnailMailRequest.class));
 
 	}
 
@@ -67,7 +66,7 @@ class SnailMailResourceTest {
 			.expectStatus()
 			.isOk();
 
-		verify(mockSnailMailService, times(1)).sendBatch(any(String.class));
+		verify(mockSnailMailService).sendBatch(any(String.class));
 
 
 	}
