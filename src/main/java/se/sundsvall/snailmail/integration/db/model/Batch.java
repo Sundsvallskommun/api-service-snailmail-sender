@@ -3,6 +3,7 @@ package se.sundsvall.snailmail.integration.db.model;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
@@ -22,6 +23,7 @@ import lombok.NoArgsConstructor;
 public class Batch {
 
 	@Id
+	@Column(name = "id")
 	private String id;
 
 	@OneToMany(mappedBy = "batch", cascade = CascadeType.ALL)

@@ -19,25 +19,31 @@ public final class Mapper {
 
 	static Request toRequest(final SendSnailMailRequest request, final CitizenExtended citizen, final Department department) {
 
-		return Request.builder()
-			.withDepartment(department)
-			.withDeviation(request.getDeviation())
-			.withRecipient(toRecipient(citizen))
-			.withAttachments(Optional.ofNullable(request.getAttachments())
-				.orElse(List.of()).stream()
-				.map(Mapper::toAttachment)
-				.toList())
-			.build();
+		return Optional.ofNullable(request)
+			.map(req -> Request.builder()
+				.withDepartment(department)
+				.withDeviation(req.getDeviation())
+				.withRecipient(toRecipient(citizen))
+				.withAttachments(Optional.ofNullable(req.getAttachments())
+					.orElse(List.of()).stream()
+					.map(Mapper::toAttachment)
+					.toList())
+				.build())
+			.orElse(null);
+
 	}
 
 	static Attachment toAttachment(final SendSnailMailRequest.Attachment attachment) {
 
-		return Attachment.builder()
-			.withContent(attachment.getContent())
-			.withName(attachment.getName())
-			.withContentType(attachment.getContentType())
-			.withEnvelopeType(attachment.getEnvelopeType())
-			.build();
+		return Optional.ofNullable(attachment)
+			.map(attach -> Attachment.builder()
+				.withContent(attach.getContent())
+				.withName(attach.getName())
+				.withContentType(attach.getContentType())
+				.withEnvelopeType(attach.getEnvelopeType())
+				.build())
+			.orElse(null);
+
 	}
 
 	static Department toDepartment(final String departmentName, final Batch batch) {

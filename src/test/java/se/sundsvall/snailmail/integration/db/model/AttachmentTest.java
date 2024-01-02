@@ -5,10 +5,10 @@ import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanEquals;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanHashCode;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanToString;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidGettersAndSetters;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.allOf;
-import static org.hamcrest.MatcherAssert.assertThat;
 
-import org.assertj.core.api.Assertions;
+import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Test;
 
 import se.sundsvall.snailmail.api.model.EnvelopeType;
@@ -17,7 +17,7 @@ class AttachmentTest {
 
 	@Test
 	void testBean() {
-		assertThat(Attachment.class, allOf(
+		MatcherAssert.assertThat(Attachment.class, allOf(
 			hasValidBeanConstructor(),
 			hasValidGettersAndSetters(),
 			hasValidBeanHashCode(),
@@ -45,20 +45,20 @@ class AttachmentTest {
 			.withContent(content)
 			.build();
 
-		Assertions.assertThat(attachment).isNotNull().hasNoNullFieldsOrProperties();
-		Assertions.assertThat(attachment.getId()).isEqualTo(id);
-		Assertions.assertThat(attachment.getRequest()).isNotNull();
-		Assertions.assertThat(attachment.getContentType()).isEqualTo(contentType);
-		Assertions.assertThat(attachment.getEnvelopeType()).isEqualTo(envelopeType);
-		Assertions.assertThat(attachment.getName()).isEqualTo(name);
-		Assertions.assertThat(attachment.getContent()).isEqualTo(content);
+		assertThat(attachment).isNotNull().hasNoNullFieldsOrProperties();
+		assertThat(attachment.getId()).isEqualTo(id);
+		assertThat(attachment.getRequest()).isNotNull();
+		assertThat(attachment.getContentType()).isEqualTo(contentType);
+		assertThat(attachment.getEnvelopeType()).isEqualTo(envelopeType);
+		assertThat(attachment.getName()).isEqualTo(name);
+		assertThat(attachment.getContent()).isEqualTo(content);
 
 	}
 
 	@Test
 	void testNoDirtOnCreatedBean() {
-		Assertions.assertThat(Attachment.builder().build()).hasAllNullFieldsOrProperties();
-		Assertions.assertThat(new Attachment()).hasAllNullFieldsOrProperties();
+		assertThat(Attachment.builder().build()).hasAllNullFieldsOrProperties();
+		assertThat(new Attachment()).hasAllNullFieldsOrProperties();
 	}
 
 }

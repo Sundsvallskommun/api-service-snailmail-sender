@@ -100,4 +100,25 @@ class MapperTest {
 		assertThat(result.getLastName()).isEqualTo(lastName);
 	}
 
+	@Test
+	void toRecipientWhenRecipientIsNull() {
+		final var result = Mapper.toRecipient(null);
+
+		assertThat(result).isNull();
+	}
+
+	@Test
+	void toRequestWhenRequestIsNull() {
+		final var result = Mapper.toRequest(null, null, null);
+
+		assertThat(result).isNull();
+	}
+
+	@Test
+	void toAttachmentWhenAttachmentIsNull() {
+		final var result = Mapper.toAttachment(null);
+
+		assertThat(result).isNull();
+	}
+
 }

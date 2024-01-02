@@ -5,17 +5,17 @@ import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanEquals;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanHashCode;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanToString;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidGettersAndSetters;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.allOf;
-import static org.hamcrest.MatcherAssert.assertThat;
 
-import org.assertj.core.api.Assertions;
+import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Test;
 
 class RecipientTest {
 
 	@Test
 	void testBean() {
-		assertThat(Recipient.class, allOf(
+		MatcherAssert.assertThat(Recipient.class, allOf(
 			hasValidBeanConstructor(),
 			hasValidGettersAndSetters(),
 			hasValidBeanHashCode(),
@@ -47,21 +47,21 @@ class RecipientTest {
 			.withCity(city)
 			.build();
 
-		Assertions.assertThat(recipient).isNotNull().hasNoNullFieldsOrProperties();
-		Assertions.assertThat(recipient.getId()).isEqualTo(id);
-		Assertions.assertThat(recipient.getRequest()).isNotNull();
-		Assertions.assertThat(recipient.getCo()).isEqualTo(co);
-		Assertions.assertThat(recipient.getGivenName()).isEqualTo(givenName);
-		Assertions.assertThat(recipient.getLastName()).isEqualTo(lastName);
-		Assertions.assertThat(recipient.getAdress()).isEqualTo(adress);
-		Assertions.assertThat(recipient.getPostalCode()).isEqualTo(postalCode);
-		Assertions.assertThat(recipient.getCity()).isEqualTo(city);
+		assertThat(recipient).isNotNull().hasNoNullFieldsOrProperties();
+		assertThat(recipient.getId()).isEqualTo(id);
+		assertThat(recipient.getRequest()).isNotNull();
+		assertThat(recipient.getCo()).isEqualTo(co);
+		assertThat(recipient.getGivenName()).isEqualTo(givenName);
+		assertThat(recipient.getLastName()).isEqualTo(lastName);
+		assertThat(recipient.getAdress()).isEqualTo(adress);
+		assertThat(recipient.getPostalCode()).isEqualTo(postalCode);
+		assertThat(recipient.getCity()).isEqualTo(city);
 	}
 
 	@Test
 	void testNoDirtOnCreatedBean() {
-		Assertions.assertThat(Recipient.builder().build()).hasAllNullFieldsOrProperties();
-		Assertions.assertThat(new Recipient()).hasAllNullFieldsOrProperties();
+		assertThat(Recipient.builder().build()).hasAllNullFieldsOrProperties();
+		assertThat(new Recipient()).hasAllNullFieldsOrProperties();
 	}
 
 }

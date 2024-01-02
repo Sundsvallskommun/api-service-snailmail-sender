@@ -10,7 +10,6 @@ import static org.hamcrest.CoreMatchers.allOf;
 
 import java.util.List;
 
-import org.assertj.core.api.Assertions;
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Test;
 
@@ -60,8 +59,8 @@ class SendSnailMailRequestTest {
 
 	@Test
 	void testNoDirtOnCreatedBean() {
-		Assertions.assertThat(SendSnailMailRequest.builder().build()).hasAllNullFieldsOrProperties();
-		Assertions.assertThat(new SendSnailMailRequest()).hasAllNullFieldsOrProperties();
+		assertThat(SendSnailMailRequest.builder().build()).hasAllNullFieldsOrProperties();
+		assertThat(new SendSnailMailRequest()).hasAllNullFieldsOrProperties();
 	}
 
 }

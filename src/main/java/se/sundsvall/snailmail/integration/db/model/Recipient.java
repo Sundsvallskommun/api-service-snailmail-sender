@@ -1,5 +1,6 @@
 package se.sundsvall.snailmail.integration.db.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -25,19 +26,26 @@ public class Recipient {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Long id;
+	@Column(name = "id")
+	private Long id;
 
-	String givenName;
+	@Column(name = "given_name")
+	private String givenName;
 
-	String lastName;
+	@Column(name = "last_name")
+	private String lastName;
 
-	String co;
+	@Column(name = "co")
+	private String co;
 
-	String adress;
+	@Column(name = "adress")
+	private String adress;
 
-	String postalCode;
+	@Column(name = "postal_code")
+	private String postalCode;
 
-	String city;
+	@Column(name = "city")
+	private String city;
 
 	@OneToOne(mappedBy = "recipient")
 	private Request request;

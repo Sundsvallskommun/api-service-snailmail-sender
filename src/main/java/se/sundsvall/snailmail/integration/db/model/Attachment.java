@@ -1,5 +1,6 @@
 package se.sundsvall.snailmail.integration.db.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
@@ -26,18 +27,23 @@ public class Attachment {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id")
 	private Long id;
 
 	@ManyToOne
 	@JoinColumn(name = "request_id", foreignKey = @ForeignKey(name = "fk_attachment_request"))
 	private Request request;
 
+	@Column(name = "content")
 	private String content;
 
+	@Column(name = "name")
 	private String name;
 
+	@Column(name = "content_type")
 	private String contentType;
 
+	@Column(name = "envelope_type")
 	private EnvelopeType envelopeType;
 
 }

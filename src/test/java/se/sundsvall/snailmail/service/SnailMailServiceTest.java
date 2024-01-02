@@ -1,7 +1,6 @@
 package se.sundsvall.snailmail.service;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -56,10 +55,10 @@ class SnailMailServiceTest {
 
 		snailMailService.sendSnailMail(buildSendSnailMailRequest());
 
-		verify(batchRepositoryMock, times(1)).findById(any(String.class));
-		verify(departmentRepositoryMock, times(1)).findByName(any(String.class));
-		verify(requestRepositoryMock, times(1)).save(any());
-		verify(citizenIntegrationMock, times(1)).getCitizen(any(String.class));
+		verify(batchRepositoryMock).findById(any(String.class));
+		verify(departmentRepositoryMock).findByName(any(String.class));
+		verify(requestRepositoryMock).save(any());
+		verify(citizenIntegrationMock).getCitizen(any(String.class));
 		verifyNoMoreInteractions(batchRepositoryMock, departmentRepositoryMock, requestRepositoryMock, citizenIntegrationMock);
 		verifyNoInteractions(sambaIntegrationMock);
 
@@ -74,11 +73,11 @@ class SnailMailServiceTest {
 
 		snailMailService.sendSnailMail(buildSendSnailMailRequest());
 
-		verify(batchRepositoryMock, times(1)).findById(any(String.class));
-		verify(batchRepositoryMock, times(1)).save(any(Batch.class));
-		verify(departmentRepositoryMock, times(1)).findByName(any(String.class));
-		verify(requestRepositoryMock, times(1)).save(any(Request.class));
-		verify(citizenIntegrationMock, times(1)).getCitizen(any(String.class));
+		verify(batchRepositoryMock).findById(any(String.class));
+		verify(batchRepositoryMock).save(any(Batch.class));
+		verify(departmentRepositoryMock).findByName(any(String.class));
+		verify(requestRepositoryMock).save(any(Request.class));
+		verify(citizenIntegrationMock).getCitizen(any(String.class));
 		verifyNoMoreInteractions(batchRepositoryMock, departmentRepositoryMock, requestRepositoryMock, citizenIntegrationMock);
 		verifyNoInteractions(sambaIntegrationMock);
 
@@ -92,11 +91,11 @@ class SnailMailServiceTest {
 		when(citizenIntegrationMock.getCitizen(any(String.class))).thenReturn(buildCitizenExtended());
 		snailMailService.sendSnailMail(buildSendSnailMailRequest());
 
-		verify(batchRepositoryMock, times(1)).findById(any(String.class));
-		verify(departmentRepositoryMock, times(1)).findByName(any(String.class));
-		verify(departmentRepositoryMock, times(1)).save(any(Department.class));
-		verify(requestRepositoryMock, times(1)).save(any(Request.class));
-		verify(citizenIntegrationMock, times(1)).getCitizen(any(String.class));
+		verify(batchRepositoryMock).findById(any(String.class));
+		verify(departmentRepositoryMock).findByName(any(String.class));
+		verify(departmentRepositoryMock).save(any(Department.class));
+		verify(requestRepositoryMock).save(any(Request.class));
+		verify(citizenIntegrationMock).getCitizen(any(String.class));
 		verifyNoMoreInteractions(batchRepositoryMock, departmentRepositoryMock, requestRepositoryMock, citizenIntegrationMock);
 		verifyNoInteractions(sambaIntegrationMock);
 
@@ -111,12 +110,12 @@ class SnailMailServiceTest {
 
 		snailMailService.sendSnailMail(buildSendSnailMailRequest());
 
-		verify(batchRepositoryMock, times(1)).findById(any(String.class));
-		verify(batchRepositoryMock, times(1)).save(any(Batch.class));
-		verify(departmentRepositoryMock, times(1)).findByName(any(String.class));
-		verify(departmentRepositoryMock, times(1)).save(any(Department.class));
-		verify(requestRepositoryMock, times(1)).save(any(Request.class));
-		verify(citizenIntegrationMock, times(1)).getCitizen(any(String.class));
+		verify(batchRepositoryMock).findById(any(String.class));
+		verify(batchRepositoryMock).save(any(Batch.class));
+		verify(departmentRepositoryMock).findByName(any(String.class));
+		verify(departmentRepositoryMock).save(any(Department.class));
+		verify(requestRepositoryMock).save(any(Request.class));
+		verify(citizenIntegrationMock).getCitizen(any(String.class));
 		verifyNoMoreInteractions(batchRepositoryMock, departmentRepositoryMock, requestRepositoryMock, citizenIntegrationMock);
 		verifyNoInteractions(sambaIntegrationMock);
 
@@ -131,12 +130,12 @@ class SnailMailServiceTest {
 
 		snailMailService.sendSnailMail(buildSendSnailMailRequest());
 
-		verify(batchRepositoryMock, times(1)).findById(any(String.class));
-		verify(batchRepositoryMock, times(1)).save(any(Batch.class));
-		verify(departmentRepositoryMock, times(1)).findByName(any(String.class));
-		verify(departmentRepositoryMock, times(1)).save(any(Department.class));
-		verify(requestRepositoryMock, times(1)).save(any(Request.class));
-		verify(citizenIntegrationMock, times(1)).getCitizen(any(String.class));
+		verify(batchRepositoryMock).findById(any(String.class));
+		verify(batchRepositoryMock).save(any(Batch.class));
+		verify(departmentRepositoryMock).findByName(any(String.class));
+		verify(departmentRepositoryMock).save(any(Department.class));
+		verify(requestRepositoryMock).save(any(Request.class));
+		verify(citizenIntegrationMock).getCitizen(any(String.class));
 		verifyNoMoreInteractions(batchRepositoryMock, departmentRepositoryMock, requestRepositoryMock, citizenIntegrationMock);
 		verifyNoInteractions(sambaIntegrationMock);
 

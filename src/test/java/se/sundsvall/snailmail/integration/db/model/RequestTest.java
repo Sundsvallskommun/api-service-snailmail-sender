@@ -5,19 +5,19 @@ import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanEquals;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanHashCode;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanToString;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidGettersAndSetters;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.allOf;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.List;
 
-import org.assertj.core.api.Assertions;
+import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Test;
 
 class RequestTest {
 
 	@Test
 	void testBean() {
-		assertThat(Request.class, allOf(
+		MatcherAssert.assertThat(Request.class, allOf(
 			hasValidBeanConstructor(),
 			hasValidGettersAndSetters(),
 			hasValidBeanHashCode(),
@@ -43,20 +43,20 @@ class RequestTest {
 			.withDeviation(deviation)
 			.build();
 
-		Assertions.assertThat(request).isNotNull().hasNoNullFieldsOrProperties();
-		Assertions.assertThat(request.getId()).isEqualTo(id);
-		Assertions.assertThat(request.getDepartment()).isNotNull();
-		Assertions.assertThat(request.getRecipient()).isNotNull();
-		Assertions.assertThat(request.getAttachments()).hasSize(1);
-		Assertions.assertThat(request.getDeviation()).isEqualTo(deviation);
+		assertThat(request).isNotNull().hasNoNullFieldsOrProperties();
+		assertThat(request.getId()).isEqualTo(id);
+		assertThat(request.getDepartment()).isNotNull();
+		assertThat(request.getRecipient()).isNotNull();
+		assertThat(request.getAttachments()).hasSize(1);
+		assertThat(request.getDeviation()).isEqualTo(deviation);
 
 
 	}
 
 	@Test
 	void testNoDirtOnCreatedBean() {
-		Assertions.assertThat(Request.builder().build()).hasAllNullFieldsOrProperties();
-		Assertions.assertThat(new Request()).hasAllNullFieldsOrProperties();
+		assertThat(Request.builder().build()).hasAllNullFieldsOrProperties();
+		assertThat(new Request()).hasAllNullFieldsOrProperties();
 	}
 
 
