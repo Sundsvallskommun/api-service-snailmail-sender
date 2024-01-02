@@ -44,31 +44,31 @@ public class SambaIntegration {
 		shareUrl = String.format("smb://%s:%d%s", properties.host(), properties.port(), properties.share());
 	}
 
-	public void writeBatchDataToSambaShare(final SendSnailMailRequest snailMailDto) throws IOException {
-		final var batchPath = shareUrl + snailMailDto.getBatchId();
-		final var departmentPath = batchPath + File.separator + snailMailDto.getDepartment();
+	public void writeBatchDataToSambaShare(final SendSnailMailRequest request) throws IOException {
+		final var batchPath = shareUrl + request.getBatchId();
+		final var departmentPath = batchPath + File.separator + request.getDepartment();
 
 		//Create folders
 		createBatchFolder(batchPath);
 		createDepartmentFolder(departmentPath);
 
 		//Save citizen data
-		saveSnailMailDtoMetaData(snailMailDto, departmentPath);
+		saveSnailMailRequestMetaData(request, departmentPath);
 	}
 
 	/**
 	 * Save citizen data including the file content.
 	 *
-	 * @param snailMailDto to save to disk
+	 * @param request to save to disk
 	 * @throws IOException if something goes wrong during communication with the samba share
 	 */
-	private void saveSnailMailDtoMetaData(final SendSnailMailRequest snailMailDto, final String departmentPath) throws IOException {
-		final var citizenFile = departmentPath + File.separator + snailMailDto.getPartyId() + ".json";
+	private void saveSnailMailRequestMetaData(final SendSnailMailRequest request, final String departmentPath) throws IOException {
+		final var citizenFile = departmentPath + File.separator + request.getPartyId() + ".json";
 
 		try (final var destinationFile = new SmbFile(citizenFile, context)) {
 			//Will always overwrite the file if it exists, e.g. if an update comes for a user / batch
 			try (final var smbFileOutputStream = new SmbFileOutputStream(destinationFile)) {
-				smbFileOutputStream.write(gson.toJson(snailMailDto).getBytes(StandardCharsets.UTF_8));
+				smbFileOutputStream.write(gson.toJson(request).getBytes(StandardCharsets.UTF_8));
 				smbFileOutputStream.flush();
 			}
 		}

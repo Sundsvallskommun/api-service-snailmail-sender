@@ -64,31 +64,6 @@ class CitizenIntegrationTest {
 	}
 
 	@Test
-	void getCitizensThrowingException() {
-		final var uuid = randomUUID();
-
-		when(citizenMock.getCitizen(uuid.toString()))
-			.thenThrow(Problem.builder()
-				.withStatus(Status.BAD_GATEWAY)
-				.withCause(Problem.builder()
-					.withStatus(Status.BAD_GATEWAY)
-					.build())
-				.build());
-
-		final var stringUuid = uuid.toString();
-		assertThatExceptionOfType(ThrowableProblem.class)
-			.isThrownBy(() -> citizenIntegration.getCitizen(stringUuid))
-			.satisfies(problem -> {
-				assertThat(problem.getStatus()).isEqualTo(Status.BAD_GATEWAY);
-				assertThat(problem.getCause()).isNotNull();
-				assertThat(problem.getCause().getStatus()).isEqualTo(Status.BAD_GATEWAY);
-			});
-
-		verify(citizenMock).getCitizen(uuid.toString());
-		verifyNoMoreInteractions(citizenMock);
-	}
-
-	@Test
 	void getCitizenThrowingException() {
 		final var uuid1 = randomUUID();
 
