@@ -2,12 +2,10 @@ package se.sundsvall.snailmail.service;
 
 import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
 
-import java.io.IOException;
-
 import org.springframework.stereotype.Service;
 import org.zalando.problem.Problem;
 
-import se.sundsvall.dept44.util.jacoco.ExcludeFromJacocoGeneratedCoverageReport;
+import se.sundsvall.snailmail.api.model.EnvelopeType;
 import se.sundsvall.snailmail.api.model.SendSnailMailRequest;
 import se.sundsvall.snailmail.integration.citizen.CitizenIntegration;
 import se.sundsvall.snailmail.integration.db.BatchRepository;
@@ -15,6 +13,8 @@ import se.sundsvall.snailmail.integration.db.DepartmentRepository;
 import se.sundsvall.snailmail.integration.db.RequestRepository;
 import se.sundsvall.snailmail.integration.db.model.Batch;
 import se.sundsvall.snailmail.integration.samba.SambaIntegration;
+
+import generated.se.sundsvall.citizen.CitizenExtended;
 
 @Service
 public class SnailMailService {
@@ -40,6 +40,11 @@ public class SnailMailService {
 
 	public void sendSnailMail(final SendSnailMailRequest request) {
 
+		CitizenExtended citizen = null;
+		if (!request.getAttachments().getFirst().getEnvelopeType().equals(EnvelopeType.WINDOWED)) {
+			citizen = citizenIntegration.getCitizen(request.getPartyId());
+		}
+
 		final var batch = batchRepository.findById(request.getBatchId())
 			.orElseGet(() -> batchRepository.save(Batch.builder().withId(request.getBatchId()).build()));
 
@@ -47,17 +52,22 @@ public class SnailMailService {
 			.orElseGet(() -> departmentRepository
 				.save(Mapper.toDepartment(request.getDepartment(), batch)));
 
-		final var citizen = citizenIntegration.getCitizen(request.getPartyId());
 		requestRepository.save(Mapper.toRequest(request, citizen, department));
 	}
 
-
-	@ExcludeFromJacocoGeneratedCoverageReport
 	public void sendBatch(final String batchId) {
-		//Should create CSVs for batch and put them in the samba share
-		// Implemented in different story
-	}
 
+		final var batch = batchRepository.findById(batchId)
+			.orElseThrow(() -> Problem.builder()
+				.withTitle("No batch found")
+				.withStatus(INTERNAL_SERVER_ERROR)
+				.withDetail("Failed to fetch batch data from database")
+				.build());
+
+		sambaIntegration.writeBatchDataToSambaShare(batch);
+
+		batchRepository.delete(batch);
+	}
 
 
 }

@@ -102,7 +102,7 @@ components:
         name:
           type: string
           description: The attachment filename
-          example: test.txt
+          example: test.pdf
         contentType:
           type: string
           description: The attachment content type

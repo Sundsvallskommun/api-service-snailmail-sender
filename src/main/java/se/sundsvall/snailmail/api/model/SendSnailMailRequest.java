@@ -52,7 +52,7 @@ public class SendSnailMailRequest {
 		@NotBlank
 		private String content;
 
-		@Schema(description = "The attachment filename", example = "test.txt")
+		@Schema(description = "The attachment filename", example = "test.pdf")
 		@NotBlank
 		private String name;
 

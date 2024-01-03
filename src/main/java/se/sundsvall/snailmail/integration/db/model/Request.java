@@ -50,4 +50,7 @@ public class Request {
 	@JoinColumn(name = "recipient_id", foreignKey = @ForeignKey(name = "fk_request_recipient"))
 	private Recipient recipient;
 
+	@Column(name = "party_id")
+	private String partyId;
+
 }

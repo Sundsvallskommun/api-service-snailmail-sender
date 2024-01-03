@@ -43,14 +43,16 @@ class MapperTest {
 			.withContentType(contentType)
 			.withEnvelopeType(envelopeType)
 			.build();
+		final var request = new se.sundsvall.snailmail.integration.db.model.Request();
 
-		final var result = Mapper.toAttachment(sendSnailMailRequestAttachment);
+		final var result = Mapper.toAttachment(sendSnailMailRequestAttachment, request);
 
 		assertThat(result).isNotNull();
 		assertThat(result.getContent()).isEqualTo(content);
 		assertThat(result.getName()).isEqualTo(name);
 		assertThat(result.getContentType()).isEqualTo(contentType);
 		assertThat(result.getEnvelopeType()).isEqualTo(envelopeType);
+		assertThat(result.getRequest()).isEqualTo(request);
 	}
 
 	@Test
@@ -67,9 +69,8 @@ class MapperTest {
 
 	@Test
 	void toRecipientShouldMapCorrectlyWhenCitizenIsNull() {
-		final CitizenExtended citizen = null;
 
-		final var result = Mapper.toRecipient(citizen);
+		final var result = Mapper.toRecipient(null);
 
 		assertThat(result).isNull();
 	}
@@ -116,7 +117,7 @@ class MapperTest {
 
 	@Test
 	void toAttachmentWhenAttachmentIsNull() {
-		final var result = Mapper.toAttachment(null);
+		final var result = Mapper.toAttachment(null, null);
 
 		assertThat(result).isNull();
 	}

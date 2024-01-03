@@ -33,6 +33,7 @@ class RequestTest {
 		final var recipient = Recipient.builder().build();
 		final var attachment = Attachment.builder().build();
 		final var deviation = "deviation";
+		final var partyId = "partyId";
 
 
 		final var request = Request.builder()
@@ -41,6 +42,7 @@ class RequestTest {
 			.withRecipient(recipient)
 			.withAttachments(List.of(attachment))
 			.withDeviation(deviation)
+			.withPartyId(partyId)
 			.build();
 
 		assertThat(request).isNotNull().hasNoNullFieldsOrProperties();
@@ -49,6 +51,7 @@ class RequestTest {
 		assertThat(request.getRecipient()).isNotNull();
 		assertThat(request.getAttachments()).hasSize(1);
 		assertThat(request.getDeviation()).isEqualTo(deviation);
+		assertThat(request.getPartyId()).isEqualTo(partyId);
 
 
 	}

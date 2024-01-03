@@ -1,5 +1,6 @@
 package se.sundsvall.snailmail.service;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.zalando.problem.Problem;
 
 import se.sundsvall.snailmail.integration.citizen.CitizenIntegration;
 import se.sundsvall.snailmail.integration.db.BatchRepository;
@@ -139,6 +141,38 @@ class SnailMailServiceTest {
 		verifyNoMoreInteractions(batchRepositoryMock, departmentRepositoryMock, requestRepositoryMock, citizenIntegrationMock);
 		verifyNoInteractions(sambaIntegrationMock);
 
+	}
+
+	@Test
+	void sendBatch() {
+
+		final var batchId = "batchId";
+
+		when(batchRepositoryMock.findById(batchId)).thenReturn(Optional.ofNullable(Batch.builder().build()));
+
+		snailMailService.sendBatch(batchId);
+
+		verify(batchRepositoryMock).findById(batchId);
+		verify(sambaIntegrationMock).writeBatchDataToSambaShare(any(Batch.class));
+		verify(batchRepositoryMock).delete(any(Batch.class));
+		verifyNoMoreInteractions(batchRepositoryMock, sambaIntegrationMock);
+		verifyNoInteractions(departmentRepositoryMock, requestRepositoryMock, citizenIntegrationMock);
+	}
+
+	@Test
+	void sendBatchWithNoBatchFound() {
+
+		final var batchId = "batchId";
+
+		when(batchRepositoryMock.findById(batchId)).thenReturn(Optional.empty());
+
+		assertThatThrownBy(() -> snailMailService.sendBatch(batchId))
+			.isInstanceOf(Problem.class)
+			.hasMessage("No batch found: Failed to fetch batch data from database");
+
+		verify(batchRepositoryMock).findById(batchId);
+		verifyNoMoreInteractions(batchRepositoryMock);
+		verifyNoInteractions(departmentRepositoryMock, sambaIntegrationMock, requestRepositoryMock, citizenIntegrationMock);
 	}
 
 }
