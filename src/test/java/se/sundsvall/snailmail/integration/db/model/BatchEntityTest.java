@@ -13,11 +13,11 @@ import java.util.List;
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Test;
 
-class RequestTest {
+class BatchEntityTest {
 
 	@Test
 	void testBean() {
-		MatcherAssert.assertThat(Request.class, allOf(
+		MatcherAssert.assertThat(BatchEntity.class, allOf(
 			hasValidBeanConstructor(),
 			hasValidGettersAndSetters(),
 			hasValidBeanHashCode(),
@@ -28,36 +28,23 @@ class RequestTest {
 	@Test
 	void testBuilderMethods() {
 		// Set values as variables
-		final var id = 12L;
-		final var department = Department.builder().build();
-		final var recipient = Recipient.builder().build();
-		final var attachment = Attachment.builder().build();
-		final var deviation = "deviation";
+		final String id = "batchId";
+		final var department = DepartmentEntity.builder().build();
 
-
-		final var request = Request.builder()
+		final var batch = BatchEntity.builder()
 			.withId(id)
-			.withDepartment(department)
-			.withRecipient(recipient)
-			.withAttachments(List.of(attachment))
-			.withDeviation(deviation)
+			.withDepartmentEntities(List.of(department))
 			.build();
 
-		assertThat(request).isNotNull().hasNoNullFieldsOrProperties();
-		assertThat(request.getId()).isEqualTo(id);
-		assertThat(request.getDepartment()).isNotNull();
-		assertThat(request.getRecipient()).isNotNull();
-		assertThat(request.getAttachments()).hasSize(1);
-		assertThat(request.getDeviation()).isEqualTo(deviation);
-
-
+		assertThat(batch).isNotNull().hasNoNullFieldsOrProperties();
+		assertThat(batch.getId()).isEqualTo(id);
+		assertThat(batch.getDepartmentEntities()).hasSize(1);
 	}
 
 	@Test
 	void testNoDirtOnCreatedBean() {
-		assertThat(Request.builder().build()).hasAllNullFieldsOrProperties();
-		assertThat(new Request()).hasAllNullFieldsOrProperties();
+		assertThat(BatchEntity.builder().build()).hasAllNullFieldsOrProperties();
+		assertThat(new BatchEntity()).hasAllNullFieldsOrProperties();
 	}
-
 
 }

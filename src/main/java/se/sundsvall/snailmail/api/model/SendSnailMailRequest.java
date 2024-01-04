@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 
 import se.sundsvall.dept44.common.validators.annotation.OneOf;
+import se.sundsvall.dept44.common.validators.annotation.ValidBase64;
 import se.sundsvall.dept44.common.validators.annotation.ValidUuid;
 import se.sundsvall.snailmail.api.validation.ValidFolderName;
 
@@ -25,14 +26,14 @@ public class SendSnailMailRequest {
 
 	@NotBlank
 	@ValidFolderName
-	@Schema(description = "Department and unit that should be billed", example = "SBK(Gatuavdelningen, Trafiksektionen)")
+	@Schema(description = "DepartmentEntity and unit that should be billed", example = "SBK(Gatuavdelningen, Trafiksektionen)")
 	private String department;
 
 	@Schema(description = "If the letter to send deviates from the standard", example = "A3 Ritning")
 	private String deviation;
 
 	@NotBlank
-	@Schema(description = "Batch id to be used for creating a csv-file", example = "6a5c3d04-412d-11ec-973a-0242ac130043")
+	@Schema(description = "BatchEntity id to be used for creating a csv-file", example = "6a5c3d04-412d-11ec-973a-0242ac130043")
 	private String batchId;
 
 	@Schema(description = "Party id for the person the letter should be sent to", example = "6a5c3d04-412d-11ec-973a-0242ac130003")
@@ -49,10 +50,10 @@ public class SendSnailMailRequest {
 	public static class Attachment {
 
 		@Schema(description = "The attachment (file) content as a BASE64-encoded string", example = "aGVsbG8gd29ybGQK")
-		@NotBlank
+		@ValidBase64
 		private String content;
 
-		@Schema(description = "The attachment filename", example = "test.txt")
+		@Schema(description = "The attachment filename", example = "test.pdf")
 		@NotBlank
 		private String name;
 

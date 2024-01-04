@@ -29,7 +29,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "request", uniqueConstraints = {
 	@UniqueConstraint(name = "uq_request_recipient", columnNames = "recipient_id")
 })
-public class Request {
+public class RequestEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,16 +38,19 @@ public class Request {
 
 	@ManyToOne
 	@JoinColumn(name = "department_id", foreignKey = @ForeignKey(name = "fk_request_department"))
-	private Department department;
+	private DepartmentEntity departmentEntity;
 
 	@Column(name = "deviation")
 	private String deviation;
 
-	@OneToMany(mappedBy = "request", cascade = CascadeType.ALL)
-	private List<Attachment> attachments;
+	@OneToMany(mappedBy = "requestEntity", cascade = CascadeType.ALL)
+	private List<AttachmentEntity> attachmentEntities;
 
 	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "recipient_id", foreignKey = @ForeignKey(name = "fk_request_recipient"))
-	private Recipient recipient;
+	private RecipientEntity recipientEntity;
+
+	@Column(name = "party_id")
+	private String partyId;
 
 }

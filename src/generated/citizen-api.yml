@@ -57,7 +57,7 @@ paths:
         '204':
           description: No Content
         '400':
-          description: Bad Request
+          description: Bad RequestEntity
           content:
             text/plain:
               schema:
@@ -144,7 +144,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/CitizenExtended'
         '400':
-          description: Bad Request
+          description: Bad RequestEntity
           content:
             text/plain:
               schema:
@@ -213,7 +213,7 @@ paths:
         '204':
           description: No Content
         '400':
-          description: Bad Request
+          description: Bad RequestEntity
           content:
             text/plain:
               schema:
@@ -277,7 +277,7 @@ paths:
         '204':
           description: No Content
         '400':
-          description: Bad Request
+          description: Bad RequestEntity
           content:
             text/plain:
               schema:
@@ -343,7 +343,7 @@ paths:
         '204':
           description: No Content
         '400':
-          description: Bad Request
+          description: Bad RequestEntity
           content:
             text/plain:
               schema:
@@ -433,7 +433,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/PersonGuidBatch'
         '400':
-          description: Bad Request
+          description: Bad RequestEntity
           content:
             text/plain:
               schema:
@@ -502,7 +502,7 @@ paths:
                 type: string
                 format: uuid
         '400':
-          description: Bad Request
+          description: Bad RequestEntity
           content:
             text/plain:
               schema:

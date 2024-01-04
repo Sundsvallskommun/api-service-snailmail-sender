@@ -11,11 +11,11 @@ import static org.hamcrest.CoreMatchers.allOf;
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Test;
 
-class RecipientTest {
+class RecipientEntityTest {
 
 	@Test
 	void testBean() {
-		MatcherAssert.assertThat(Recipient.class, allOf(
+		MatcherAssert.assertThat(RecipientEntity.class, allOf(
 			hasValidBeanConstructor(),
 			hasValidGettersAndSetters(),
 			hasValidBeanHashCode(),
@@ -27,8 +27,8 @@ class RecipientTest {
 	void testBuilderMethods() {
 		// Set values as variables
 		final var id = 12L;
-		final var request = Request.builder().build();
-		final var co = "co";
+		final var request = RequestEntity.builder().build();
+		final var careOf = "careOf";
 		final var givenName = "givenName";
 		final var lastName = "lastName";
 		final var adress = "adress";
@@ -36,32 +36,32 @@ class RecipientTest {
 		final var city = "city";
 
 
-		final var recipient = Recipient.builder()
+		final var recipient = RecipientEntity.builder()
 			.withId(id)
-			.withRequest(request)
-			.withCo(co)
+			.withRequestEntity(request)
+			.withCareOf(careOf)
 			.withGivenName(givenName)
 			.withLastName(lastName)
-			.withAdress(adress)
+			.withAddress(adress)
 			.withPostalCode(postalCode)
 			.withCity(city)
 			.build();
 
 		assertThat(recipient).isNotNull().hasNoNullFieldsOrProperties();
 		assertThat(recipient.getId()).isEqualTo(id);
-		assertThat(recipient.getRequest()).isNotNull();
-		assertThat(recipient.getCo()).isEqualTo(co);
+		assertThat(recipient.getRequestEntity()).isNotNull();
+		assertThat(recipient.getCareOf()).isEqualTo(careOf);
 		assertThat(recipient.getGivenName()).isEqualTo(givenName);
 		assertThat(recipient.getLastName()).isEqualTo(lastName);
-		assertThat(recipient.getAdress()).isEqualTo(adress);
+		assertThat(recipient.getAddress()).isEqualTo(adress);
 		assertThat(recipient.getPostalCode()).isEqualTo(postalCode);
 		assertThat(recipient.getCity()).isEqualTo(city);
 	}
 
 	@Test
 	void testNoDirtOnCreatedBean() {
-		assertThat(Recipient.builder().build()).hasAllNullFieldsOrProperties();
-		assertThat(new Recipient()).hasAllNullFieldsOrProperties();
+		assertThat(RecipientEntity.builder().build()).hasAllNullFieldsOrProperties();
+		assertThat(new RecipientEntity()).hasAllNullFieldsOrProperties();
 	}
 
 }

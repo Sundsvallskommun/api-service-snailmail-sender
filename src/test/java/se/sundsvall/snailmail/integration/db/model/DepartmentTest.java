@@ -17,7 +17,7 @@ class DepartmentTest {
 
 	@Test
 	void testBean() {
-		MatcherAssert.assertThat(Department.class, allOf(
+		MatcherAssert.assertThat(DepartmentEntity.class, allOf(
 			hasValidBeanConstructor(),
 			hasValidGettersAndSetters(),
 			hasValidBeanHashCode(),
@@ -29,28 +29,28 @@ class DepartmentTest {
 	void testBuilderMethods() {
 		// Set values as variables
 		final var id = 12L;
-		final var request = Request.builder().build();
-		final var batch = Batch.builder().build();
+		final var request = RequestEntity.builder().build();
+		final var batch = BatchEntity.builder().build();
 		final var name = "departmentName";
 
-		final var department = Department.builder()
+		final var department = DepartmentEntity.builder()
 			.withId(id)
 			.withName(name)
-			.withBatch(batch)
-			.withRequests(List.of(request))
+			.withBatchEntity(batch)
+			.withRequestEntities(List.of(request))
 			.build();
 
 		Assertions.assertThat(department).isNotNull().hasNoNullFieldsOrProperties();
 		Assertions.assertThat(department.getId()).isEqualTo(id);
-		Assertions.assertThat(department.getRequests()).hasSize(1);
+		Assertions.assertThat(department.getRequestEntities()).hasSize(1);
 		Assertions.assertThat(department.getName()).isEqualTo(name);
-		Assertions.assertThat(department.getBatch()).isNotNull();
+		Assertions.assertThat(department.getBatchEntity()).isNotNull();
 	}
 
 	@Test
 	void testNoDirtOnCreatedBean() {
-		Assertions.assertThat(Department.builder().build()).hasAllNullFieldsOrProperties();
-		Assertions.assertThat(new Department()).hasAllNullFieldsOrProperties();
+		Assertions.assertThat(DepartmentEntity.builder().build()).hasAllNullFieldsOrProperties();
+		Assertions.assertThat(new DepartmentEntity()).hasAllNullFieldsOrProperties();
 	}
 
 }

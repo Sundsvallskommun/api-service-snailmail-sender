@@ -5,11 +5,11 @@ import java.util.List;
 import java.util.Optional;
 
 import se.sundsvall.snailmail.api.model.SendSnailMailRequest;
-import se.sundsvall.snailmail.integration.db.model.Attachment;
-import se.sundsvall.snailmail.integration.db.model.Batch;
-import se.sundsvall.snailmail.integration.db.model.Department;
-import se.sundsvall.snailmail.integration.db.model.Recipient;
-import se.sundsvall.snailmail.integration.db.model.Request;
+import se.sundsvall.snailmail.integration.db.model.AttachmentEntity;
+import se.sundsvall.snailmail.integration.db.model.BatchEntity;
+import se.sundsvall.snailmail.integration.db.model.DepartmentEntity;
+import se.sundsvall.snailmail.integration.db.model.RecipientEntity;
+import se.sundsvall.snailmail.integration.db.model.RequestEntity;
 
 import generated.se.sundsvall.citizen.CitizenExtended;
 
@@ -17,57 +17,63 @@ public final class Mapper {
 
 	private Mapper() {}
 
-	static Request toRequest(final SendSnailMailRequest request, final CitizenExtended citizen, final Department department) {
+	static RequestEntity toRequest(final SendSnailMailRequest request, final CitizenExtended citizen, final DepartmentEntity departmentEntity) {
 
 		return Optional.ofNullable(request)
-			.map(req -> Request.builder()
-				.withDepartment(department)
-				.withDeviation(req.getDeviation())
-				.withRecipient(toRecipient(citizen))
-				.withAttachments(Optional.ofNullable(req.getAttachments())
-					.orElse(List.of()).stream()
-					.map(Mapper::toAttachment)
-					.toList())
-				.build())
-			.orElse(null);
+			.map(req -> {
+				final var newRequest = RequestEntity.builder()
+					.withDepartmentEntity(departmentEntity)
+					.withDeviation(req.getDeviation())
+					.withRecipientEntity(toRecipient(citizen))
+					.build();
 
+				final var attachments = Optional.ofNullable(req.getAttachments())
+					.orElse(List.of()).stream()
+					.map(attachment -> toAttachment(attachment, newRequest))
+					.toList();
+
+				newRequest.setAttachmentEntities(attachments);
+
+				return newRequest;
+			})
+			.orElse(null);
 	}
 
-	static Attachment toAttachment(final SendSnailMailRequest.Attachment attachment) {
+	static AttachmentEntity toAttachment(final SendSnailMailRequest.Attachment attachment, final RequestEntity requestEntity) {
 
 		return Optional.ofNullable(attachment)
-			.map(attach -> Attachment.builder()
+			.map(attach -> AttachmentEntity.builder()
 				.withContent(attach.getContent())
 				.withName(attach.getName())
 				.withContentType(attach.getContentType())
 				.withEnvelopeType(attach.getEnvelopeType())
+				.withRequestEntity(requestEntity)
 				.build())
 			.orElse(null);
-
 	}
 
-	static Department toDepartment(final String departmentName, final Batch batch) {
+	static DepartmentEntity toDepartment(final String departmentName, final BatchEntity batchEntity) {
 
-		return Department.builder()
+		return DepartmentEntity.builder()
 			.withName(departmentName)
-			.withBatch(batch)
+			.withBatchEntity(batchEntity)
 			.build();
 	}
 
-	static Recipient toRecipient(final CitizenExtended citizen) {
+	static RecipientEntity toRecipient(final CitizenExtended citizen) {
 
 		return Optional.ofNullable(citizen)
 			.flatMap(c -> Optional.ofNullable(c.getAddresses())
 				.orElse(Collections.emptyList())
 				.stream()
 				.findFirst())
-			.map(address -> Recipient.builder()
+			.map(address -> RecipientEntity.builder()
 				.withGivenName(citizen.getGivenname())
 				.withLastName(citizen.getLastname())
-				.withAdress(address.getAddress())
+				.withAddress(address.getAddress())
 				.withPostalCode(address.getPostalCode())
 				.withCity(address.getCity())
-				.withCo(address.getCo())
+				.withCareOf(address.getCo())
 				.build())
 			.orElse(null);
 	}

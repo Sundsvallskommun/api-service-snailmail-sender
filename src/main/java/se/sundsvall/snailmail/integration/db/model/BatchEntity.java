@@ -20,13 +20,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "batch")
-public class Batch {
+public class BatchEntity {
 
 	@Id
 	@Column(name = "id")
 	private String id;
 
-	@OneToMany(mappedBy = "batch", cascade = CascadeType.ALL)
-	private List<Department> departments;
+	@OneToMany(mappedBy = "batchEntity", cascade = CascadeType.ALL)
+	private List<DepartmentEntity> departmentEntities;
 
 }

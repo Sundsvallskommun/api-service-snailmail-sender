@@ -9,8 +9,9 @@ import org.junit.jupiter.api.Test;
 
 import se.sundsvall.snailmail.api.model.EnvelopeType;
 import se.sundsvall.snailmail.api.model.SendSnailMailRequest;
-import se.sundsvall.snailmail.integration.db.model.Batch;
-import se.sundsvall.snailmail.integration.db.model.Department;
+import se.sundsvall.snailmail.integration.db.model.BatchEntity;
+import se.sundsvall.snailmail.integration.db.model.DepartmentEntity;
+import se.sundsvall.snailmail.integration.db.model.RequestEntity;
 
 import generated.se.sundsvall.citizen.CitizenAddress;
 import generated.se.sundsvall.citizen.CitizenExtended;
@@ -22,12 +23,12 @@ class MapperTest {
 		final var deviation = "deviation";
 		final var sendSnailMailRequest = SendSnailMailRequest.builder().withDeviation(deviation).build();
 		final var citizen = new CitizenExtended();
-		final var department = new Department();
+		final var department = new DepartmentEntity();
 
 		final var result = Mapper.toRequest(sendSnailMailRequest, citizen, department);
 
 		assertThat(result).isNotNull();
-		assertThat(result.getDepartment()).isEqualTo(department);
+		assertThat(result.getDepartmentEntity()).isEqualTo(department);
 		assertThat(result.getDeviation()).isEqualTo(deviation);
 	}
 
@@ -43,33 +44,34 @@ class MapperTest {
 			.withContentType(contentType)
 			.withEnvelopeType(envelopeType)
 			.build();
+		final var request = new RequestEntity();
 
-		final var result = Mapper.toAttachment(sendSnailMailRequestAttachment);
+		final var result = Mapper.toAttachment(sendSnailMailRequestAttachment, request);
 
 		assertThat(result).isNotNull();
 		assertThat(result.getContent()).isEqualTo(content);
 		assertThat(result.getName()).isEqualTo(name);
 		assertThat(result.getContentType()).isEqualTo(contentType);
 		assertThat(result.getEnvelopeType()).isEqualTo(envelopeType);
+		assertThat(result.getRequestEntity()).isEqualTo(request);
 	}
 
 	@Test
 	void toDepartmentShouldMapCorrectly() {
-		final var departmentName = "Department Name";
-		final var batch = new Batch();
+		final var departmentName = "DepartmentEntity Name";
+		final var batch = new BatchEntity();
 
 		final var result = Mapper.toDepartment(departmentName, batch);
 
 		assertThat(result).isNotNull();
 		assertThat(result.getName()).isEqualTo(departmentName);
-		assertThat(result.getBatch()).isEqualTo(batch);
+		assertThat(result.getBatchEntity()).isEqualTo(batch);
 	}
 
 	@Test
 	void toRecipientShouldMapCorrectlyWhenCitizenIsNull() {
-		final CitizenExtended citizen = null;
 
-		final var result = Mapper.toRecipient(citizen);
+		final var result = Mapper.toRecipient(null);
 
 		assertThat(result).isNull();
 	}
@@ -116,7 +118,7 @@ class MapperTest {
 
 	@Test
 	void toAttachmentWhenAttachmentIsNull() {
-		final var result = Mapper.toAttachment(null);
+		final var result = Mapper.toAttachment(null, null);
 
 		assertThat(result).isNull();
 	}

@@ -29,8 +29,6 @@ class SambaIntegrationPropertiesTest {
 		assertThat(properties.share()).isEqualTo("/someShare/");
 		assertThat(properties.connectTimeout()).isEqualTo(Duration.parse("PT5S"));
 		assertThat(properties.responseTimeout()).isEqualTo(Duration.parse("PT10S"));
-
-		//assertThat(properties.jcifsProperties().getProperty("jcifs.smb.client.connTimeout")).isEqualTo("5000");
-		//assertThat(properties.jcifsProperties().getProperty("jcifs.smb.client.responseTimeout")).isEqualTo("10000");
 	}
+
 }

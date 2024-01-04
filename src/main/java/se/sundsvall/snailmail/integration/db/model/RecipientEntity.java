@@ -7,7 +7,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,10 +18,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "request", uniqueConstraints = {
-	@UniqueConstraint(name = "uq_request_recipient", columnNames = "recipient_id")
-})
-public class Recipient {
+@Table(name = "recipient")
+public class RecipientEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,11 +32,11 @@ public class Recipient {
 	@Column(name = "last_name")
 	private String lastName;
 
-	@Column(name = "co")
-	private String co;
+	@Column(name = "care_of")
+	private String careOf;
 
-	@Column(name = "adress")
-	private String adress;
+	@Column(name = "address")
+	private String address;
 
 	@Column(name = "postal_code")
 	private String postalCode;
@@ -47,7 +44,7 @@ public class Recipient {
 	@Column(name = "city")
 	private String city;
 
-	@OneToOne(mappedBy = "recipient")
-	private Request request;
+	@OneToOne(mappedBy = "recipientEntity")
+	private RequestEntity requestEntity;
 
 }

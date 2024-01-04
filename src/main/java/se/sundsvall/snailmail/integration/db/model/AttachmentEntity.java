@@ -7,6 +7,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
@@ -23,7 +24,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "attachment")
-public class Attachment {
+public class AttachmentEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,9 +33,10 @@ public class Attachment {
 
 	@ManyToOne
 	@JoinColumn(name = "request_id", foreignKey = @ForeignKey(name = "fk_attachment_request"))
-	private Request request;
+	private RequestEntity requestEntity;
 
-	@Column(name = "content")
+	@Lob
+	@Column(name = "content", columnDefinition = "longtext")
 	private String content;
 
 	@Column(name = "name")
