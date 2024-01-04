@@ -13,11 +13,11 @@ import org.junit.jupiter.api.Test;
 
 import se.sundsvall.snailmail.api.model.EnvelopeType;
 
-class AttachmentTest {
+class AttachmentEntityTest {
 
 	@Test
 	void testBean() {
-		MatcherAssert.assertThat(Attachment.class, allOf(
+		MatcherAssert.assertThat(AttachmentEntity.class, allOf(
 			hasValidBeanConstructor(),
 			hasValidGettersAndSetters(),
 			hasValidBeanHashCode(),
@@ -29,16 +29,16 @@ class AttachmentTest {
 	void testBuilderMethods() {
 		// Set values as variables
 		final var id = 12L;
-		final var request = Request.builder().build();
+		final var request = RequestEntity.builder().build();
 		final var contentType = "contentType";
 		final var envelopeType = EnvelopeType.PLAIN;
 		final var name = "name";
 		final var content = "content";
 
 
-		final var attachment = Attachment.builder()
+		final var attachment = AttachmentEntity.builder()
 			.withId(id)
-			.withRequest(request)
+			.withRequestEntity(request)
 			.withContentType(contentType)
 			.withEnvelopeType(envelopeType)
 			.withName(name)
@@ -47,7 +47,7 @@ class AttachmentTest {
 
 		assertThat(attachment).isNotNull().hasNoNullFieldsOrProperties();
 		assertThat(attachment.getId()).isEqualTo(id);
-		assertThat(attachment.getRequest()).isNotNull();
+		assertThat(attachment.getRequestEntity()).isNotNull();
 		assertThat(attachment.getContentType()).isEqualTo(contentType);
 		assertThat(attachment.getEnvelopeType()).isEqualTo(envelopeType);
 		assertThat(attachment.getName()).isEqualTo(name);
@@ -57,8 +57,8 @@ class AttachmentTest {
 
 	@Test
 	void testNoDirtOnCreatedBean() {
-		assertThat(Attachment.builder().build()).hasAllNullFieldsOrProperties();
-		assertThat(new Attachment()).hasAllNullFieldsOrProperties();
+		assertThat(AttachmentEntity.builder().build()).hasAllNullFieldsOrProperties();
+		assertThat(new AttachmentEntity()).hasAllNullFieldsOrProperties();
 	}
 
 }

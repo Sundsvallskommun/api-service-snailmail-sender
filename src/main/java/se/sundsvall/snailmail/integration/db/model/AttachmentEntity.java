@@ -1,9 +1,5 @@
 package se.sundsvall.snailmail.integration.db.model;
 
-
-import java.util.List;
-
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ForeignKey;
@@ -11,9 +7,11 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+
+import se.sundsvall.snailmail.api.model.EnvelopeType;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,22 +23,29 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "department")
-public class Department {
+@Table(name = "attachment")
+public class AttachmentEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
 	private Long id;
 
+	@ManyToOne
+	@JoinColumn(name = "request_id", foreignKey = @ForeignKey(name = "fk_attachment_request"))
+	private RequestEntity requestEntity;
+
+	@Lob
+	@Column(name = "content", columnDefinition = "longtext")
+	private String content;
+
 	@Column(name = "name")
 	private String name;
 
-	@ManyToOne
-	@JoinColumn(name = "batch_id", foreignKey = @ForeignKey(name = "fk_department_batch"))
-	private Batch batch;
+	@Column(name = "content_type")
+	private String contentType;
 
-	@OneToMany(mappedBy = "department", cascade = CascadeType.ALL)
-	private List<Request> requests;
+	@Column(name = "envelope_type")
+	private EnvelopeType envelopeType;
 
 }

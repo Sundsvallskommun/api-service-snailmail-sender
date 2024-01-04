@@ -11,7 +11,7 @@ import se.sundsvall.snailmail.integration.citizen.CitizenIntegration;
 import se.sundsvall.snailmail.integration.db.BatchRepository;
 import se.sundsvall.snailmail.integration.db.DepartmentRepository;
 import se.sundsvall.snailmail.integration.db.RequestRepository;
-import se.sundsvall.snailmail.integration.db.model.Batch;
+import se.sundsvall.snailmail.integration.db.model.BatchEntity;
 import se.sundsvall.snailmail.integration.samba.SambaIntegration;
 
 import generated.se.sundsvall.citizen.CitizenExtended;
@@ -46,7 +46,7 @@ public class SnailMailService {
 		}
 
 		final var batch = batchRepository.findById(request.getBatchId())
-			.orElseGet(() -> batchRepository.save(Batch.builder().withId(request.getBatchId()).build()));
+			.orElseGet(() -> batchRepository.save(BatchEntity.builder().withId(request.getBatchId()).build()));
 
 		final var department = departmentRepository.findByName(request.getDepartment())
 			.orElseGet(() -> departmentRepository

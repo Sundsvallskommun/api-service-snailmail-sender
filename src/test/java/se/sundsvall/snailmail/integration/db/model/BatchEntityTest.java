@@ -13,11 +13,11 @@ import java.util.List;
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Test;
 
-class BatchTest {
+class BatchEntityTest {
 
 	@Test
 	void testBean() {
-		MatcherAssert.assertThat(Batch.class, allOf(
+		MatcherAssert.assertThat(BatchEntity.class, allOf(
 			hasValidBeanConstructor(),
 			hasValidGettersAndSetters(),
 			hasValidBeanHashCode(),
@@ -29,22 +29,22 @@ class BatchTest {
 	void testBuilderMethods() {
 		// Set values as variables
 		final String id = "batchId";
-		final var department = Department.builder().build();
+		final var department = DepartmentEntity.builder().build();
 
-		final var batch = Batch.builder()
+		final var batch = BatchEntity.builder()
 			.withId(id)
-			.withDepartments(List.of(department))
+			.withDepartmentEntities(List.of(department))
 			.build();
 
 		assertThat(batch).isNotNull().hasNoNullFieldsOrProperties();
 		assertThat(batch.getId()).isEqualTo(id);
-		assertThat(batch.getDepartments()).hasSize(1);
+		assertThat(batch.getDepartmentEntities()).hasSize(1);
 	}
 
 	@Test
 	void testNoDirtOnCreatedBean() {
-		assertThat(Batch.builder().build()).hasAllNullFieldsOrProperties();
-		assertThat(new Batch()).hasAllNullFieldsOrProperties();
+		assertThat(BatchEntity.builder().build()).hasAllNullFieldsOrProperties();
+		assertThat(new BatchEntity()).hasAllNullFieldsOrProperties();
 	}
 
 }

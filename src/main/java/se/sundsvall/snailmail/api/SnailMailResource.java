@@ -29,7 +29,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Validated
 @RequestMapping("/send")
 @Tag(name = "SnailMailSender", description = "SnailMailSender")
-@ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(schema = @Schema(oneOf = {Problem.class, ConstraintViolation.class})))
+@ApiResponse(responseCode = "400", description = "Bad RequestEntity", content = @Content(schema = @Schema(oneOf = {Problem.class, ConstraintViolation.class})))
 @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Problem.class)))
 public class SnailMailResource {
 

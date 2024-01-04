@@ -23,9 +23,9 @@
 
     create table recipient (
         id bigint not null auto_increment,
-        adress varchar(255),
+        address varchar(255),
+        care_of varchar(255),
         city varchar(255),
-        co varchar(255),
         given_name varchar(255),
         last_name varchar(255),
         postal_code varchar(255),
@@ -40,6 +40,9 @@
         party_id varchar(255),
         primary key (id)
     ) engine=InnoDB;
+
+    create index idx_department_name 
+       on department (name);
 
     alter table if exists request 
        add constraint UK_q3hqdcjoytjj5c5i5unhkqyjj unique (recipient_id);

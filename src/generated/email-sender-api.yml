@@ -24,7 +24,7 @@ paths:
         required: true
       responses:
         "400":
-          description: Bad Request
+          description: Bad RequestEntity
           content:
             '*/*':
               schema:
@@ -80,7 +80,7 @@ components:
       properties:
         emailAddress:
           type: string
-          description: Recipient e-mail address
+          description: RecipientEntity e-mail address
           example: recipient@recipient.se
         subject:
           type: string

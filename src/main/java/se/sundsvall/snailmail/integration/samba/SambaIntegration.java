@@ -15,9 +15,9 @@ import org.zalando.problem.Problem;
 import org.zalando.problem.Status;
 
 import se.sundsvall.snailmail.api.model.EnvelopeType;
-import se.sundsvall.snailmail.integration.db.model.Attachment;
-import se.sundsvall.snailmail.integration.db.model.Batch;
-import se.sundsvall.snailmail.integration.db.model.Request;
+import se.sundsvall.snailmail.integration.db.model.AttachmentEntity;
+import se.sundsvall.snailmail.integration.db.model.BatchEntity;
+import se.sundsvall.snailmail.integration.db.model.RequestEntity;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import jcifs.CIFSContext;
@@ -48,21 +48,21 @@ public class SambaIntegration {
 		shareUrl = String.format("smb://%s:%d%s", properties.host(), properties.port(), properties.share());
 	}
 
-	public void writeBatchDataToSambaShare(final Batch batch) {
+	public void writeBatchDataToSambaShare(final BatchEntity batchEntity) {
 
-		// Create the batch folder
-		final var batchPath = shareUrl + batch.getId();
+		// Create the batchEntity folder
+		final var batchPath = shareUrl + batchEntity.getId();
 		createFolder(batchPath);
 
-		batch.getDepartments().forEach(
+		batchEntity.getDepartmentEntities().forEach(
 			department -> {
 				// Create the department folders
 				final var departmentPath = batchPath + File.separator + department.getName();
 				createFolder(departmentPath);
 				// Save the data to the files
-				department.getRequests()
+				department.getRequestEntities()
 					.forEach(request -> {
-						final var attachment = request.getAttachments().getFirst();
+						final var attachment = request.getAttachmentEntities().getFirst();
 						saveAttachment(attachment, departmentPath);
 
 						// Only save the request data if it's not a windowed envelope
@@ -74,9 +74,9 @@ public class SambaIntegration {
 		);
 	}
 
-	private void saveRequestDataToFile(final Request request, final String departmentPath) {
+	private void saveRequestDataToFile(final RequestEntity requestEntity, final String departmentPath) {
 
-		final var targetFile = findFile(request, departmentPath);
+		final var targetFile = findFile(requestEntity, departmentPath);
 
 		try (final var destinationFile = new SmbFile(targetFile, context)) {
 			if (!destinationFile.exists()) {
@@ -91,11 +91,11 @@ public class SambaIntegration {
 					printWriter.println("namn,careOf,adress,postnummer,postort");
 				}
 
-				final var name = request.getRecipient().getGivenName() + " " + request.getRecipient().getLastName();
-				final var careOf = request.getRecipient().getCo();
-				final var address = request.getRecipient().getAdress();
-				final var postalCode = request.getRecipient().getPostalCode();
-				final var city = request.getRecipient().getCity();
+				final var name = requestEntity.getRecipientEntity().getGivenName() + " " + requestEntity.getRecipientEntity().getLastName();
+				final var careOf = requestEntity.getRecipientEntity().getCareOf();
+				final var address = requestEntity.getRecipientEntity().getAddress();
+				final var postalCode = requestEntity.getRecipientEntity().getPostalCode();
+				final var city = requestEntity.getRecipientEntity().getCity();
 
 				printWriter.printf("%s,%s,%s,%s,%s%n", name, careOf, address, postalCode, city);
 			}
@@ -104,8 +104,8 @@ public class SambaIntegration {
 		}
 	}
 
-	private void saveAttachment(final Attachment attachment, final String departmentPath) {
-		final var attachmentFile = departmentPath + File.separator + attachment.getName();
+	private void saveAttachment(final AttachmentEntity attachmentEntity, final String departmentPath) {
+		final var attachmentFile = departmentPath + File.separator + attachmentEntity.getName();
 
 		try (final var destinationAttachmentFile = new SmbFile(attachmentFile, context)) {
 			if (!destinationAttachmentFile.exists()) {
@@ -113,22 +113,22 @@ public class SambaIntegration {
 
 				try (final var smbFileOutputStream = new SmbFileOutputStream(destinationAttachmentFile)) {
 
-					smbFileOutputStream.write(Base64.getDecoder().decode(attachment.getContent()));
+					smbFileOutputStream.write(Base64.getDecoder().decode(attachmentEntity.getContent()));
 				}
 			}
 		} catch (final IOException e) {
-			throw Problem.valueOf(Status.INTERNAL_SERVER_ERROR, "Failed to write attachment to Samba share");
+			throw Problem.valueOf(Status.INTERNAL_SERVER_ERROR, "Failed to write attachmentEntity to Samba share");
 		}
 	}
 
 
-	String findFile(final Request request, final String departmentPath) {
-		return Optional.ofNullable(request.getAttachments().getFirst().getName())
+	String findFile(final RequestEntity requestEntity, final String departmentPath) {
+		return Optional.ofNullable(requestEntity.getAttachmentEntities().getFirst().getName())
 			.map(name -> name.substring(0, Optional.of(name.lastIndexOf("."))
 				.filter(i -> i != -1)
 				.orElse(name.length())))
 			.map(name -> departmentPath + File.separator + FILE_PREFIX + name + ".csv")
-			.orElseThrow(() -> Problem.valueOf(Status.INTERNAL_SERVER_ERROR, "Attachment name is null"));
+			.orElseThrow(() -> Problem.valueOf(Status.INTERNAL_SERVER_ERROR, "AttachmentEntity name is null"));
 	}
 
 	void createFolder(final String folder) {

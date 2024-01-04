@@ -13,11 +13,11 @@ import java.util.List;
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Test;
 
-class RequestTest {
+class RequestEntityTest {
 
 	@Test
 	void testBean() {
-		MatcherAssert.assertThat(Request.class, allOf(
+		MatcherAssert.assertThat(RequestEntity.class, allOf(
 			hasValidBeanConstructor(),
 			hasValidGettersAndSetters(),
 			hasValidBeanHashCode(),
@@ -29,27 +29,27 @@ class RequestTest {
 	void testBuilderMethods() {
 		// Set values as variables
 		final var id = 12L;
-		final var department = Department.builder().build();
-		final var recipient = Recipient.builder().build();
-		final var attachment = Attachment.builder().build();
+		final var department = DepartmentEntity.builder().build();
+		final var recipient = RecipientEntity.builder().build();
+		final var attachment = AttachmentEntity.builder().build();
 		final var deviation = "deviation";
 		final var partyId = "partyId";
 
 
-		final var request = Request.builder()
+		final var request = RequestEntity.builder()
 			.withId(id)
-			.withDepartment(department)
-			.withRecipient(recipient)
-			.withAttachments(List.of(attachment))
+			.withDepartmentEntity(department)
+			.withRecipientEntity(recipient)
+			.withAttachmentEntities(List.of(attachment))
 			.withDeviation(deviation)
 			.withPartyId(partyId)
 			.build();
 
 		assertThat(request).isNotNull().hasNoNullFieldsOrProperties();
 		assertThat(request.getId()).isEqualTo(id);
-		assertThat(request.getDepartment()).isNotNull();
-		assertThat(request.getRecipient()).isNotNull();
-		assertThat(request.getAttachments()).hasSize(1);
+		assertThat(request.getDepartmentEntity()).isNotNull();
+		assertThat(request.getRecipientEntity()).isNotNull();
+		assertThat(request.getAttachmentEntities()).hasSize(1);
 		assertThat(request.getDeviation()).isEqualTo(deviation);
 		assertThat(request.getPartyId()).isEqualTo(partyId);
 
@@ -58,8 +58,8 @@ class RequestTest {
 
 	@Test
 	void testNoDirtOnCreatedBean() {
-		assertThat(Request.builder().build()).hasAllNullFieldsOrProperties();
-		assertThat(new Request()).hasAllNullFieldsOrProperties();
+		assertThat(RequestEntity.builder().build()).hasAllNullFieldsOrProperties();
+		assertThat(new RequestEntity()).hasAllNullFieldsOrProperties();
 	}
 
 
