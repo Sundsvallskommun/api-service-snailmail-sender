@@ -24,9 +24,9 @@ class SambaIntegrationPropertiesTest {
 		assertThat(properties.host()).isEqualTo("localhost");
 		assertThat(properties.port()).isEqualTo(445);
 		assertThat(properties.domain()).isEqualTo("WORKGROUP");
-		assertThat(properties.username()).isEqualTo("someUsername");
-		assertThat(properties.password()).isEqualTo("somePassword");
-		assertThat(properties.share()).isEqualTo("/someShare/");
+		assertThat(properties.username()).isEqualTo("user");
+		assertThat(properties.password()).isEqualTo("1234");
+		assertThat(properties.share()).isEqualTo("/share/");
 		assertThat(properties.connectTimeout()).isEqualTo(Duration.parse("PT5S"));
 		assertThat(properties.responseTimeout()).isEqualTo(Duration.parse("PT10S"));
 	}
