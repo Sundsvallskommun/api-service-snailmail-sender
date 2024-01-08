@@ -28,7 +28,6 @@ import se.sundsvall.snailmail.integration.db.model.DepartmentEntity;
 import se.sundsvall.snailmail.integration.db.model.RecipientEntity;
 import se.sundsvall.snailmail.integration.db.model.RequestEntity;
 
-//@Testcontainers
 @ActiveProfiles("junit")
 @SpringBootTest(classes = Application.class, webEnvironment = RANDOM_PORT)
 @Testcontainers
@@ -41,7 +40,7 @@ class SambaIntegrationTest {
 			.withStartupTimeout(Duration.ofSeconds(60));
 
 	@Autowired
-	SambaIntegration sambaIntegration;
+	private SambaIntegration sambaIntegration;
 
 
 	@Test
