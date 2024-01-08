@@ -1,11 +1,11 @@
 create table attachment
 (
-    envelope_type tinyint check (envelope_type between 0 and 1),
     id            bigint not null auto_increment,
     request_id    bigint,
     content_type  varchar(255),
     name          varchar(255),
     content       longtext,
+    envelope_type enum ('WINDOWED','PLAIN'),
     primary key (id)
 ) engine = InnoDB;
 

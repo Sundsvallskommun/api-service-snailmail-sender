@@ -122,7 +122,7 @@ public class SambaIntegration {
 	}
 
 
-	String findFile(final RequestEntity requestEntity, final String departmentPath) {
+	private String findFile(final RequestEntity requestEntity, final String departmentPath) {
 		return Optional.ofNullable(requestEntity.getAttachmentEntities().getFirst().getName())
 			.map(name -> name.substring(0, Optional.of(name.lastIndexOf("."))
 				.filter(i -> i != -1)
@@ -131,7 +131,7 @@ public class SambaIntegration {
 			.orElseThrow(() -> Problem.valueOf(Status.INTERNAL_SERVER_ERROR, "AttachmentEntity name is null"));
 	}
 
-	void createFolder(final String folder) {
+	private void createFolder(final String folder) {
 		try (final var folderFile = new SmbFile(folder, context)) {
 			if (!folderFile.exists()) {
 				LOGGER.info("Folder: {}, doesn't exist, creating it.", folderFile);

@@ -5,9 +5,9 @@ integration:
     host: localhost
     port: 445
     domain: WORKGROUP
-    username: someUsername
-    password: somePassword
-    share: /someShare/
+    username: user
+    password: 1234
+    share: /share/
     connect-timeout: PT5S
     response-timeout: PT10S
 
