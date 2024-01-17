@@ -45,7 +45,7 @@
        on department (name);
 
     alter table if exists request 
-       add constraint UK_q3hqdcjoytjj5c5i5unhkqyjj unique (recipient_id);
+       add constraint uq_request_recipient unique (recipient_id);
 
     alter table if exists attachment 
        add constraint fk_attachment_request 
