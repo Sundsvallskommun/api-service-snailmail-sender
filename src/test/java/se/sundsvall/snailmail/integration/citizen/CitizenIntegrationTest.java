@@ -3,13 +3,13 @@ package se.sundsvall.snailmail.integration.citizen;
 import static java.util.UUID.randomUUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
@@ -34,31 +34,40 @@ class CitizenIntegrationTest {
 	private CitizenIntegration citizenIntegration;
 
 	@Test
-	void getCitizens() {
-		final var uuid1 = randomUUID();
-		final var uuid2 = randomUUID();
-		final var citizen1 = buildCitizen(uuid1);
-		final var citizen2 = buildCitizen(uuid2);
+	void getCitizen() {
+		final var uuid = randomUUID();
+		final var citizenExtended = buildCitizen(uuid);
 
-		when(citizenMock.getCitizens(eq(false), anyList())).thenReturn(List.of(citizen1, citizen2));
+		when(citizenMock.getCitizen(uuid.toString())).thenReturn(Optional.ofNullable(citizenExtended));
 
-		final var response = citizenIntegration.getCitizens(List.of(uuid1.toString(), uuid2.toString()));
+		final var response = citizenIntegration.getCitizen(uuid.toString());
 
-		assertThat(response)
-			.hasSize(2)
-			.extracting(CitizenExtended::getPersonId)
-			.containsExactly(uuid1, uuid2);
+		assertThat(response).isEqualTo(citizenExtended);
 
-		verify(citizenMock).getCitizens(false, List.of(uuid1.toString(), uuid2.toString()));
+		verify(citizenMock).getCitizen(uuid.toString());
 		verifyNoMoreInteractions(citizenMock);
+	}
+
+	@Test
+	void testGetCitizenReturnsEmpty_shouldThrowException() {
+		final var uuid = randomUUID();
+
+		when(citizenMock.getCitizen(uuid.toString())).thenReturn(Optional.empty());
+
+		final var stringUuid = uuid.toString();
+		assertThatExceptionOfType(ThrowableProblem.class)
+			.isThrownBy(() -> citizenIntegration.getCitizen(stringUuid))
+			.satisfies(problem -> {
+				assertThat(problem.getStatus()).isEqualTo(Status.INTERNAL_SERVER_ERROR);
+				assertThat(problem.getDetail()).isEqualTo("Failed to fetch citizen data from Citizen API");
+			});
 	}
 
 	@Test
 	void getCitizenThrowingException() {
 		final var uuid1 = randomUUID();
-		final var uuid2 = randomUUID();
 
-		when(citizenMock.getCitizens(eq(false), anyList()))
+		when(citizenMock.getCitizen(any(String.class)))
 			.thenThrow(Problem.builder()
 				.withStatus(Status.BAD_GATEWAY)
 				.withCause(Problem.builder()
@@ -66,19 +75,20 @@ class CitizenIntegrationTest {
 					.build())
 				.build());
 
+		final var stringUuid = uuid1.toString();
 		assertThatExceptionOfType(ThrowableProblem.class)
-			.isThrownBy(() -> citizenIntegration.getCitizens(List.of(uuid1.toString(), uuid2.toString())))
+			.isThrownBy(() -> citizenIntegration.getCitizen(stringUuid))
 			.satisfies(problem -> {
 				assertThat(problem.getStatus()).isEqualTo(Status.BAD_GATEWAY);
 				assertThat(problem.getCause()).isNotNull();
 				assertThat(problem.getCause().getStatus()).isEqualTo(Status.BAD_GATEWAY);
 			});
 
-		verify(citizenMock).getCitizens(false, List.of(uuid1.toString(), uuid2.toString()));
+		verify(citizenMock).getCitizen(uuid1.toString());
 		verifyNoMoreInteractions(citizenMock);
 	}
 
-	private CitizenExtended buildCitizen(UUID uuid) {
+	private CitizenExtended buildCitizen(final UUID uuid) {
 		return new CitizenExtended()
 			.givenname("someGivenName")
 			.lastname("someLastName")
@@ -95,4 +105,5 @@ class CitizenIntegrationTest {
 					.city("someCity")
 					.country("someCountry")));
 	}
+
 }

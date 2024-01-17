@@ -1,85 +1,68 @@
 package se.sundsvall.snailmail;
 
 import java.util.List;
+import java.util.UUID;
 
 import se.sundsvall.snailmail.api.model.EnvelopeType;
 import se.sundsvall.snailmail.api.model.SendSnailMailRequest;
-import se.sundsvall.snailmail.dto.SnailMailDto;
-import se.sundsvall.snailmail.integration.emailsender.EmailSenderIntegrationProperties;
+
+import generated.se.sundsvall.citizen.CitizenAddress;
+import generated.se.sundsvall.citizen.CitizenExtended;
 
 public final class TestDataFactory {
 
-    public static SnailMailDto buildSnailMailDto() {
+	public static SendSnailMailRequest buildSendSnailMailRequest() {
+		return SendSnailMailRequest.builder()
+			.withBatchId("550e8400-e29b-41d4-a716-446655440000")
+			.withPartyId("6ba7b810-9dad-11d1-80b4-00c04fd430c8")
+			.withDepartment("someDepartment")
+			.withDeviation("someDeviation")
+			.withAttachments(List.of(buildAttachmentList()))
+			.build();
 
-        return SnailMailDto.builder()
-                .withDeviation("someDeviation")
-                .withDepartment("someDepartment")
-                .withAttachments(List.of(SnailMailDto.AttachmentDto.builder()
-                        .withContent("someContent")
-                        .withName("someName")
-                        .withContentType("someContentType")
-                        .withEnvelopeType(EnvelopeType.PLAIN)
-                        .build()))
-                .build();
-    }
+	}
 
-    public static SnailMailDto buildSnailMailDtoWithBlankDeviation() {
+	public static SendSnailMailRequest.Attachment buildAttachmentList() {
+		return SendSnailMailRequest.Attachment.builder()
+			.withContent("base64")
+			.withContentType("application/pdf")
+			.withName("filename.pdf")
+			.withEnvelopeType(EnvelopeType.PLAIN)
+			.build();
+	}
 
-        return SnailMailDto.builder()
-                .withDeviation(" ")
-                .withDepartment("someDepartment")
-                .withAttachments(List.of(SnailMailDto.AttachmentDto.builder()
-                        .withContent("someContent")
-                        .withName("someName")
-                        .withContentType("someContentType")
-                        .withEnvelopeType(EnvelopeType.PLAIN)
-                        .build()))
-                .build();
-    }
+	public static CitizenExtended buildCitizenExtended() {
+		final var citizenExtended = new CitizenExtended();
+		citizenExtended.setPersonId(UUID.randomUUID());
+		citizenExtended.setGivenname("Kalle");
+		citizenExtended.setLastname("Anka");
+		citizenExtended.setGender("M");
+		citizenExtended.setCivilStatus("OG");
+		citizenExtended.setNrDate("20131125");
+		citizenExtended.setClassified("N");
+		citizenExtended.setProtectedNR("N");
 
-    public static SnailMailDto buildSnailMailDtoWithoutDeviation() {
+		final var citizenAddress = buildCitizenAddress();
 
-        return SnailMailDto.builder()
-                .withDepartment("someDepartment")
-                .withAttachments(List.of(SnailMailDto.AttachmentDto.builder()
-                        .withContent("someContent")
-                        .withName("someName")
-                        .withContentType("someContentType")
-                        .build()))
-                .build();
-    }
+		citizenExtended.setAddresses(List.of(citizenAddress));
 
-    public static EmailSenderIntegrationProperties buildEmailProperties() {
+		return citizenExtended;
 
-        var properties = new EmailSenderIntegrationProperties();
+	}
 
-        properties.setEmailAddress("some@email.se");
+	private static CitizenAddress buildCitizenAddress() {
+		final var citizenAddress = new CitizenAddress();
+		citizenAddress.setRealEstateDescription("Ankeborg 1:80");
+		citizenAddress.setAddress("Ankeborgsvägen 1");
+		citizenAddress.setAppartmentNumber("LGH 123");
+		citizenAddress.setPostalCode("123 45");
+		citizenAddress.setCity("ANKEBORG");
+		citizenAddress.setMunicipality("2281");
+		citizenAddress.setCountry("SVERIGE");
+		citizenAddress.setEmigrated(false);
+		citizenAddress.setAddressType("POPULATION_REGISTRATION_ADDRESS");
+		citizenAddress.setCo("Kajsa Anka");
+		return citizenAddress;
+	}
 
-
-        var sender = new EmailSenderIntegrationProperties.Sender();
-        sender.setAddress("someemail@host.se");
-        sender.setName("someName");
-        sender.setReplyTo("someoneToReplyTo");
-
-        properties.setSender(sender);
-        return properties;
-    }
-
-    public static SendSnailMailRequest buildSendSnailMailRequest() {
-        return SendSnailMailRequest.builder()
-                .withDepartment("someDepartment")
-                .withDeviation("someDeviation")
-                .withAttachments(List.of(buildAttachmentList()))
-                .build();
-
-    }
-
-    public static SendSnailMailRequest.Attachment buildAttachmentList() {
-        return SendSnailMailRequest.Attachment.builder()
-                .withContent("someContent")
-                .withContentType("someContentType")
-                .withName("someName")
-                .withEnvelopeType(EnvelopeType.PLAIN)
-                .build();
-    }
 }
