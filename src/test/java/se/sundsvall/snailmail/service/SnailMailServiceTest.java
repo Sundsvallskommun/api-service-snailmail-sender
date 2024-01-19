@@ -175,4 +175,28 @@ class SnailMailServiceTest {
 		verifyNoInteractions(departmentRepositoryMock, sambaIntegrationMock, requestRepositoryMock, citizenIntegrationMock);
 	}
 
+	@Test
+	void sendBatchWithoutEvelopeType() {
+		// Arrange
+		final var request = buildSendSnailMailRequest();
+		request.getAttachments().getFirst().setEnvelopeType(null);
+
+		// Mock
+		when(batchRepositoryMock.findById(any(String.class))).thenReturn(Optional.ofNullable(BatchEntity.builder().build()));
+		when(departmentRepositoryMock.findByName(any(String.class))).thenReturn(Optional.ofNullable(DepartmentEntity.builder().build()));
+		when(citizenIntegrationMock.getCitizen(any(String.class))).thenReturn(buildCitizenExtended());
+
+		// Act
+		snailMailService.sendSnailMail(request);
+
+		// Verify
+		verify(batchRepositoryMock).findById(any(String.class));
+		verify(departmentRepositoryMock).findByName(any(String.class));
+		verify(requestRepositoryMock).save(any());
+		verify(citizenIntegrationMock).getCitizen(any(String.class));
+		verifyNoMoreInteractions(batchRepositoryMock, departmentRepositoryMock, requestRepositoryMock, citizenIntegrationMock);
+		verifyNoInteractions(sambaIntegrationMock);
+
+	}
+
 }
