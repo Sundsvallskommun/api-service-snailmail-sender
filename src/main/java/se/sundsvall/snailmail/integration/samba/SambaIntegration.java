@@ -66,7 +66,7 @@ public class SambaIntegration {
 						saveAttachment(attachment, departmentPath);
 
 						// Only save the request data if it's not a windowed envelope
-						if (!attachment.getEnvelopeType().equals(EnvelopeType.WINDOWED)) {
+						if (!EnvelopeType.WINDOWED.equals(attachment.getEnvelopeType())) {
 							saveRequestDataToFile(request, departmentPath);
 						}
 					});
