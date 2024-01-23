@@ -50,24 +50,24 @@ public class SambaIntegration {
 
 	public void writeBatchDataToSambaShare(final BatchEntity batchEntity) {
 
-		// Create the batchEntity folder
-		final var batchPath = shareUrl + batchEntity.getId();
-		createFolder(batchPath);
-
 		batchEntity.getDepartmentEntities().forEach(
 			department -> {
 				// Create the department folders
-				final var departmentPath = batchPath + File.separator + department.getName();
+				final var departmentPath = shareUrl + department.getName();
 				createFolder(departmentPath);
+				// Create the batchEntity folder
+				final var batchPath = departmentPath + File.separator + batchEntity.getId();
+				createFolder(batchPath);
+
 				// Save the data to the files
 				department.getRequestEntities()
 					.forEach(request -> {
 						final var attachment = request.getAttachmentEntities().getFirst();
-						saveAttachment(attachment, departmentPath);
+						saveAttachment(attachment, batchPath);
 
 						// Only save the request data if it's not a windowed envelope
 						if (!EnvelopeType.WINDOWED.equals(attachment.getEnvelopeType())) {
-							saveRequestDataToFile(request, departmentPath);
+							saveRequestDataToFile(request, batchPath);
 						}
 					});
 			}
