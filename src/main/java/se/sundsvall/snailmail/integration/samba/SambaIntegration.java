@@ -62,11 +62,10 @@ public class SambaIntegration {
 				// Save the data to the files
 				department.getRequestEntities()
 					.forEach(request -> {
-						final var attachment = request.getAttachmentEntities().getFirst();
-						saveAttachment(attachment, batchPath);
-
+						LOGGER.info("Saving attachment for request");
+						request.getAttachmentEntities().forEach(attachmentEntity -> saveAttachment(attachmentEntity, batchPath));
 						// Only save the request data if it's not a windowed envelope
-						if (!EnvelopeType.WINDOWED.equals(attachment.getEnvelopeType())) {
+						if (!EnvelopeType.WINDOWED.equals(request.getAttachmentEntities().getFirst().getEnvelopeType())) {
 							saveRequestDataToFile(request, batchPath);
 						}
 					});
@@ -89,6 +88,7 @@ public class SambaIntegration {
 				// Write the headers to the file only if it's a new file
 				if (destinationFile.length() == 0) {
 					printWriter.println("namn,careOf,adress,postnummer,postort");
+					LOGGER.info("new file writing headers");
 				}
 
 				final var name = requestEntity.getRecipientEntity().getGivenName() + " " + requestEntity.getRecipientEntity().getLastName();
@@ -112,7 +112,7 @@ public class SambaIntegration {
 				destinationAttachmentFile.createNewFile();
 
 				try (final var smbFileOutputStream = new SmbFileOutputStream(destinationAttachmentFile)) {
-
+					LOGGER.info("Writing file");
 					smbFileOutputStream.write(Base64.getDecoder().decode(attachmentEntity.getContent()));
 				}
 			}
@@ -137,6 +137,7 @@ public class SambaIntegration {
 				LOGGER.info("Folder: {}, doesn't exist, creating it.", folderFile);
 				folderFile.mkdir();
 			}
+			LOGGER.info("Folder: {}, exits, not creating it", folderFile);
 		} catch (final SmbException | MalformedURLException e) {
 			throw Problem.valueOf(Status.INTERNAL_SERVER_ERROR, "Failed to create folder " + folder + " on Samba share");
 		}
