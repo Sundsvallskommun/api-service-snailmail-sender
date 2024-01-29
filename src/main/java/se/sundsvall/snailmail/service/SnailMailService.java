@@ -2,6 +2,8 @@ package se.sundsvall.snailmail.service;
 
 import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.zalando.problem.Problem;
 
@@ -18,6 +20,8 @@ import generated.se.sundsvall.citizen.CitizenExtended;
 
 @Service
 public class SnailMailService {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(SnailMailService.class);
 
 	private final BatchRepository batchRepository;
 
@@ -42,6 +46,7 @@ public class SnailMailService {
 
 		CitizenExtended citizen = null;
 		if (!EnvelopeType.WINDOWED.equals(request.getAttachments().getFirst().getEnvelopeType())) {
+			LOGGER.info("Finding information for citizen: {} ", request.getPartyId());
 			citizen = citizenIntegration.getCitizen(request.getPartyId());
 		}
 
@@ -51,7 +56,7 @@ public class SnailMailService {
 		final var department = departmentRepository.findByName(request.getDepartment())
 			.orElseGet(() -> departmentRepository
 				.save(Mapper.toDepartment(request.getDepartment(), batch)));
-
+		LOGGER.info("Saving request");
 		requestRepository.save(Mapper.toRequest(request, citizen, department));
 	}
 
