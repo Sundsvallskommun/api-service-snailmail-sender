@@ -19,7 +19,8 @@ integration:
     connect-timeout: 5
     read-timeout: 30
 logbook:
-  exclusionfilters:
+  body-filters:
     # Exclude base64-encoded content from incoming requests.
-    jsonPath:
-      '$.attachments[*].content': '[ base64]'
+    json-Path:
+      - key: '$.attachments[*].content'
+        value: '[base64]'
