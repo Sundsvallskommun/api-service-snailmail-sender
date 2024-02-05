@@ -23,4 +23,4 @@ logbook:
     # Exclude base64-encoded content from incoming requests.
     json-Path:
       - key: '$.attachments[*].content'
-        value: '[ base64]'
+        value: '[base64]'
