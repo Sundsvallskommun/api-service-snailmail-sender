@@ -6,7 +6,7 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Java CI with Maven
+name: Run CI
 
 on:
   workflow_dispatch:
@@ -21,5 +21,4 @@ on:
 
 jobs:
   build:
-    name: Run CI
     uses: Sundsvallskommun/api-shared-workflows/.github/workflows/maven_ci.yml@main
