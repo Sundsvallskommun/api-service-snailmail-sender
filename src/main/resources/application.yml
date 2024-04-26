@@ -5,6 +5,9 @@ openapi:
 spring:
   application:
     name: api-snailmail-sender
+  datasource:
+    hikari:
+      connection-timeout: 5000
   main:
     banner-mode: 'off'
   security:

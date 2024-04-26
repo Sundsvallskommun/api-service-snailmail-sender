@@ -2,7 +2,9 @@ package se.sundsvall.snailmail.integration.db.model;
 
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanConstructor;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanEquals;
+import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanEqualsExcluding;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanHashCode;
+import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanHashCodeExcluding;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanToString;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidGettersAndSetters;
 import static org.hamcrest.CoreMatchers.allOf;
@@ -13,15 +15,15 @@ import org.assertj.core.api.Assertions;
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Test;
 
-class DepartmentTest {
+class DepartmentEntityTest {
 
 	@Test
 	void testBean() {
 		MatcherAssert.assertThat(DepartmentEntity.class, allOf(
 			hasValidBeanConstructor(),
 			hasValidGettersAndSetters(),
-			hasValidBeanHashCode(),
-			hasValidBeanEquals(),
+			hasValidBeanHashCodeExcluding("batchEntity", "requestEntities"),
+			hasValidBeanEqualsExcluding("batchEntity", "requestEntities"),
 			hasValidBeanToString()));
 	}
 

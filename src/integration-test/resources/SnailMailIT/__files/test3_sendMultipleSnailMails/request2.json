@@ -1,0 +1,13 @@
+{
+  "department": "dummy",
+  "partyId": "c895f6b2-3571-413a-a2f4-8d7780d6c6a6",
+  "batchId": "c895f6b2-3571-413a-a2f4-8d7780d6c6a5",
+  "attachments": [
+    {
+      "content": "aGVsbG8gd29ybGQK",
+      "name": "test.pdf",
+      "contentType": "application/pdf",
+      "envelopeType": "PLAIN"
+    }
+  ]
+}
