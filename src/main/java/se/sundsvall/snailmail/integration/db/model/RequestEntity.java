@@ -1,6 +1,7 @@
 package se.sundsvall.snailmail.integration.db.model;
 
 import java.util.List;
+import java.util.Objects;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -15,13 +16,14 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @Builder(setterPrefix = "with")
 @Entity
 @NoArgsConstructor
@@ -53,4 +55,27 @@ public class RequestEntity {
 	@Column(name = "party_id")
 	private String partyId;
 
+	@Override
+	public String toString() {
+		return "RequestEntity{" +
+			"id=" + id +
+			", departmentEntity=" + departmentEntity +
+			", deviation='" + deviation + '\'' +
+			", attachmentEntities=" + attachmentEntities +
+			", recipientEntity=" + recipientEntity +
+			", partyId='" + partyId + '\'' +
+			'}';
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof RequestEntity that)) return false;
+		return Objects.equals(id, that.id) && Objects.equals(deviation, that.deviation) && Objects.equals(partyId, that.partyId);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id, deviation, partyId);
+	}
 }

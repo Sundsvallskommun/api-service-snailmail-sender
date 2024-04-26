@@ -1,5 +1,9 @@
 package se.sundsvall.snailmail.integration.db.model;
 
+import java.util.Objects;
+
+import se.sundsvall.snailmail.api.model.EnvelopeType;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -12,15 +16,14 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-
-import se.sundsvall.snailmail.api.model.EnvelopeType;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @Builder(setterPrefix = "with")
 @Entity
 @NoArgsConstructor
@@ -51,4 +54,27 @@ public class AttachmentEntity {
 	@Enumerated(EnumType.STRING)
 	private EnvelopeType envelopeType;
 
+	@Override
+	public String toString() {
+		return "AttachmentEntity{" +
+			"id=" + id +
+			", requestEntity=" + requestEntity +
+			", content='" + content + '\'' +
+			", name='" + name + '\'' +
+			", contentType='" + contentType + '\'' +
+			", envelopeType=" + envelopeType +
+			'}';
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof AttachmentEntity that)) return false;
+		return Objects.equals(id, that.id) && Objects.equals(content, that.content) && Objects.equals(name, that.name) && Objects.equals(contentType, that.contentType) && envelopeType == that.envelopeType;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id, content, name, contentType, envelopeType);
+	}
 }

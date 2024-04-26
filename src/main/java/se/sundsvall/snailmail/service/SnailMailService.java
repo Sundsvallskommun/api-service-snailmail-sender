@@ -17,8 +17,10 @@ import se.sundsvall.snailmail.integration.db.model.BatchEntity;
 import se.sundsvall.snailmail.integration.samba.SambaIntegration;
 
 import generated.se.sundsvall.citizen.CitizenExtended;
+import jakarta.transaction.Transactional;
 
 @Service
+@Transactional
 public class SnailMailService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SnailMailService.class);
@@ -53,9 +55,9 @@ public class SnailMailService {
 		final var batch = batchRepository.findById(request.getBatchId())
 			.orElseGet(() -> batchRepository.save(BatchEntity.builder().withId(request.getBatchId()).build()));
 
-		final var department = departmentRepository.findByName(request.getDepartment())
-			.orElseGet(() -> departmentRepository
-				.save(Mapper.toDepartment(request.getDepartment(), batch)));
+		final var department = departmentRepository.findByNameAndBatchEntity(request.getDepartment(), batch)
+			.orElseGet(() -> departmentRepository.save(Mapper.toDepartment(request.getDepartment(), batch)));
+
 		LOGGER.info("Saving request");
 		requestRepository.save(Mapper.toRequest(request, citizen, department));
 	}
