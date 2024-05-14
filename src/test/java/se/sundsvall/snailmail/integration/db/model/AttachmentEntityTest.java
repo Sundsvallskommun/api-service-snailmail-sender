@@ -25,7 +25,7 @@ class AttachmentEntityTest {
 			hasValidGettersAndSetters(),
 			hasValidBeanHashCodeExcluding("requestEntity"),
 			hasValidBeanEqualsExcluding("requestEntity"),
-			hasValidBeanToString()));
+			hasValidBeanToStringExcluding("requestEntity")));
 	}
 
 	@Test

@@ -50,6 +50,8 @@ public class SambaIntegration {
 
 	public void writeBatchDataToSambaShare(final BatchEntity batchEntity) {
 
+		LOGGER.info("Writing batch with id {} to Samba share", batchEntity.getId());
+
 		batchEntity.getDepartmentEntities().forEach(
 			department -> {
 				// Create the department folders

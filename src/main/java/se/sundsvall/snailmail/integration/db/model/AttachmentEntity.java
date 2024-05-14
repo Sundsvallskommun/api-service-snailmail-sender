@@ -58,7 +58,6 @@ public class AttachmentEntity {
 	public String toString() {
 		return "AttachmentEntity{" +
 			"id=" + id +
-			", requestEntity=" + requestEntity +
 			", content='" + content + '\'' +
 			", name='" + name + '\'' +
 			", contentType='" + contentType + '\'' +

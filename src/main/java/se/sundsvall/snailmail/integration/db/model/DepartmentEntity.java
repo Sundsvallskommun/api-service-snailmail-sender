@@ -53,8 +53,6 @@ public class DepartmentEntity {
 		return "DepartmentEntity{" +
 			"id=" + id +
 			", name='" + name + '\'' +
-			", batchEntity=" + batchEntity +
-			", requestEntities=" + requestEntities +
 			'}';
 	}
 

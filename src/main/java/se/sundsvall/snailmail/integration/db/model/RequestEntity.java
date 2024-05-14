@@ -59,7 +59,6 @@ public class RequestEntity {
 	public String toString() {
 		return "RequestEntity{" +
 			"id=" + id +
-			", departmentEntity=" + departmentEntity +
 			", deviation='" + deviation + '\'' +
 			", attachmentEntities=" + attachmentEntities +
 			", recipientEntity=" + recipientEntity +

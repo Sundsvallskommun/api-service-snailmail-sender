@@ -1,5 +1,6 @@
 package se.sundsvall.snailmail.service;
 
+import static org.springframework.transaction.annotation.Propagation.REQUIRES_NEW;
 import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
 
 import org.slf4j.Logger;
@@ -20,7 +21,6 @@ import generated.se.sundsvall.citizen.CitizenExtended;
 import jakarta.transaction.Transactional;
 
 @Service
-@Transactional
 public class SnailMailService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SnailMailService.class);
@@ -35,7 +35,6 @@ public class SnailMailService {
 
 	private final CitizenIntegration citizenIntegration;
 
-
 	public SnailMailService(final SambaIntegration sambaIntegration, final BatchRepository batchRepository, final DepartmentRepository departmentRepository, final RequestRepository requestRepository, final CitizenIntegration citizenIntegration) {
 		this.batchRepository = batchRepository;
 		this.departmentRepository = departmentRepository;
@@ -44,6 +43,7 @@ public class SnailMailService {
 		this.citizenIntegration = citizenIntegration;
 	}
 
+	@Transactional(Transactional.TxType.REQUIRES_NEW)
 	public void sendSnailMail(final SendSnailMailRequest request) {
 
 		CitizenExtended citizen = null;
@@ -62,7 +62,9 @@ public class SnailMailService {
 		requestRepository.save(Mapper.toRequest(request, citizen, department));
 	}
 
+	@Transactional(Transactional.TxType.REQUIRES_NEW)
 	public void sendBatch(final String batchId) {
+		LOGGER.info("Starting to send batch with id: {}", batchId);
 
 		final var batch = batchRepository.findById(batchId)
 			.orElseThrow(() -> Problem.builder()

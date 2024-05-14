@@ -6,6 +6,7 @@ import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanEqualsExclud
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanHashCode;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanHashCodeExcluding;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanToString;
+import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanToStringExcluding;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidGettersAndSetters;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.allOf;
@@ -24,7 +25,7 @@ class RequestEntityTest {
 			hasValidGettersAndSetters(),
 			hasValidBeanHashCodeExcluding("departmentEntity", "recipientEntity", "attachmentEntities"),
 			hasValidBeanEqualsExcluding("departmentEntity", "recipientEntity", "attachmentEntities"),
-			hasValidBeanToString()));
+			hasValidBeanToStringExcluding( "departmentEntity")));
 	}
 
 	@Test
