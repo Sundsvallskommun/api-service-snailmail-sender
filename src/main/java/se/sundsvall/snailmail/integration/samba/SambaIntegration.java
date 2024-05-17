@@ -121,7 +121,6 @@ public class SambaIntegration {
 		}
 	}
 
-
 	private String findFile(final RequestEntity requestEntity, final String departmentPath) {
 		return Optional.ofNullable(requestEntity.getAttachmentEntities().getFirst().getName())
 			.map(name -> name.substring(0, Optional.of(name.lastIndexOf("."))
@@ -136,11 +135,11 @@ public class SambaIntegration {
 			if (!folderFile.exists()) {
 				LOGGER.info("Folder: {}, doesn't exist, creating it.", folderFile);
 				folderFile.mkdir();
+			} else {
+				LOGGER.info("Folder: {}, exits, not creating it", folderFile);
 			}
-			LOGGER.info("Folder: {}, exits, not creating it", folderFile);
 		} catch (final SmbException | MalformedURLException e) {
 			throw Problem.valueOf(Status.INTERNAL_SERVER_ERROR, "Failed to create folder " + folder + " on Samba share");
 		}
 	}
-
 }

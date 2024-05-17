@@ -75,6 +75,4 @@ public class SnailMailService {
 
 		batchRepository.delete(batch);
 	}
-
-
 }
