@@ -5,7 +5,7 @@
         content_type varchar(255),
         name varchar(255),
         content longtext,
-        envelope_type enum ('WINDOWED','PLAIN'),
+        envelope_type enum ('PLAIN','WINDOWED'),
         primary key (id)
     ) engine=InnoDB;
 
