@@ -1,6 +1,5 @@
 package apptest;
 
-import static apptest.CommonStubs.stubForAccessToken;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
@@ -26,21 +25,21 @@ import se.sundsvall.snailmail.integration.db.BatchRepository;
 @Testcontainers
 class SnailMailIT extends AbstractAppTest {
 
-	@Autowired
-	private BatchRepository batchRepository;
-
 	@Container
 	public static final DockerComposeContainer<?> sambaContainer =
 		new DockerComposeContainer<>(new File("src/test/resources/docker/docker-compose.yml"))
 			.withExposedService("samba", 445, Wait.forListeningPort())
 			.withStartupTimeout(Duration.ofSeconds(60));
 
+	private static final String MUNICIPALITY_ID = "2281";
+
+	@Autowired
+	private BatchRepository batchRepository;
+
 	@Test
 	void test1_sendSnailMail() {
-		stubForAccessToken();
-
 		setupCall()
-			.withServicePath("/send/snailmail")
+			.withServicePath("/" + MUNICIPALITY_ID + "/send/snailmail")
 			.withHttpMethod(HttpMethod.POST)
 			.withRequest("request.json")
 			.withExpectedResponseStatus(HttpStatus.OK)
@@ -50,7 +49,7 @@ class SnailMailIT extends AbstractAppTest {
 	@Test
 	void test2_sendBatch() {
 		setupCall()
-			.withServicePath("/send/batch/123e4567-e89b-12d3-a456-426614174000")
+			.withServicePath("/" + MUNICIPALITY_ID + "/send/batch/123e4567-e89b-12d3-a456-426614174000")
 			.withHttpMethod(HttpMethod.POST)
 			.withExpectedResponseStatus(HttpStatus.OK)
 			.sendRequestAndVerifyResponse();
@@ -59,23 +58,22 @@ class SnailMailIT extends AbstractAppTest {
 	//Check that new batches with same department generates multiple batches
 	@Test
 	void test3_sendMultipleSnailMails() {
-		stubForAccessToken();
 
 		setupCall()
-			.withServicePath("/send/snailmail")
+			.withServicePath("/" + MUNICIPALITY_ID + "/send/snailmail")
 			.withHttpMethod(HttpMethod.POST)
 			.withRequest("request.json")
 			.withExpectedResponseStatus(HttpStatus.OK)
 			.sendRequest();
-		
+
 		setupCall()
-			.withServicePath("/send/snailmail")
+			.withServicePath("/" + MUNICIPALITY_ID + "/send/snailmail")
 			.withHttpMethod(HttpMethod.POST)
 			.withRequest("request2.json")
 			.withExpectedResponseStatus(HttpStatus.OK)
 			.sendRequest();
 
-		var batchEntityList = batchRepository.findAll();
+		final var batchEntityList = batchRepository.findAll();
 
 		//Verify that two separate batches has been created
 		assertThat(batchEntityList.stream()
@@ -90,4 +88,5 @@ class SnailMailIT extends AbstractAppTest {
 				.allMatch(departmentEntity -> departmentEntity.getName().equalsIgnoreCase("dummy"))))
 			.isTrue();
 	}
+
 }

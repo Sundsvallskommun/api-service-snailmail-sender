@@ -11,6 +11,7 @@
 
     create table batch (
         id varchar(255) not null,
+        municipality_id varchar(255),
         primary key (id)
     ) engine=InnoDB;
 
@@ -40,6 +41,9 @@
         party_id varchar(255),
         primary key (id)
     ) engine=InnoDB;
+
+    create index idx_batch_municipality_id 
+       on batch (municipality_id);
 
     create index idx_department_name 
        on department (name);

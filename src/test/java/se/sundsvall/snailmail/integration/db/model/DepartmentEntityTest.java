@@ -1,17 +1,15 @@
 package se.sundsvall.snailmail.integration.db.model;
 
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanConstructor;
-import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanEquals;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanEqualsExcluding;
-import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanHashCode;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanHashCodeExcluding;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanToString;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidGettersAndSetters;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.allOf;
 
 import java.util.List;
 
-import org.assertj.core.api.Assertions;
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Test;
 
@@ -42,17 +40,17 @@ class DepartmentEntityTest {
 			.withRequestEntities(List.of(request))
 			.build();
 
-		Assertions.assertThat(department).isNotNull().hasNoNullFieldsOrProperties();
-		Assertions.assertThat(department.getId()).isEqualTo(id);
-		Assertions.assertThat(department.getRequestEntities()).hasSize(1);
-		Assertions.assertThat(department.getName()).isEqualTo(name);
-		Assertions.assertThat(department.getBatchEntity()).isNotNull();
+		assertThat(department).isNotNull().hasNoNullFieldsOrProperties();
+		assertThat(department.getId()).isEqualTo(id);
+		assertThat(department.getRequestEntities()).hasSize(1);
+		assertThat(department.getName()).isEqualTo(name);
+		assertThat(department.getBatchEntity()).isNotNull();
 	}
 
 	@Test
 	void testNoDirtOnCreatedBean() {
-		Assertions.assertThat(DepartmentEntity.builder().build()).hasAllNullFieldsOrProperties();
-		Assertions.assertThat(new DepartmentEntity()).hasAllNullFieldsOrProperties();
+		assertThat(DepartmentEntity.builder().build()).hasAllNullFieldsOrProperties();
+		assertThat(new DepartmentEntity()).hasAllNullFieldsOrProperties();
 	}
 
 }

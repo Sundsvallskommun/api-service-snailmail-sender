@@ -142,4 +142,10 @@ public class SambaIntegration {
 			throw Problem.valueOf(Status.INTERNAL_SERVER_ERROR, "Failed to create folder " + folder + " on Samba share");
 		}
 	}
+
+	// For testing purposes
+	CIFSContext getContext() {
+		return context;
+	}
+
 }

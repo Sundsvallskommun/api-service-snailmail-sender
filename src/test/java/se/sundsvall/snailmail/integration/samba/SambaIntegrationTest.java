@@ -1,15 +1,18 @@
 package se.sundsvall.snailmail.integration.samba;
 
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.time.Duration;
 import java.util.Base64;
 import java.util.List;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,6 +31,9 @@ import se.sundsvall.snailmail.integration.db.model.DepartmentEntity;
 import se.sundsvall.snailmail.integration.db.model.RecipientEntity;
 import se.sundsvall.snailmail.integration.db.model.RequestEntity;
 
+import jcifs.smb.SmbException;
+import jcifs.smb.SmbFile;
+
 @ActiveProfiles("junit")
 @SpringBootTest(classes = Application.class, webEnvironment = RANDOM_PORT)
 @Testcontainers
@@ -39,58 +45,61 @@ class SambaIntegrationTest {
 			.withExposedService("samba", 445, Wait.forListeningPort())
 			.withStartupTimeout(Duration.ofSeconds(60));
 
+	private static final String SOME_DATA = "someData";
+
+	private static final String DEPARTMENT_1 = "department1";
+
+	private static final String BATCH_ID = "123e4567-e89b-12d3-a456-426614174000";
+
 	@Autowired
 	private SambaIntegration sambaIntegration;
 
+	private static @NotNull List<RequestEntity> getRequestEntities(final String name) {
+		return List.of(
+			RequestEntity.builder()
+				.withRecipientEntity(
+					RecipientEntity.builder()
+						.build())
+				.withAttachmentEntities(List.of(
+					AttachmentEntity.builder()
+						.withEnvelopeType(EnvelopeType.PLAIN)
+						.withContent(Base64.getEncoder().encodeToString(SOME_DATA.getBytes()))
+						.withName(name)
+						.build()))
+				.build());
+	}
 
-	@Test
-	void writeBatchDataToSambaShare() {
-
-		final var batchEntity = BatchEntity.builder()
-			.withId("123e4567-e89b-12d3-a456-426614174000")
+	private static BatchEntity getBatchEntity(final String batchId, final String name) {
+		return BatchEntity.builder()
+			.withId(batchId)
 			.withDepartmentEntities(List.of(
 				DepartmentEntity.builder()
-					.withName("department1")
-					.withRequestEntities(List.of(
-						RequestEntity.builder()
-							.withRecipientEntity(
-								RecipientEntity.builder()
-									.build())
-							.withAttachmentEntities(List.of(
-								AttachmentEntity.builder()
-									.withEnvelopeType(EnvelopeType.PLAIN)
-									.withContent(Base64.getEncoder().encodeToString("someData".getBytes()))
-									.withName("someName.pdf")
-									.build()))
-							.build()))
+					.withName(DEPARTMENT_1)
+					.withRequestEntities(getRequestEntities(name))
 					.build()))
 			.build();
-
-		sambaIntegration.writeBatchDataToSambaShare(batchEntity);
 	}
 
 	@Test
-	void writeBatchDataToSambaShare_failedToCreateFolder() {
+	void writeBatchDataToSambaShare() throws MalformedURLException, SmbException {
 
-		final var batchEntity = BatchEntity.builder()
-			.withId("asd/asd")
-			.withDepartmentEntities(List.of(
-				DepartmentEntity.builder()
-					.withName("department1")
-					.withRequestEntities(List.of(
-						RequestEntity.builder()
-							.withRecipientEntity(
-								RecipientEntity.builder()
-									.build())
-							.withAttachmentEntities(List.of(
-								AttachmentEntity.builder()
-									.withEnvelopeType(EnvelopeType.PLAIN)
-									.withContent(Base64.getEncoder().encodeToString("someData".getBytes()))
-									.withName("someName.pdf")
-									.build()))
-							.build()))
-					.build()))
-			.build();
+		// Arrange
+		final var smbPath = "smb://localhost:445/share/" + DEPARTMENT_1 + "/" + BATCH_ID + "/sandlista-someName.csv";
+
+		final var batchEntity = getBatchEntity(BATCH_ID, "someName.pdf");
+
+		sambaIntegration.writeBatchDataToSambaShare(batchEntity);
+
+		// Assert
+		try (final var smbFile = new SmbFile(smbPath, sambaIntegration.getContext())) {
+			assertThat(smbFile.exists()).isTrue();
+		}
+	}
+
+	@Test
+	void writeBatchDataToSambaShareFailedToCreateFolder() {
+
+		final var batchEntity = getBatchEntity("asd/asd", "someName.pdf");
 
 		assertThatThrownBy(() -> sambaIntegration.writeBatchDataToSambaShare(batchEntity))
 			.isInstanceOf(Problem.class)
@@ -99,27 +108,9 @@ class SambaIntegrationTest {
 	}
 
 	@Test
-	void writeBatchDataToSambaShare_failedSaveAttachment() {
+	void writeBatchDataToSambaShareFailedSaveAttachment() {
 
-		final var batchEntity = BatchEntity.builder()
-			.withId("123e4567-e89b-12d3-a456-426614174000")
-			.withDepartmentEntities(List.of(
-				DepartmentEntity.builder()
-					.withName("department1")
-					.withRequestEntities(List.of(
-						RequestEntity.builder()
-							.withRecipientEntity(
-								RecipientEntity.builder()
-									.build())
-							.withAttachmentEntities(List.of(
-								AttachmentEntity.builder()
-									.withEnvelopeType(EnvelopeType.PLAIN)
-									.withContent(Base64.getEncoder().encodeToString("someData".getBytes()))
-									.withName("someName/pdf")
-									.build()))
-							.build()))
-					.build()))
-			.build();
+		final var batchEntity = getBatchEntity(BATCH_ID, "someName/pdf");
 
 		assertThatThrownBy(() -> sambaIntegration.writeBatchDataToSambaShare(batchEntity))
 			.isInstanceOf(Problem.class)

@@ -49,7 +49,7 @@ class CitizenIntegrationTest {
 	}
 
 	@Test
-	void testGetCitizenReturnsEmpty_shouldThrowException() {
+	void testGetCitizenReturnsEmptyShouldThrowException() {
 		final var uuid = randomUUID();
 
 		when(citizenMock.getCitizen(uuid.toString())).thenReturn(Optional.empty());
