@@ -31,7 +31,7 @@ class SnailMailIT extends AbstractAppTest {
 			.withExposedService("samba", 445, Wait.forListeningPort())
 			.withStartupTimeout(Duration.ofSeconds(60));
 
-	private final static String MUNICIPALITY_ID = "2281";
+	private static final String MUNICIPALITY_ID = "2281";
 
 	@Autowired
 	private BatchRepository batchRepository;

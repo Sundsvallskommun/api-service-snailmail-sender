@@ -8,6 +8,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
@@ -23,7 +24,11 @@ import lombok.Setter;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "batch")
+@Table(name = "batch",
+	indexes =
+		{
+			@Index(name = "idx_batch_municipality_id", columnList = "municipality_id")
+		})
 public class BatchEntity {
 
 	@Id

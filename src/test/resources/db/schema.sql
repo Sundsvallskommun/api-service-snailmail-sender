@@ -42,6 +42,9 @@
         primary key (id)
     ) engine=InnoDB;
 
+    create index idx_batch_municipality_id 
+       on batch (municipality_id);
+
     create index idx_department_name 
        on department (name);
 
