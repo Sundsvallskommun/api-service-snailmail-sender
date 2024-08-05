@@ -11,6 +11,10 @@ import generated.se.sundsvall.citizen.CitizenExtended;
 
 public final class TestDataFactory {
 
+	private TestDataFactory() {
+		// Intentionally empty to prevent instantiation
+	}
+
 	public static SendSnailMailRequest buildSendSnailMailRequest() {
 		return SendSnailMailRequest.builder()
 			.withBatchId("550e8400-e29b-41d4-a716-446655440000")

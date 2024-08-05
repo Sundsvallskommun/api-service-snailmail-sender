@@ -7,23 +7,31 @@ info:
     url: https://opensource.org/licenses/MIT
   version: "2.0"
 servers:
-  - url: http://localhost:63316
+  - url: http://localhost:54638
     description: Generated server url
 tags:
   - name: SnailMailSender
     description: SnailMailSender
 paths:
-  /send/snailmail:
+  /{municipalityId}/send/snailmail:
     post:
       tags:
         - SnailMailSender
       summary: Prepare snail mail for batch
       operationId: sendSnailMail
+      parameters:
+        - name: municipalityId
+          in: path
+          description: Municipality id
+          required: true
+          schema:
+            type: string
+          example: 2281
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SendSnailMailRequest'
+              $ref: "#/components/schemas/SendSnailMailRequest"
         required: true
       responses:
         "400":
@@ -32,23 +40,30 @@ paths:
             '*/*':
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/Problem'
-                  - $ref: '#/components/schemas/ConstraintViolation'
+                  - $ref: "#/components/schemas/Problem"
+                  - $ref: "#/components/schemas/ConstraintViolation"
         "500":
           description: Internal Server Error
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/Problem'
+                $ref: "#/components/schemas/Problem"
         "200":
           description: Successful Operation
-  /send/batch/{batchId}:
+  /{municipalityId}/send/batch/{batchId}:
     post:
       tags:
         - SnailMailSender
       summary: Send batch
       operationId: sendBatch
       parameters:
+        - name: municipalityId
+          in: path
+          description: Municipality id
+          required: true
+          schema:
+            type: string
+          example: 2281
         - name: batchId
           in: path
           required: true
@@ -61,14 +76,14 @@ paths:
             '*/*':
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/Problem'
-                  - $ref: '#/components/schemas/ConstraintViolation'
+                  - $ref: "#/components/schemas/Problem"
+                  - $ref: "#/components/schemas/ConstraintViolation"
         "500":
           description: Internal Server Error
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/Problem'
+                $ref: "#/components/schemas/Problem"
         "200":
           description: Successful Operation
   /api-docs:
@@ -142,7 +157,7 @@ components:
           type: array
           description: Attachments
           items:
-            $ref: '#/components/schemas/Attachment'
+            $ref: "#/components/schemas/Attachment"
     Problem:
       type: object
       properties:
@@ -156,12 +171,12 @@ components:
           type: object
           additionalProperties:
             type: object
+        status:
+          $ref: "#/components/schemas/StatusType"
         title:
           type: string
         detail:
           type: string
-        status:
-          $ref: '#/components/schemas/StatusType'
     StatusType:
       type: object
       properties:
@@ -197,7 +212,7 @@ components:
           uniqueItems: true
           type: array
           items:
-            $ref: '#/components/schemas/ConstraintDescriptorObject'
+            $ref: "#/components/schemas/ConstraintDescriptorObject"
         reportAsSingleViolation:
           type: boolean
     ConstraintViolation:
@@ -207,13 +222,13 @@ components:
           type: string
         invalidValue:
           type: object
+        propertyPath:
+          $ref: "#/components/schemas/Path"
         messageTemplate:
           type: string
-        propertyPath:
-          $ref: '#/components/schemas/Path'
-        rootBean:
-          type: object
         leafBean:
+          type: object
+        rootBean:
           type: object
         executableParameters:
           type: array
@@ -222,7 +237,7 @@ components:
         executableReturnValue:
           type: object
         constraintDescriptor:
-          $ref: '#/components/schemas/ConstraintDescriptorObject'
+          $ref: "#/components/schemas/ConstraintDescriptorObject"
     Path:
       type: object
   securitySchemes: { }

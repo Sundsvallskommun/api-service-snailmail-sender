@@ -103,13 +103,6 @@ class MapperTest {
 	}
 
 	@Test
-	void toRecipientWhenRecipientIsNull() {
-		final var result = Mapper.toRecipient(null);
-
-		assertThat(result).isNull();
-	}
-
-	@Test
 	void toRequestWhenRequestIsNull() {
 		final var result = Mapper.toRequest(null, null, null);
 

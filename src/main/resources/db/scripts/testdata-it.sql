@@ -1,5 +1,5 @@
 insert into batch
-values ('123e4567-e89b-12d3-a456-426614174000');
+values ('123e4567-e89b-12d3-a456-426614174000', '2281');
 
 insert into department
 values (1, '123e4567-e89b-12d3-a456-426614174000', 'name');

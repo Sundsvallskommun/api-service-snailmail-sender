@@ -2,7 +2,6 @@ package se.sundsvall.snailmail.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.groups.Tuple.tuple;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
@@ -38,20 +37,24 @@ class SnailMailResourceTest {
 	@Test
 	void sendSnailMail() {
 
+		//Arrange
+		final var municipalityId = "2281";
+		final var request = SendSnailMailRequest.builder()
+			.withDepartment("department")
+			.withPartyId(UUID.randomUUID().toString())
+			.withBatchId(UUID.randomUUID().toString())
+			.build();
+
 		//ACT
 		webTestClient.post()
-			.uri("/send/snailmail")
-			.bodyValue(SendSnailMailRequest.builder()
-				.withDepartment("department")
-				.withPartyId(UUID.randomUUID().toString())
-				.withBatchId(UUID.randomUUID().toString())
-				.build())
+			.uri("/2281/send/snailmail")
+			.bodyValue(request)
 			.exchange()
 			.expectStatus()
 			.isOk();
 
 		// VERIFY
-		verify(mockSnailMailService).sendSnailMail(any(SendSnailMailRequest.class));
+		verify(mockSnailMailService).sendSnailMail(municipalityId, request);
 
 	}
 
@@ -60,15 +63,16 @@ class SnailMailResourceTest {
 	void sendBatch() {
 
 		final var uuid = UUID.randomUUID().toString();
+		final var municipalityId = "2281";
 
 		//ACT
 		webTestClient.post()
-			.uri("/send/batch/" + uuid)
+			.uri("/2281/send/batch/" + uuid)
 			.exchange()
 			.expectStatus()
 			.isOk();
 
-		verify(mockSnailMailService).sendBatch(any(String.class));
+		verify(mockSnailMailService).sendBatch(municipalityId, uuid);
 
 
 	}
@@ -78,7 +82,7 @@ class SnailMailResourceTest {
 
 		//ACT
 		final var response = webTestClient.post()
-			.uri("/send/batch/abc")
+			.uri("/2281/send/batch/abc")
 			.exchange()
 			.expectStatus()
 			.isBadRequest()
