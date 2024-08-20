@@ -88,5 +88,4 @@ class SnailMailIT extends AbstractAppTest {
 				.allMatch(departmentEntity -> departmentEntity.getName().equalsIgnoreCase("dummy"))))
 			.isTrue();
 	}
-
 }

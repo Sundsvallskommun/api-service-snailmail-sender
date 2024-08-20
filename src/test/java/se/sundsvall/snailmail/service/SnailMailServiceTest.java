@@ -11,13 +11,20 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static se.sundsvall.snailmail.TestDataFactory.buildCitizenExtended;
 import static se.sundsvall.snailmail.TestDataFactory.buildSendSnailMailRequest;
+import static se.sundsvall.snailmail.service.SnailMailService.ADDRESS;
+import static se.sundsvall.snailmail.service.SnailMailService.CITY;
+import static se.sundsvall.snailmail.service.SnailMailService.GIVEN_NAME;
+import static se.sundsvall.snailmail.service.SnailMailService.LAST_NAME;
+import static se.sundsvall.snailmail.service.SnailMailService.POSTAL_CODE;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -264,7 +271,7 @@ class SnailMailServiceTest {
 
 	@ParameterizedTest
 	@MethodSource("provideIncompleteAddress")
-	void sendBatchWithIncompleteAddress_shouldThrowException(CitizenExtended citizenExtended) {
+	void sendBatchWithIncompleteAddress_shouldThrowException(CitizenExtended citizenExtended, String missingField) {
 		// Arrange
 		final var municipalityId = "municipalityId";
 		final var snailMailRequest = buildSendSnailMailRequest();
@@ -273,11 +280,10 @@ class SnailMailServiceTest {
 		// Act & Assert
 		assertThatExceptionOfType(ThrowableProblem.class)
 			.isThrownBy(() -> snailMailService.sendSnailMail(municipalityId, snailMailRequest))
-			.withMessage("Incomplete recipient address information: Missing required fields in the recipient address")
 			.satisfies(throwableProblem -> {
 				assertThat(throwableProblem.getStatus()).isEqualTo(Status.INTERNAL_SERVER_ERROR);
-				assertThat(throwableProblem.getTitle()).isEqualTo("Incomplete recipient address information");
-				assertThat(throwableProblem.getDetail()).isEqualTo("Missing required fields in the recipient address");
+				assertThat(throwableProblem.getTitle()).isEqualTo("Citizen with partyId: " + citizenExtended.getPersonId() + " is missing required address information");
+				assertThat(throwableProblem.getDetail()).contains("Missing fields: " + missingField);
 			});
 
 		verify(citizenIntegrationMock).getCitizen(snailMailRequest.getPartyId());
@@ -285,7 +291,51 @@ class SnailMailServiceTest {
 		verifyNoInteractions(batchRepositoryMock, departmentRepositoryMock, requestRepositoryMock, sambaIntegrationMock);
 	}
 
-	private static Stream<CitizenExtended> provideIncompleteAddress() {
+	@Test
+	void sendBatchWithAllRequiredAddressFieldsMissing_shouldThrowException() {
+		// Arrange
+		final var municipalityId = "municipalityId";
+		final var snailMailRequest = buildSendSnailMailRequest();
+		final var citizenExtended = buildCitizenExtended();
+		citizenExtended.setGivenname(null);
+		citizenExtended.setLastname(null);
+		citizenExtended.getAddresses().getFirst().setAddress(null);
+		citizenExtended.getAddresses().getFirst().setPostalCode(null);
+		citizenExtended.getAddresses().getFirst().setCity(null);
+
+		when(citizenIntegrationMock.getCitizen(snailMailRequest.getPartyId())).thenReturn(citizenExtended);
+
+		// Act & Assert
+		assertThatExceptionOfType(ThrowableProblem.class)
+			.isThrownBy(() -> snailMailService.sendSnailMail(municipalityId, snailMailRequest))
+			.satisfies(throwableProblem -> {
+				assertThat(throwableProblem.getStatus()).isEqualTo(Status.INTERNAL_SERVER_ERROR);
+				assertThat(throwableProblem.getTitle()).isEqualTo("Citizen with partyId: " + citizenExtended.getPersonId() + " is missing required address information");
+				assertThat(throwableProblem.getDetail()).contains("Missing fields: " + GIVEN_NAME + ", " + LAST_NAME + ", " + ADDRESS + ", " + POSTAL_CODE + ", " + CITY);
+			});
+	}
+
+	@Test
+	void sendBatchWithMissingAddress_shouldThrowException() {
+		// Arrange
+		final var municipalityId = "municipalityId";
+		final var snailMailRequest = buildSendSnailMailRequest();
+		final var citizenExtended = buildCitizenExtended();
+		citizenExtended.setAddresses(null);
+
+		when(citizenIntegrationMock.getCitizen(snailMailRequest.getPartyId())).thenReturn(citizenExtended);
+
+		// Act & Assert
+		assertThatExceptionOfType(ThrowableProblem.class)
+			.isThrownBy(() -> snailMailService.sendSnailMail(municipalityId, snailMailRequest))
+			.satisfies(throwableProblem -> {
+				assertThat(throwableProblem.getStatus()).isEqualTo(Status.INTERNAL_SERVER_ERROR);
+				assertThat(throwableProblem.getTitle()).isEqualTo("No address information found for citizen");
+				assertThat(throwableProblem.getDetail()).isEqualTo("No address information found for citizen with partyId: " + citizenExtended.getPersonId());
+			});
+	}
+
+	private static Stream<Arguments> provideIncompleteAddress() {
 		final var missingGivenName = buildCitizenExtended();
 		missingGivenName.setGivenname(null);
 
@@ -302,7 +352,11 @@ class SnailMailServiceTest {
 		missingCity.getAddresses().getFirst().setCity(" ");
 
 		return Stream.of(
-			missingGivenName, missingLastName, missingAddress, missingPostalCode, missingCity
+			Arguments.of(missingGivenName, GIVEN_NAME),
+			Arguments.of(missingLastName, LAST_NAME),
+			Arguments.of(missingAddress, ADDRESS),
+			Arguments.of(missingPostalCode, POSTAL_CODE),
+			Arguments.of(missingCity, CITY)
 		);
 	}
 }
