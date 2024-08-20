@@ -1,8 +1,10 @@
 package se.sundsvall.snailmail.service;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
 
-import jakarta.transaction.Transactional;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +21,7 @@ import se.sundsvall.snailmail.integration.db.model.BatchEntity;
 import se.sundsvall.snailmail.integration.samba.SambaIntegration;
 
 import generated.se.sundsvall.citizen.CitizenExtended;
+import jakarta.transaction.Transactional;
 
 @Service
 @Transactional
@@ -51,6 +54,7 @@ public class SnailMailService {
 		if (!EnvelopeType.WINDOWED.equals(request.getAttachments().getFirst().getEnvelopeType())) {
 			LOGGER.info("Finding information for citizen: {} ", request.getPartyId());
 			citizen = citizenIntegration.getCitizen(request.getPartyId());
+			validateCitizenAddress(citizen);
 		}
 
 		final var batch = batchRepository.findByMunicipalityIdAndId(municipalityId, request.getBatchId())
@@ -61,6 +65,21 @@ public class SnailMailService {
 
 		LOGGER.info("Saving request");
 		requestRepository.save(Mapper.toRequest(request, citizen, department));
+	}
+
+	private void validateCitizenAddress(CitizenExtended citizen) {
+		//Verify that we have name, lastname, address, postal code and city, otherwise we cannot send it as a snail mail.
+		Optional.ofNullable(Mapper.toRecipient(citizen))
+				.filter(recipientEntity -> isNotBlank(recipientEntity.getGivenName()))
+				.filter(recipientEntity -> isNotBlank(recipientEntity.getLastName()))
+				.filter(recipientEntity -> isNotBlank(recipientEntity.getAddress()))
+				.filter(recipientEntity -> isNotBlank(recipientEntity.getPostalCode()))
+				.filter(recipientEntity -> isNotBlank(recipientEntity.getCity()))
+			.orElseThrow(() -> Problem.builder()
+				.withTitle("Incomplete recipient address information")
+				.withStatus(INTERNAL_SERVER_ERROR)
+				.withDetail("Missing required fields in the recipient address")
+				.build());
 	}
 
 	public void sendBatch(final String municipalityId, final String batchId) {

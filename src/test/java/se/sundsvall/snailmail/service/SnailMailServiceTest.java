@@ -1,5 +1,7 @@
 package se.sundsvall.snailmail.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -11,13 +13,18 @@ import static se.sundsvall.snailmail.TestDataFactory.buildCitizenExtended;
 import static se.sundsvall.snailmail.TestDataFactory.buildSendSnailMailRequest;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.zalando.problem.Problem;
+import org.zalando.problem.Status;
+import org.zalando.problem.ThrowableProblem;
 
 import se.sundsvall.snailmail.integration.citizen.CitizenIntegration;
 import se.sundsvall.snailmail.integration.db.BatchRepository;
@@ -27,6 +34,8 @@ import se.sundsvall.snailmail.integration.db.model.BatchEntity;
 import se.sundsvall.snailmail.integration.db.model.DepartmentEntity;
 import se.sundsvall.snailmail.integration.db.model.RequestEntity;
 import se.sundsvall.snailmail.integration.samba.SambaIntegration;
+
+import generated.se.sundsvall.citizen.CitizenExtended;
 
 @ExtendWith(MockitoExtension.class)
 class SnailMailServiceTest {
@@ -167,7 +176,7 @@ class SnailMailServiceTest {
 		// Arrange
 		final var municipalityId = "municipalityId";
 		final var request = buildSendSnailMailRequest();
-		when(citizenIntegrationMock.getCitizen(any(String.class))).thenReturn(null);
+		when(citizenIntegrationMock.getCitizen(any(String.class))).thenReturn(buildCitizenExtended());
 		when(batchRepositoryMock.findByMunicipalityIdAndId(municipalityId, request.getBatchId())).thenReturn(Optional.empty());
 		when(batchRepositoryMock.save(any(BatchEntity.class))).thenReturn(BatchEntity.builder().build());
 		when(departmentRepositoryMock.findByNameAndBatchEntity(any(String.class), any(BatchEntity.class))).thenReturn(Optional.empty());
@@ -251,7 +260,49 @@ class SnailMailServiceTest {
 		verify(citizenIntegrationMock).getCitizen(any(String.class));
 		verifyNoMoreInteractions(batchRepositoryMock, departmentRepositoryMock, requestRepositoryMock, citizenIntegrationMock);
 		verifyNoInteractions(sambaIntegrationMock);
-
 	}
 
+	@ParameterizedTest
+	@MethodSource("provideIncompleteAddress")
+	void sendBatchWithIncompleteAddress_shouldThrowException(CitizenExtended citizenExtended) {
+		// Arrange
+		final var municipalityId = "municipalityId";
+		final var snailMailRequest = buildSendSnailMailRequest();
+		when(citizenIntegrationMock.getCitizen(snailMailRequest.getPartyId())).thenReturn(citizenExtended);
+
+		// Act & Assert
+		assertThatExceptionOfType(ThrowableProblem.class)
+			.isThrownBy(() -> snailMailService.sendSnailMail(municipalityId, snailMailRequest))
+			.withMessage("Incomplete recipient address information: Missing required fields in the recipient address")
+			.satisfies(throwableProblem -> {
+				assertThat(throwableProblem.getStatus()).isEqualTo(Status.INTERNAL_SERVER_ERROR);
+				assertThat(throwableProblem.getTitle()).isEqualTo("Incomplete recipient address information");
+				assertThat(throwableProblem.getDetail()).isEqualTo("Missing required fields in the recipient address");
+			});
+
+		verify(citizenIntegrationMock).getCitizen(snailMailRequest.getPartyId());
+		verifyNoMoreInteractions(citizenIntegrationMock);
+		verifyNoInteractions(batchRepositoryMock, departmentRepositoryMock, requestRepositoryMock, sambaIntegrationMock);
+	}
+
+	private static Stream<CitizenExtended> provideIncompleteAddress() {
+		final var missingGivenName = buildCitizenExtended();
+		missingGivenName.setGivenname(null);
+
+		final var missingLastName = buildCitizenExtended();
+		missingLastName.setLastname(null);
+
+		final var missingAddress = buildCitizenExtended();
+		missingAddress.getAddresses().getFirst().setAddress(null);
+
+		final var missingPostalCode = buildCitizenExtended();
+		missingPostalCode.getAddresses().getFirst().setPostalCode("");
+
+		final var missingCity = buildCitizenExtended();
+		missingCity.getAddresses().getFirst().setCity(" ");
+
+		return Stream.of(
+			missingGivenName, missingLastName, missingAddress, missingPostalCode, missingCity
+		);
+	}
 }
