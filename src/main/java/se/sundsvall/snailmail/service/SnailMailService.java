@@ -1,8 +1,12 @@
 package se.sundsvall.snailmail.service;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
 
-import jakarta.transaction.Transactional;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +23,7 @@ import se.sundsvall.snailmail.integration.db.model.BatchEntity;
 import se.sundsvall.snailmail.integration.samba.SambaIntegration;
 
 import generated.se.sundsvall.citizen.CitizenExtended;
+import jakarta.transaction.Transactional;
 
 @Service
 @Transactional
@@ -36,6 +41,11 @@ public class SnailMailService {
 
 	private final CitizenIntegration citizenIntegration;
 
+	public static final String GIVEN_NAME = "Given Name";
+	public static final String LAST_NAME = "Last Name";
+	public static final String ADDRESS = "Address";
+	public static final String POSTAL_CODE = "Postal Code";
+	public static final String CITY = "City";
 
 	public SnailMailService(final SambaIntegration sambaIntegration, final BatchRepository batchRepository, final DepartmentRepository departmentRepository, final RequestRepository requestRepository, final CitizenIntegration citizenIntegration) {
 		this.batchRepository = batchRepository;
@@ -51,6 +61,7 @@ public class SnailMailService {
 		if (!EnvelopeType.WINDOWED.equals(request.getAttachments().getFirst().getEnvelopeType())) {
 			LOGGER.info("Finding information for citizen: {} ", request.getPartyId());
 			citizen = citizenIntegration.getCitizen(request.getPartyId());
+			validateCitizenAddress(citizen);
 		}
 
 		final var batch = batchRepository.findByMunicipalityIdAndId(municipalityId, request.getBatchId())
@@ -61,6 +72,42 @@ public class SnailMailService {
 
 		LOGGER.info("Saving request");
 		requestRepository.save(Mapper.toRequest(request, citizen, department));
+	}
+
+	/**
+	 * Validate that the citizen has all required address information
+	 * If any required field is missing, a Problem will be thrown describing the missing fields
+	 */
+	private void validateCitizenAddress(CitizenExtended citizen) {
+		var recipientEntity = Optional.ofNullable(Mapper.toRecipient(citizen))
+			.orElseThrow(() -> Problem.builder()
+				.withTitle("No address information found for citizen")
+				.withStatus(INTERNAL_SERVER_ERROR)
+				.withDetail("No address information found for citizen with partyId: " + citizen.getPersonId())
+				.build());
+
+		//Check each required field in the address and save it in the map
+		Map<String, Boolean> validatedFields = new LinkedHashMap<>();   //Preserve insertion order
+		validatedFields.put(GIVEN_NAME, isNotBlank(recipientEntity.getGivenName()));
+		validatedFields.put(LAST_NAME, isNotBlank(recipientEntity.getLastName()));
+		validatedFields.put(ADDRESS, isNotBlank(recipientEntity.getAddress()));
+		validatedFields.put(POSTAL_CODE, isNotBlank(recipientEntity.getPostalCode()));
+		validatedFields.put(CITY, isNotBlank(recipientEntity.getCity()));
+
+		//If there are any missing fields (i.e. false in any of the values of the map), throw a Problem
+		if (validatedFields.values().stream().anyMatch(Boolean.FALSE::equals)) {
+			//Create a string with the missing fields
+			var missingFields = validatedFields.entrySet().stream()
+				.filter(entry -> !entry.getValue())
+				.map(Map.Entry::getKey)
+				.collect(Collectors.joining(", ", "Missing fields: ", ""));
+
+			throw Problem.builder()
+				.withTitle("Citizen with partyId: " + citizen.getPersonId() + " is missing required address information")
+				.withStatus(INTERNAL_SERVER_ERROR)
+				.withDetail(missingFields)
+				.build();
+		}
 	}
 
 	public void sendBatch(final String municipalityId, final String batchId) {
@@ -76,5 +123,4 @@ public class SnailMailService {
 
 		batchRepository.delete(batch);
 	}
-
 }
