@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xmlns="http://maven.apache.org/POM/4.0.0"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>se.sundsvall.dept44</groupId>
 		<artifactId>dept44-service-parent</artifactId>
-		<version>6.0.0</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<version>6.0.1</version>
+		<relativePath/>
+		<!-- lookup parent from repository -->
 	</parent>
 	<groupId>se.sundsvall</groupId>
 	<artifactId>api-service-snailmail-sender</artifactId>
@@ -154,7 +154,7 @@
 				<artifactId>jacoco-maven-plugin</artifactId>
 				<configuration>
 					<excludes>
-						<exclude>**/generated/se/sundsvall/**/*</exclude> <!-- API model classes -->
+						<exclude>**/generated/se/sundsvall/**/*</exclude>						<!-- API model classes -->
 					</excludes>
 				</configuration>
 			</plugin>
