@@ -25,6 +25,7 @@
     create table recipient (
         id bigint not null auto_increment,
         address varchar(255),
+        apartment_number varchar(255),
         care_of varchar(255),
         city varchar(255),
         given_name varchar(255),

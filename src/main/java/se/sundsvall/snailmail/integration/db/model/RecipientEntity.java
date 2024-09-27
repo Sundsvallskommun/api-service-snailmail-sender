@@ -41,6 +41,9 @@ public class RecipientEntity {
 	@Column(name = "address")
 	private String address;
 
+	@Column(name = "apartment_number")
+	private String apartmentNumber;
+
 	@Column(name = "postal_code")
 	private String postalCode;
 
@@ -58,6 +61,7 @@ public class RecipientEntity {
 			", lastName='" + lastName + '\'' +
 			", careOf='" + careOf + '\'' +
 			", address='" + address + '\'' +
+			", apartmentNumber='" + apartmentNumber + '\'' +
 			", postalCode='" + postalCode + '\'' +
 			", city='" + city + '\'' +
 			", requestEntity=" + requestEntity +
@@ -68,11 +72,11 @@ public class RecipientEntity {
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (!(o instanceof RecipientEntity that)) return false;
-		return Objects.equals(id, that.id) && Objects.equals(givenName, that.givenName) && Objects.equals(lastName, that.lastName) && Objects.equals(careOf, that.careOf) && Objects.equals(address, that.address) && Objects.equals(postalCode, that.postalCode) && Objects.equals(city, that.city);
+		return Objects.equals(id, that.id) && Objects.equals(givenName, that.givenName) && Objects.equals(lastName, that.lastName) && Objects.equals(careOf, that.careOf) && Objects.equals(address, that.address) && Objects.equals(apartmentNumber, that.apartmentNumber) && Objects.equals(postalCode, that.postalCode) && Objects.equals(city, that.city);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(id, givenName, lastName, careOf, address, postalCode, city);
+		return Objects.hash(id, givenName, lastName, careOf, address, apartmentNumber, postalCode, city);
 	}
 }
