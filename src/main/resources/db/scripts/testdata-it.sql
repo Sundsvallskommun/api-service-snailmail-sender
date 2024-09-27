@@ -5,7 +5,7 @@ insert into department
 values (1, '123e4567-e89b-12d3-a456-426614174000', 'name');
 
 insert into recipient
-values (1, 'Ankeborgsvägen 12', 'Ankeborg', 'Kajsa Anka', 'Kalle', 'Aka', '85751');
+values (1, 'Ankeborgsvägen 12', '1984', 'Ankeborg', 'Kajsa Anka', 'Kalle', 'Aka', '85751');
 
 insert into request
 values (1, 1, 1, 'someDeviation', '285fffb1-f4cf-450a-b19f-46067387a7b6');
