@@ -1,9 +1,7 @@
 package se.sundsvall.snailmail.integration.db.model;
 
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanConstructor;
-import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanEquals;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanEqualsExcluding;
-import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanHashCode;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanHashCodeExcluding;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanToString;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidGettersAndSetters;
@@ -28,23 +26,24 @@ class RecipientEntityTest {
 	@Test
 	void testBuilderMethods() {
 		// Set values as variables
-		final var id = 12L;
-		final var request = RequestEntity.builder().build();
-		final var careOf = "careOf";
-		final var givenName = "givenName";
-		final var lastName = "lastName";
-		final var adress = "adress";
-		final var postalCode = "postalCode";
-		final var city = "city";
+		var id = 12L;
+		var request = RequestEntity.builder().build();
+		var careOf = "careOf";
+		var givenName = "givenName";
+		var lastName = "lastName";
+		var address = "address";
+		var apartmentNumber = "apartmentNumber";
+		var postalCode = "postalCode";
+		var city = "city";
 
-
-		final var recipient = RecipientEntity.builder()
+		var recipient = RecipientEntity.builder()
 			.withId(id)
 			.withRequestEntity(request)
 			.withCareOf(careOf)
 			.withGivenName(givenName)
 			.withLastName(lastName)
-			.withAddress(adress)
+			.withAddress(address)
+			.withApartmentNumber(apartmentNumber)
 			.withPostalCode(postalCode)
 			.withCity(city)
 			.build();
@@ -55,7 +54,8 @@ class RecipientEntityTest {
 		assertThat(recipient.getCareOf()).isEqualTo(careOf);
 		assertThat(recipient.getGivenName()).isEqualTo(givenName);
 		assertThat(recipient.getLastName()).isEqualTo(lastName);
-		assertThat(recipient.getAddress()).isEqualTo(adress);
+		assertThat(recipient.getAddress()).isEqualTo(address);
+		assertThat(recipient.getApartmentNumber()).isEqualTo(apartmentNumber);
 		assertThat(recipient.getPostalCode()).isEqualTo(postalCode);
 		assertThat(recipient.getCity()).isEqualTo(city);
 	}
@@ -65,5 +65,4 @@ class RecipientEntityTest {
 		assertThat(RecipientEntity.builder().build()).hasAllNullFieldsOrProperties();
 		assertThat(new RecipientEntity()).hasAllNullFieldsOrProperties();
 	}
-
 }

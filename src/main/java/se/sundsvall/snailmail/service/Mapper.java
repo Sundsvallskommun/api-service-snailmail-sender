@@ -71,6 +71,7 @@ public final class Mapper {
 				.withGivenName(citizen.getGivenname())
 				.withLastName(citizen.getLastname())
 				.withAddress(address.getAddress())
+				.withApartmentNumber(address.getAppartmentNumber())
 				.withPostalCode(address.getPostalCode())
 				.withCity(address.getCity())
 				.withCareOf(address.getCo())
