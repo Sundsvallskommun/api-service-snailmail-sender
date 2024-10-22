@@ -55,7 +55,7 @@ public class SnailMailService {
 		this.citizenIntegration = citizenIntegration;
 	}
 
-	public void sendSnailMail(final String municipalityId, final SendSnailMailRequest request) {
+	public void sendSnailMail(final String municipalityId, final SendSnailMailRequest request, final String issuer) {
 
 		CitizenExtended citizen = null;
 		if (!EnvelopeType.WINDOWED.equals(request.getAttachments().getFirst().getEnvelopeType())) {

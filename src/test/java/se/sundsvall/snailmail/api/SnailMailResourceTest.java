@@ -38,6 +38,7 @@ class SnailMailResourceTest {
 	void sendSnailMail() {
 
 		//Arrange
+		final var issuer = "issuer";
 		final var municipalityId = "2281";
 		final var request = SendSnailMailRequest.builder()
 			.withDepartment("department")
@@ -48,13 +49,14 @@ class SnailMailResourceTest {
 		//ACT
 		webTestClient.post()
 			.uri("/2281/send/snailmail")
+			.header("x-issuer", issuer)
 			.bodyValue(request)
 			.exchange()
 			.expectStatus()
 			.isOk();
 
 		// VERIFY
-		verify(mockSnailMailService).sendSnailMail(municipalityId, request);
+		verify(mockSnailMailService).sendSnailMail(municipalityId, request, issuer);
 
 	}
 
