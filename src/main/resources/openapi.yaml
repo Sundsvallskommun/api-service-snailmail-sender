@@ -1,13 +1,13 @@
 openapi: 3.0.1
 info:
   title: SnailMailSender
-  contact: {}
+  contact: { }
   license:
     name: MIT License
     url: https://opensource.org/licenses/MIT
   version: "2.1"
 servers:
-  - url: http://localhost:58449
+  - url: http://localhost:64948
     description: Generated server url
 tags:
   - name: SnailMailSender
@@ -22,7 +22,9 @@ paths:
       parameters:
         - name: x-issuer
           in: header
-          description: Issuer of the request
+          description: |
+            Issuer of the request, is used as a prefix in a folder name.
+            Cannot contain any of: '"', '*', '<', '>', '?', '|', '/', '\', ':'
           required: false
           schema:
             type: string
@@ -179,12 +181,12 @@ components:
           type: object
           additionalProperties:
             type: object
-        status:
-          $ref: "#/components/schemas/StatusType"
-        detail:
-          type: string
         title:
           type: string
+        detail:
+          type: string
+        status:
+          $ref: "#/components/schemas/StatusType"
     StatusType:
       type: object
       properties:
@@ -202,27 +204,27 @@ components:
           type: object
           additionalProperties:
             type: object
-        validationAppliesTo:
-          type: string
-          enum:
-            - IMPLICIT
-            - RETURN_VALUE
-            - PARAMETERS
-        composingConstraints:
-          uniqueItems: true
-          type: array
-          items:
-            $ref: "#/components/schemas/ConstraintDescriptorObject"
-        reportAsSingleViolation:
-          type: boolean
-        messageTemplate:
-          type: string
         valueUnwrapping:
           type: string
           enum:
             - DEFAULT
             - UNWRAP
             - SKIP
+        messageTemplate:
+          type: string
+        reportAsSingleViolation:
+          type: boolean
+        composingConstraints:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: "#/components/schemas/ConstraintDescriptorObject"
+        validationAppliesTo:
+          type: string
+          enum:
+            - IMPLICIT
+            - RETURN_VALUE
+            - PARAMETERS
     ConstraintViolation:
       type: object
       properties:
@@ -230,22 +232,22 @@ components:
           type: string
         messageTemplate:
           type: string
-        rootBean:
-          type: object
         propertyPath:
           $ref: "#/components/schemas/Path"
+        rootBean:
+          type: object
         executableReturnValue:
           type: object
-        constraintDescriptor:
-          $ref: "#/components/schemas/ConstraintDescriptorObject"
         executableParameters:
           type: array
           items:
             type: object
-        invalidValue:
-          type: object
+        constraintDescriptor:
+          $ref: "#/components/schemas/ConstraintDescriptorObject"
         leafBean:
+          type: object
+        invalidValue:
           type: object
     Path:
       type: object
-  securitySchemes: {}
+  securitySchemes: { }

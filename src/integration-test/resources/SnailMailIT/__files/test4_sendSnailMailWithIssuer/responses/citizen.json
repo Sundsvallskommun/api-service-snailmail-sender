@@ -1,0 +1,22 @@
+{
+  "personId": "550e8400-e29b-41d4-a716-446655440000",
+  "givenname": "Kalle",
+  "lastname": "Anka",
+  "gender": "M",
+  "civilStatus": "OG",
+  "nrDate": "123",
+  "classified": "N",
+  "protectedNR": "N",
+  "addresses": [
+    {
+      "realEstateDescription": "BORGEN 1:1",
+      "address": "Ankvägen 1",
+      "postalCode": "123 45",
+      "city": "Ankeborg",
+      "municipality": "2281",
+      "country": "SVERIGE",
+      "emigrated": false,
+      "addressType": "POPULATION_REGISTRATION_ADDRESS"
+    }
+  ]
+}

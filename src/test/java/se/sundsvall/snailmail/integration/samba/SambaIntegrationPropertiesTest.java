@@ -22,7 +22,7 @@ class SambaIntegrationPropertiesTest {
 	@Test
 	void test() {
 		assertThat(properties.host()).isEqualTo("localhost");
-		assertThat(properties.port()).isEqualTo(445);
+		assertThat(properties.port()).isEqualTo(1445);
 		assertThat(properties.domain()).isEqualTo("WORKGROUP");
 		assertThat(properties.username()).isEqualTo("user");
 		assertThat(properties.password()).isEqualTo("1234");

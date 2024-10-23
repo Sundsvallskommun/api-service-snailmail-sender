@@ -3,7 +3,7 @@ integration:
     base-url: http://citizen.url
   samba:
     host: localhost
-    port: 445
+    port: 1445
     domain: WORKGROUP
     username: user
     password: 1234

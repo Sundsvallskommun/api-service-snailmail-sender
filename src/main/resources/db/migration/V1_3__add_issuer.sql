@@ -1,0 +1,2 @@
+ALTER TABLE batch
+    ADD COLUMN issuer VARCHAR(255);

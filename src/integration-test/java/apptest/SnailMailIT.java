@@ -1,17 +1,16 @@
 package apptest;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpStatus.OK;
 
 import java.io.File;
 import java.time.Duration;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.containers.DockerComposeContainer;
-import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
@@ -28,7 +27,6 @@ class SnailMailIT extends AbstractAppTest {
 	@Container
 	public static final DockerComposeContainer<?> sambaContainer =
 		new DockerComposeContainer<>(new File("src/test/resources/docker/docker-compose.yml"))
-			.withExposedService("samba", 445, Wait.forListeningPort())
 			.withStartupTimeout(Duration.ofSeconds(60));
 
 	private static final String MUNICIPALITY_ID = "2281";
@@ -40,9 +38,9 @@ class SnailMailIT extends AbstractAppTest {
 	void test1_sendSnailMail() {
 		setupCall()
 			.withServicePath("/" + MUNICIPALITY_ID + "/send/snailmail")
-			.withHttpMethod(HttpMethod.POST)
+			.withHttpMethod(POST)
 			.withRequest("request.json")
-			.withExpectedResponseStatus(HttpStatus.OK)
+			.withExpectedResponseStatus(OK)
 			.sendRequestAndVerifyResponse();
 	}
 
@@ -50,8 +48,8 @@ class SnailMailIT extends AbstractAppTest {
 	void test2_sendBatch() {
 		setupCall()
 			.withServicePath("/" + MUNICIPALITY_ID + "/send/batch/123e4567-e89b-12d3-a456-426614174000")
-			.withHttpMethod(HttpMethod.POST)
-			.withExpectedResponseStatus(HttpStatus.OK)
+			.withHttpMethod(POST)
+			.withExpectedResponseStatus(OK)
 			.sendRequestAndVerifyResponse();
 	}
 
@@ -61,16 +59,16 @@ class SnailMailIT extends AbstractAppTest {
 
 		setupCall()
 			.withServicePath("/" + MUNICIPALITY_ID + "/send/snailmail")
-			.withHttpMethod(HttpMethod.POST)
+			.withHttpMethod(POST)
 			.withRequest("request.json")
-			.withExpectedResponseStatus(HttpStatus.OK)
+			.withExpectedResponseStatus(OK)
 			.sendRequest();
 
 		setupCall()
 			.withServicePath("/" + MUNICIPALITY_ID + "/send/snailmail")
-			.withHttpMethod(HttpMethod.POST)
+			.withHttpMethod(POST)
 			.withRequest("request2.json")
-			.withExpectedResponseStatus(HttpStatus.OK)
+			.withExpectedResponseStatus(OK)
 			.sendRequest();
 
 		final var batchEntityList = batchRepository.findAll();
@@ -87,5 +85,16 @@ class SnailMailIT extends AbstractAppTest {
 			.anyMatch(entity -> entity.getDepartmentEntities().stream()
 				.allMatch(departmentEntity -> departmentEntity.getName().equalsIgnoreCase("dummy"))))
 			.isTrue();
+	}
+
+	@Test
+	void test4_sendSnailMailWithIssuer() {
+		setupCall()
+			.withServicePath("/" + MUNICIPALITY_ID + "/send/snailmail")
+			.withHttpMethod(POST)
+			.withHeader("x-issuer", "issuer")
+			.withRequest("request.json")
+			.withExpectedResponseStatus(OK)
+			.sendRequestAndVerifyResponse();
 	}
 }

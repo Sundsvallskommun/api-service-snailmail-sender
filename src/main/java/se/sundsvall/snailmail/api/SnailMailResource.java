@@ -19,6 +19,7 @@ import org.zalando.problem.Problem;
 import se.sundsvall.dept44.common.validators.annotation.ValidMunicipalityId;
 import se.sundsvall.dept44.common.validators.annotation.ValidUuid;
 import se.sundsvall.snailmail.api.model.SendSnailMailRequest;
+import se.sundsvall.snailmail.api.validation.ValidFolderName;
 import se.sundsvall.snailmail.service.SnailMailService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -46,7 +47,11 @@ class SnailMailResource {
 	@PostMapping(path = "/snailmail", consumes = APPLICATION_JSON_VALUE)
 	@Operation(summary = "Prepare snail mail for batch")
 	ResponseEntity<Void> sendSnailMail(
-		@Parameter(name = "x-issuer", description = "Issuer of the request") @RequestHeader(name = "x-issuer", required = false) final String issuer,
+		@Parameter(name = "x-issuer", description = """
+			Issuer of the request, is used as a prefix in a folder name.
+			Cannot contain any of: '"', '*', '<', '>', '?', '|', '/', '\\', ':'
+			""")
+		@RequestHeader(name = "x-issuer", required = false) @ValidFolderName(nullable = true) final String issuer,
 		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @ValidMunicipalityId @PathVariable final String municipalityId,
 		@Valid @RequestBody final SendSnailMailRequest request) {
 

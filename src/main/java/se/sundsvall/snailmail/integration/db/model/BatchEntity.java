@@ -35,6 +35,9 @@ public class BatchEntity {
 	@Column(name = "id")
 	private String id;
 
+	@Column(name = "issuer")
+	private String issuer;
+
 	@OneToMany(mappedBy = "batchEntity", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private List<DepartmentEntity> departmentEntities;
 
@@ -42,25 +45,25 @@ public class BatchEntity {
 	private String municipalityId;
 
 	@Override
-	public boolean equals(final Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-		final BatchEntity that = (BatchEntity) o;
-		return Objects.equals(id, that.id) && Objects.equals(departmentEntities, that.departmentEntities) && Objects.equals(municipalityId, that.municipalityId);
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(id, departmentEntities, municipalityId);
-	}
-
-	@Override
 	public String toString() {
 		return "BatchEntity{" +
 			"id='" + id + '\'' +
+			", issuer='" + issuer + '\'' +
 			", departmentEntities=" + departmentEntities +
 			", municipalityId='" + municipalityId + '\'' +
 			'}';
 	}
 
+	@Override
+	public boolean equals(final Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		final BatchEntity that = (BatchEntity) o;
+		return Objects.equals(id, that.id) && Objects.equals(issuer, that.issuer) && Objects.equals(departmentEntities, that.departmentEntities) && Objects.equals(municipalityId, that.municipalityId);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id, issuer, departmentEntities, municipalityId);
+	}
 }

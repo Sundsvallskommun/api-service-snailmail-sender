@@ -20,6 +20,8 @@ public @interface ValidFolderName {
 
 	String message() default "not a valid folder name";
 
+	boolean nullable() default false;
+
 	Class<?>[] groups() default {};
 
 	Class<? extends Payload>[] payload() default {};
