@@ -117,7 +117,7 @@ class SambaIntegrationTest {
 
 		assertThatThrownBy(() -> sambaIntegration.writeBatchDataToSambaShare(batchEntity))
 			.isInstanceOf(Problem.class)
-			.hasMessage("Internal Server Error: Failed to create folder smb://localhost:1445/share/department1\\asd/asd on Samba share")
+			.hasMessage("Internal Server Error: Failed to create folder smb://localhost:1445/share/department1/asd/asd on Samba share")
 			.hasFieldOrPropertyWithValue("status", INTERNAL_SERVER_ERROR);
 	}
 
