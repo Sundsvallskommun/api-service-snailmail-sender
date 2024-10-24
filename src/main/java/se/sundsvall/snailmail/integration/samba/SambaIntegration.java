@@ -1,5 +1,7 @@
 package se.sundsvall.snailmail.integration.samba;
 
+import static java.util.Optional.ofNullable;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -55,8 +57,12 @@ public class SambaIntegration {
 				// Create the department folders
 				var departmentPath = shareUrl + department.getName();
 				createFolder(departmentPath);
+
 				// Create the batchEntity folder
-				var batchPath = departmentPath + File.separator + batchEntity.getId();
+				var batchPath = ofNullable(batchEntity.getIssuer())
+					.map(issuer -> departmentPath + File.separator + issuer + "_" + batchEntity.getId())
+					.orElse(departmentPath + File.separator + batchEntity.getId());
+
 				createFolder(batchPath);
 
 				// Save the data to the files
@@ -124,7 +130,7 @@ public class SambaIntegration {
 	}
 
 	private String findFile(final RequestEntity requestEntity, final String departmentPath) {
-		return Optional.ofNullable(requestEntity.getAttachmentEntities().getFirst().getName())
+		return ofNullable(requestEntity.getAttachmentEntities().getFirst().getName())
 			.map(name -> name.substring(0, Optional.of(name.lastIndexOf("."))
 				.filter(i -> i != -1)
 				.orElse(name.length())))

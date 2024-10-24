@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import jakarta.transaction.Transactional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -23,7 +25,6 @@ import se.sundsvall.snailmail.integration.db.model.BatchEntity;
 import se.sundsvall.snailmail.integration.samba.SambaIntegration;
 
 import generated.se.sundsvall.citizen.CitizenExtended;
-import jakarta.transaction.Transactional;
 
 @Service
 @Transactional
@@ -55,7 +56,7 @@ public class SnailMailService {
 		this.citizenIntegration = citizenIntegration;
 	}
 
-	public void sendSnailMail(final String municipalityId, final SendSnailMailRequest request) {
+	public void sendSnailMail(final String municipalityId, final SendSnailMailRequest request, final String issuer) {
 
 		CitizenExtended citizen = null;
 		if (!EnvelopeType.WINDOWED.equals(request.getAttachments().getFirst().getEnvelopeType())) {
@@ -65,7 +66,7 @@ public class SnailMailService {
 		}
 
 		final var batch = batchRepository.findByMunicipalityIdAndId(municipalityId, request.getBatchId())
-			.orElseGet(() -> batchRepository.save(BatchEntity.builder().withId(request.getBatchId()).withMunicipalityId(municipalityId).build()));
+			.orElseGet(() -> batchRepository.save(BatchEntity.builder().withId(request.getBatchId()).withIssuer(issuer).withMunicipalityId(municipalityId).build()));
 
 		final var department = departmentRepository.findByNameAndBatchEntity(request.getDepartment(), batch)
 			.orElseGet(() -> departmentRepository.save(Mapper.toDepartment(request.getDepartment(), batch)));

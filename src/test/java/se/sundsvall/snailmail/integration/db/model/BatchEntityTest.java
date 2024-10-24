@@ -29,16 +29,19 @@ class BatchEntityTest {
 	void testBuilderMethods() {
 		// Set values as variables
 		final String id = "batchId";
+		final String issuer = "issuer";
 		final String municipalityId = "municipalityId";
 		final var department = DepartmentEntity.builder().build();
 
 		final var batch = BatchEntity.builder()
 			.withId(id)
+			.withIssuer(issuer)
 			.withMunicipalityId(municipalityId)
 			.withDepartmentEntities(List.of(department))
 			.build();
 
 		assertThat(batch).isNotNull().hasNoNullFieldsOrProperties();
+		assertThat(batch.getIssuer()).isEqualTo(issuer);
 		assertThat(batch.getId()).isEqualTo(id);
 		assertThat(batch.getMunicipalityId()).isEqualTo(municipalityId);
 		assertThat(batch.getDepartmentEntities()).hasSize(1);

@@ -4,4 +4,4 @@ services:
     image: dperson/samba
     command: -s "share;/share/;yes;no;no;user;none;user;none" -u "user;1234" -w WORKGROUP -p
     ports:
-      - "445:445"
+      - "1445:445"

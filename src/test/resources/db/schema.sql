@@ -11,6 +11,7 @@
 
     create table batch (
         id varchar(255) not null,
+        issuer varchar(255),
         municipality_id varchar(255),
         primary key (id)
     ) engine=InnoDB;

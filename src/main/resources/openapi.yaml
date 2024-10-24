@@ -5,9 +5,9 @@ info:
   license:
     name: MIT License
     url: https://opensource.org/licenses/MIT
-  version: "2.0"
+  version: "2.1"
 servers:
-  - url: http://localhost:54638
+  - url: http://localhost:64948
     description: Generated server url
 tags:
   - name: SnailMailSender
@@ -20,6 +20,14 @@ paths:
       summary: Prepare snail mail for batch
       operationId: sendSnailMail
       parameters:
+        - name: x-issuer
+          in: header
+          description: |
+            Issuer of the request, is used as a prefix in a folder name.
+            Cannot contain any of: '"', '*', '<', '>', '?', '|', '/', '\', ':'
+          required: false
+          schema:
+            type: string
         - name: municipalityId
           in: path
           description: Municipality id
@@ -34,14 +42,6 @@ paths:
               $ref: "#/components/schemas/SendSnailMailRequest"
         required: true
       responses:
-        "400":
-          description: Bad RequestEntity
-          content:
-            '*/*':
-              schema:
-                oneOf:
-                  - $ref: "#/components/schemas/Problem"
-                  - $ref: "#/components/schemas/ConstraintViolation"
         "500":
           description: Internal Server Error
           content:
@@ -50,6 +50,14 @@ paths:
                 $ref: "#/components/schemas/Problem"
         "200":
           description: Successful Operation
+        "400":
+          description: Bad RequestEntity
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Problem"
+                  - $ref: "#/components/schemas/ConstraintViolation"
   /{municipalityId}/send/batch/{batchId}:
     post:
       tags:
@@ -66,18 +74,12 @@ paths:
           example: 2281
         - name: batchId
           in: path
+          description: Batch id
           required: true
           schema:
             type: string
+          example: b588d1b7-7911-4e78-89d5-b710b32e0f8e
       responses:
-        "400":
-          description: Bad RequestEntity
-          content:
-            '*/*':
-              schema:
-                oneOf:
-                  - $ref: "#/components/schemas/Problem"
-                  - $ref: "#/components/schemas/ConstraintViolation"
         "500":
           description: Internal Server Error
           content:
@@ -86,6 +88,14 @@ paths:
                 $ref: "#/components/schemas/Problem"
         "200":
           description: Successful Operation
+        "400":
+          description: Bad RequestEntity
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Problem"
+                  - $ref: "#/components/schemas/ConstraintViolation"
   /api-docs:
     get:
       tags:
@@ -171,20 +181,20 @@ components:
           type: object
           additionalProperties:
             type: object
-        status:
-          $ref: "#/components/schemas/StatusType"
         title:
           type: string
         detail:
           type: string
+        status:
+          $ref: "#/components/schemas/StatusType"
     StatusType:
       type: object
       properties:
-        reasonPhrase:
-          type: string
         statusCode:
           type: integer
           format: int32
+        reasonPhrase:
+          type: string
     ConstraintDescriptorObject:
       type: object
       properties:
@@ -194,50 +204,50 @@ components:
           type: object
           additionalProperties:
             type: object
-        messageTemplate:
-          type: string
-        validationAppliesTo:
-          type: string
-          enum:
-            - IMPLICIT
-            - RETURN_VALUE
-            - PARAMETERS
         valueUnwrapping:
           type: string
           enum:
             - DEFAULT
             - UNWRAP
             - SKIP
+        messageTemplate:
+          type: string
+        reportAsSingleViolation:
+          type: boolean
         composingConstraints:
           uniqueItems: true
           type: array
           items:
             $ref: "#/components/schemas/ConstraintDescriptorObject"
-        reportAsSingleViolation:
-          type: boolean
+        validationAppliesTo:
+          type: string
+          enum:
+            - IMPLICIT
+            - RETURN_VALUE
+            - PARAMETERS
     ConstraintViolation:
       type: object
       properties:
         message:
           type: string
-        invalidValue:
-          type: object
-        propertyPath:
-          $ref: "#/components/schemas/Path"
         messageTemplate:
           type: string
-        leafBean:
-          type: object
+        propertyPath:
+          $ref: "#/components/schemas/Path"
         rootBean:
+          type: object
+        executableReturnValue:
           type: object
         executableParameters:
           type: array
           items:
             type: object
-        executableReturnValue:
-          type: object
         constraintDescriptor:
           $ref: "#/components/schemas/ConstraintDescriptorObject"
+        leafBean:
+          type: object
+        invalidValue:
+          type: object
     Path:
       type: object
   securitySchemes: { }

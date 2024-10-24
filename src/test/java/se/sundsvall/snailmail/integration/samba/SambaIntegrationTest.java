@@ -1,6 +1,5 @@
 package se.sundsvall.snailmail.integration.samba;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
@@ -18,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.containers.DockerComposeContainer;
-import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.zalando.problem.Problem;
@@ -42,7 +40,6 @@ class SambaIntegrationTest {
 	@Container
 	public static final DockerComposeContainer<?> sambaContainer =
 		new DockerComposeContainer<>(new File("src/test/resources/docker/docker-compose.yml"))
-			.withExposedService("samba", 445, Wait.forListeningPort())
 			.withStartupTimeout(Duration.ofSeconds(60));
 
 	private static final String SOME_DATA = "someData";
@@ -84,9 +81,26 @@ class SambaIntegrationTest {
 	void writeBatchDataToSambaShare() throws MalformedURLException, SmbException {
 
 		// Arrange
-		final var smbPath = "smb://localhost:445/share/" + DEPARTMENT_1 + "/" + BATCH_ID + "/sandlista-someName.csv";
+		final var smbPath = "smb://localhost:1445/share/" + DEPARTMENT_1 + "/" + BATCH_ID + "/sandlista-someName.csv";
 
 		final var batchEntity = getBatchEntity(BATCH_ID, "someName.pdf");
+
+		sambaIntegration.writeBatchDataToSambaShare(batchEntity);
+
+		// Assert
+		try (final var smbFile = new SmbFile(smbPath, sambaIntegration.getContext())) {
+			assertThat(smbFile.exists()).isTrue();
+		}
+	}
+
+	@Test
+	void writeBatchDataToSambaShareWithIssuer() throws MalformedURLException, SmbException {
+		// Arrange
+		final var issuer = "issuer";
+		final var smbPath = "smb://localhost:1445/share/" + DEPARTMENT_1 + "/" + issuer + "_" + BATCH_ID + "/sandlista-someName.csv";
+
+		final var batchEntity = getBatchEntity(BATCH_ID, "someName.pdf");
+		batchEntity.setIssuer(issuer);
 
 		sambaIntegration.writeBatchDataToSambaShare(batchEntity);
 
@@ -103,7 +117,7 @@ class SambaIntegrationTest {
 
 		assertThatThrownBy(() -> sambaIntegration.writeBatchDataToSambaShare(batchEntity))
 			.isInstanceOf(Problem.class)
-			.hasMessage("Internal Server Error: Failed to create folder smb://localhost:445/share/department1/asd/asd on Samba share")
+			.hasMessage("Internal Server Error: Failed to create folder smb://localhost:1445/share/department1/asd/asd on Samba share")
 			.hasFieldOrPropertyWithValue("status", INTERNAL_SERVER_ERROR);
 	}
 
