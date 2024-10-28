@@ -17,7 +17,6 @@ import static se.sundsvall.snailmail.service.SnailMailService.GIVEN_NAME;
 import static se.sundsvall.snailmail.service.SnailMailService.LAST_NAME;
 import static se.sundsvall.snailmail.service.SnailMailService.POSTAL_CODE;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -72,10 +71,10 @@ class SnailMailServiceTest {
 	@Test
 	void sendMail() {
 		//Arrange
-		final var batchEntity = BatchEntity.builder().build();
+		final var batchEntity = BatchEntity.builder().withId(BATCH_ID).build();
 		final var request = buildSendSnailMailRequest();
 		when(batchRepositoryMock.findByMunicipalityIdAndId(MUNICIPALITY_ID, request.getBatchId())).thenReturn(Optional.ofNullable(batchEntity));
-		when(departmentRepositoryMock.findByNameAndBatchEntity(any(String.class), any(BatchEntity.class))).thenReturn(Optional.ofNullable(DepartmentEntity.builder().build()));
+		when(departmentRepositoryMock.findByNameAndBatchEntityId(any(String.class), anyString())).thenReturn(Optional.ofNullable(DepartmentEntity.builder().build()));
 		when(citizenIntegrationMock.getCitizen(any(String.class))).thenReturn(buildCitizenExtended());
 
 		//Act
@@ -83,7 +82,7 @@ class SnailMailServiceTest {
 
 		//Assert
 		verify(batchRepositoryMock).findByMunicipalityIdAndId(MUNICIPALITY_ID, request.getBatchId());
-		verify(departmentRepositoryMock).findByNameAndBatchEntity("someDepartment", batchEntity);
+		verify(departmentRepositoryMock).findByNameAndBatchEntityId("someDepartment", batchEntity.getId());
 		verify(requestRepositoryMock).save(any(RequestEntity.class));
 		verify(citizenIntegrationMock).getCitizen(any(String.class));
 		verifyNoMoreInteractions(batchRepositoryMock, departmentRepositoryMock, requestRepositoryMock, citizenIntegrationMock);
@@ -94,7 +93,7 @@ class SnailMailServiceTest {
 	@Test
 	void sendMailWithNewBatch() {
 		//Arrange
-		final var batchEntity = BatchEntity.builder().build();
+		final var batchEntity = BatchEntity.builder().withId(BATCH_ID).build();
 		final var departmentEntity = DepartmentEntity.builder().build();
 		final var request = buildSendSnailMailRequest();
 
@@ -102,7 +101,7 @@ class SnailMailServiceTest {
 		when(batchRepositoryMock.findByMunicipalityIdAndId(MUNICIPALITY_ID, request.getBatchId())).thenReturn(Optional.empty());
 		when(batchRepositoryMock.save(any(BatchEntity.class))).thenReturn(batchEntity);
 
-		when(departmentRepositoryMock.findByNameAndBatchEntity(anyString(), any(BatchEntity.class))).thenReturn(Optional.empty());
+		when(departmentRepositoryMock.findByNameAndBatchEntityId(anyString(), anyString())).thenReturn(Optional.empty());
 		when(departmentRepositoryMock.save(any(DepartmentEntity.class))).thenReturn(departmentEntity);
 
 		when(requestRepositoryMock.save(any(RequestEntity.class))).thenReturn(RequestEntity.builder().build());
@@ -115,7 +114,7 @@ class SnailMailServiceTest {
 		verify(batchRepositoryMock).findByMunicipalityIdAndId(MUNICIPALITY_ID, request.getBatchId());
 		verify(batchRepositoryMock).save(any(BatchEntity.class));
 
-		verify(departmentRepositoryMock).findByNameAndBatchEntity("someDepartment", batchEntity);
+		verify(departmentRepositoryMock).findByNameAndBatchEntityId("someDepartment", batchEntity.getId());
 		verify(departmentRepositoryMock).save(any(DepartmentEntity.class));
 
 		verify(requestRepositoryMock).save(any(RequestEntity.class));
@@ -132,7 +131,7 @@ class SnailMailServiceTest {
 
 		when(citizenIntegrationMock.getCitizen(any(String.class))).thenReturn(buildCitizenExtended());
 		when(batchRepositoryMock.findByMunicipalityIdAndId(MUNICIPALITY_ID, request.getBatchId())).thenReturn(Optional.ofNullable(batchEntity));
-		when(departmentRepositoryMock.findByNameAndBatchEntity(any(String.class), any(BatchEntity.class))).thenReturn(Optional.empty());
+		when(departmentRepositoryMock.findByNameAndBatchEntityId(any(String.class), any())).thenReturn(Optional.empty());
 		when(departmentRepositoryMock.save(any(DepartmentEntity.class))).thenReturn(DepartmentEntity.builder().build());
 		when(requestRepositoryMock.save(any(RequestEntity.class))).thenReturn(RequestEntity.builder().build());
 
@@ -142,7 +141,7 @@ class SnailMailServiceTest {
 		//Assert
 		verify(citizenIntegrationMock).getCitizen(any(String.class));
 		verify(batchRepositoryMock).findByMunicipalityIdAndId(MUNICIPALITY_ID, request.getBatchId());
-		verify(departmentRepositoryMock).findByNameAndBatchEntity(anyString(), any(BatchEntity.class));
+		verify(departmentRepositoryMock).findByNameAndBatchEntityId(anyString(), any());
 		verify(departmentRepositoryMock).save(any(DepartmentEntity.class));
 		verify(requestRepositoryMock).save(any(RequestEntity.class));
 		verifyNoMoreInteractions(batchRepositoryMock, departmentRepositoryMock, requestRepositoryMock, citizenIntegrationMock);
@@ -158,7 +157,7 @@ class SnailMailServiceTest {
 		when(citizenIntegrationMock.getCitizen(any(String.class))).thenReturn(buildCitizenExtended());
 		when(batchRepositoryMock.findByMunicipalityIdAndId(MUNICIPALITY_ID, request.getBatchId())).thenReturn(Optional.empty());
 		when(batchRepositoryMock.save(any(BatchEntity.class))).thenReturn(BatchEntity.builder().build());
-		when(departmentRepositoryMock.findByNameAndBatchEntity(any(String.class), any(BatchEntity.class))).thenReturn(Optional.empty());
+		when(departmentRepositoryMock.findByNameAndBatchEntityId(any(String.class), any())).thenReturn(Optional.empty());
 		when(departmentRepositoryMock.save(any(DepartmentEntity.class))).thenReturn(DepartmentEntity.builder().build());
 
 		// Act
@@ -167,7 +166,7 @@ class SnailMailServiceTest {
 		// Assert
 		verify(batchRepositoryMock).findByMunicipalityIdAndId(MUNICIPALITY_ID, request.getBatchId());
 		verify(batchRepositoryMock).save(any(BatchEntity.class));
-		verify(departmentRepositoryMock).findByNameAndBatchEntity(anyString(), any(BatchEntity.class));
+		verify(departmentRepositoryMock).findByNameAndBatchEntityId(anyString(), any());
 		verify(departmentRepositoryMock).save(any(DepartmentEntity.class));
 		verify(requestRepositoryMock).save(any(RequestEntity.class));
 		verify(citizenIntegrationMock).getCitizen(any(String.class));
@@ -183,7 +182,7 @@ class SnailMailServiceTest {
 		when(citizenIntegrationMock.getCitizen(any(String.class))).thenReturn(buildCitizenExtended());
 		when(batchRepositoryMock.findByMunicipalityIdAndId(MUNICIPALITY_ID, request.getBatchId())).thenReturn(Optional.empty());
 		when(batchRepositoryMock.save(any(BatchEntity.class))).thenReturn(BatchEntity.builder().build());
-		when(departmentRepositoryMock.findByNameAndBatchEntity(any(String.class), any(BatchEntity.class))).thenReturn(Optional.empty());
+		when(departmentRepositoryMock.findByNameAndBatchEntityId(any(String.class), any())).thenReturn(Optional.empty());
 		when(departmentRepositoryMock.save(any(DepartmentEntity.class))).thenReturn(DepartmentEntity.builder().build());
 
 		// Act
@@ -192,7 +191,7 @@ class SnailMailServiceTest {
 		// Assert
 		verify(batchRepositoryMock).findByMunicipalityIdAndId(MUNICIPALITY_ID, request.getBatchId());
 		verify(batchRepositoryMock).save(any(BatchEntity.class));
-		verify(departmentRepositoryMock).findByNameAndBatchEntity(any(String.class), any(BatchEntity.class));
+		verify(departmentRepositoryMock).findByNameAndBatchEntityId(any(String.class), any());
 		verify(departmentRepositoryMock).save(any(DepartmentEntity.class));
 		verify(requestRepositoryMock).save(any(RequestEntity.class));
 		verify(citizenIntegrationMock).getCitizen(any(String.class));
@@ -238,13 +237,13 @@ class SnailMailServiceTest {
 	@Test
 	void sendBatchWithoutEvelopeType() {
 		// Arrange
-		final var batchEntity = BatchEntity.builder().build();
+		final var batchEntity = BatchEntity.builder().withId(BATCH_ID).build();
 		final var request = buildSendSnailMailRequest();
 		request.getAttachments().getFirst().setEnvelopeType(null);
 
 		// Mock
 		when(batchRepositoryMock.findByMunicipalityIdAndId(MUNICIPALITY_ID, request.getBatchId())).thenReturn(Optional.ofNullable(batchEntity));
-		when(departmentRepositoryMock.findByNameAndBatchEntity(any(String.class), any(BatchEntity.class))).thenReturn(Optional.ofNullable(DepartmentEntity.builder().build()));
+		when(departmentRepositoryMock.findByNameAndBatchEntityId(any(String.class), anyString())).thenReturn(Optional.ofNullable(DepartmentEntity.builder().build()));
 		when(citizenIntegrationMock.getCitizen(any(String.class))).thenReturn(buildCitizenExtended());
 
 		// Act
@@ -252,7 +251,7 @@ class SnailMailServiceTest {
 
 		// Assert
 		verify(batchRepositoryMock).findByMunicipalityIdAndId(MUNICIPALITY_ID, request.getBatchId());
-		verify(departmentRepositoryMock).findByNameAndBatchEntity(any(String.class), any(BatchEntity.class));
+		verify(departmentRepositoryMock).findByNameAndBatchEntityId(any(String.class), anyString());
 		verify(requestRepositoryMock).save(any());
 		verify(citizenIntegrationMock).getCitizen(any(String.class));
 		verifyNoMoreInteractions(batchRepositoryMock, departmentRepositoryMock, requestRepositoryMock, citizenIntegrationMock);

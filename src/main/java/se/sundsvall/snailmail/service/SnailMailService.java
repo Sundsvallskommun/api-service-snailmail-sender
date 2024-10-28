@@ -8,8 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import jakarta.transaction.Transactional;
-
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -22,9 +21,11 @@ import se.sundsvall.snailmail.integration.db.BatchRepository;
 import se.sundsvall.snailmail.integration.db.DepartmentRepository;
 import se.sundsvall.snailmail.integration.db.RequestRepository;
 import se.sundsvall.snailmail.integration.db.model.BatchEntity;
+import se.sundsvall.snailmail.integration.db.model.DepartmentEntity;
 import se.sundsvall.snailmail.integration.samba.SambaIntegration;
 
 import generated.se.sundsvall.citizen.CitizenExtended;
+import jakarta.transaction.Transactional;
 
 @Service
 @Transactional
@@ -65,14 +66,24 @@ public class SnailMailService {
 			validateCitizenAddress(citizen);
 		}
 
-		final var batch = batchRepository.findByMunicipalityIdAndId(municipalityId, request.getBatchId())
-			.orElseGet(() -> batchRepository.save(BatchEntity.builder().withId(request.getBatchId()).withIssuer(issuer).withMunicipalityId(municipalityId).build()));
+		LOGGER.info("Saving request for batch: {} and department: {} ", request.getBatchId(), request.getDepartment());
 
-		final var department = departmentRepository.findByNameAndBatchEntity(request.getDepartment(), batch)
-			.orElseGet(() -> departmentRepository.save(Mapper.toDepartment(request.getDepartment(), batch)));
+		final var batch = getBatchEntity(municipalityId, request, issuer);
+		final var department = getDepartmentEntity(request, batch);
 
-		LOGGER.info("Saving request");
 		requestRepository.save(Mapper.toRequest(request, citizen, department));
+	}
+
+	private @NotNull BatchEntity getBatchEntity(String municipalityId, SendSnailMailRequest request, String issuer) {
+		LOGGER.info("Finding batch: {} and/or saving", request.getBatchId());
+		return batchRepository.findByMunicipalityIdAndId(municipalityId, request.getBatchId())
+			.orElseGet(() -> batchRepository.save(BatchEntity.builder().withId(request.getBatchId()).withIssuer(issuer).withMunicipalityId(municipalityId).build()));
+	}
+
+	private @NotNull DepartmentEntity getDepartmentEntity(SendSnailMailRequest request, BatchEntity batch) {
+		LOGGER.info("Finding department: {} and/or saving", request.getDepartment());
+		return departmentRepository.findByNameAndBatchEntityId(request.getDepartment(), batch.getId())
+			.orElseGet(() -> departmentRepository.save(Mapper.toDepartment(request.getDepartment(), batch)));
 	}
 
 	/**

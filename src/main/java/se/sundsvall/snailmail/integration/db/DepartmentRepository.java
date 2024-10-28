@@ -13,5 +13,6 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 public interface DepartmentRepository extends JpaRepository<DepartmentEntity, Long> {
 
 	Optional<DepartmentEntity> findByNameAndBatchEntity(String departmentName, BatchEntity batchEntity);
+	Optional<DepartmentEntity> findByNameAndBatchEntityId(String departmentName, String batchEntityId);
 
 }
