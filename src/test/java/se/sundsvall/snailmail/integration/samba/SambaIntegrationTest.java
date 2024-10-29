@@ -52,7 +52,7 @@ class SambaIntegrationTest {
 
 	private static final String CSV_DATA = """
 		namn,careOf,adress,lagenhet,postnummer,postort
-		Janne Långben,Some CareOf,Some Address 123,null,null,ÖREBRO
+		Janne Långben,Some CareOf,Some Address 123,,123 45,ÖREBRO
 		""";
 
 	@Autowired
@@ -68,6 +68,7 @@ class SambaIntegrationTest {
 						.withCareOf("Some CareOf")
 						.withGivenName("Janne")
 						.withLastName("Långben")
+						.withPostalCode("123 45")
 						.build())
 				.withAttachmentEntities(List.of(
 					AttachmentEntity.builder()

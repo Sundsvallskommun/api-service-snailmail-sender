@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -62,10 +63,10 @@ public class SambaIntegration {
 	@Transactional
 	public void writeBatchDataToSambaShare(final BatchEntity batchEntity) {
 		// HashMap<batchPath, filename>. where files should be saved.
-		HashMap<String, String> batchPathFileNameMap = new HashMap<>();
+		Map<String, String> batchPathFileNameMap = new HashMap<>();
 
 		// HashMap<path, csv content list>. Where the csv content should be saved.
-		HashMap<String, List<String>> batchPathCsvMap = new HashMap<>();
+		Map<String, List<String>> batchPathCsvMap = new HashMap<>();
 
 		// Create the department and batch folders
 		createDepartmentAndBatchFolders(batchEntity);
@@ -86,7 +87,7 @@ public class SambaIntegration {
 	 * @param batchEntity the batch entity
 	 * @param fileNameMap the map with the filename for each batchPath
 	 */
-	private void saveAttachments(BatchEntity batchEntity, HashMap<String, String> fileNameMap) {
+	private void saveAttachments(BatchEntity batchEntity, Map<String, String> fileNameMap) {
 		batchEntity.getDepartmentEntities().forEach(
 			department -> {
 				var batchPath = getBatchPath(department, batchEntity);
@@ -106,7 +107,7 @@ public class SambaIntegration {
 	 * @param departmentBatchPathMap the map with the csv content for each department and batch
 	 * @param fileNameMap the map with the filename for each batchPath
 	 */
-	private void saveCsvContent(HashMap<String, List<String>> departmentBatchPathMap, HashMap<String, String> fileNameMap) {
+	private void saveCsvContent(Map<String, List<String>> departmentBatchPathMap, Map<String, String> fileNameMap) {
 		LOGGER.info("Starting to write csv content to Samba server");
 		departmentBatchPathMap.keySet().forEach(departmentPath -> {
 			//For each key in the map, create a new file with the content
@@ -140,7 +141,7 @@ public class SambaIntegration {
 	 * @param batchEntity the batch entity where everything should be stored
 	 * @param departmentBatchPathMap the map to be populated with the csv content for each department and batch
 	 */
-	private void createCsvContent(BatchEntity batchEntity, HashMap<String, List<String>> departmentBatchPathMap) {
+	private void createCsvContent(BatchEntity batchEntity, Map<String, List<String>> departmentBatchPathMap) {
 		batchEntity.getDepartmentEntities().forEach(
 			department -> {
 				var batchPath = getBatchPath(department, batchEntity);
@@ -150,9 +151,10 @@ public class SambaIntegration {
 						// Only save the request data if it's not a windowed envelope
 						if (!EnvelopeType.WINDOWED.equals(request.getAttachmentEntities().getFirst().getEnvelopeType())) {
 
-							//If the key already exists, append the content
 							if (departmentBatchPathMap.containsKey(batchPath)) {
+								//If the key already exists, append the content to the existing list
 								LOGGER.info("Appending csv information to existing csv content");
+
 								departmentBatchPathMap.get(batchPath).add(createCsvRow(request));
 							} else {
 								//If it doesn't exist, create a new list with the content
@@ -181,11 +183,11 @@ public class SambaIntegration {
 		var recipient = request.getRecipientEntity();
 
 		var name = recipient.getGivenName() + " " + recipient.getLastName();
-		var careOf = Optional.ofNullable(recipient.getCareOf()).orElse(""); // If careOf is null, set it to empty string
 		var address = recipient.getAddress();
-		var apartmentNumber = recipient.getApartmentNumber();
 		var postalCode = recipient.getPostalCode();
 		var city = recipient.getCity();
+		var careOf = ofNullable(recipient.getCareOf()).orElse(""); // If careOf is null, set it to empty string
+		var apartmentNumber = ofNullable(recipient.getApartmentNumber()).orElse(""); // If apartmentNumber is null, set it to empty string
 
 		printWriter.printf(CSV_FORMAT, name, careOf, address, apartmentNumber, postalCode, city);
 		return stringWriter.toString();
