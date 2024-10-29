@@ -6,7 +6,9 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Base64;
 import java.util.List;
@@ -48,6 +50,11 @@ class SambaIntegrationTest {
 
 	private static final String BATCH_ID = "123e4567-e89b-12d3-a456-426614174000";
 
+	private static final String CSV_DATA = """
+		namn,careOf,adress,lagenhet,postnummer,postort
+		Janne Långben,Some CareOf,Some Address 123,,123 45,ÖREBRO
+		""";
+
 	@Autowired
 	private SambaIntegration sambaIntegration;
 
@@ -56,6 +63,12 @@ class SambaIntegrationTest {
 			RequestEntity.builder()
 				.withRecipientEntity(
 					RecipientEntity.builder()
+						.withAddress("Some Address 123")
+						.withCity("ÖREBRO")
+						.withCareOf("Some CareOf")
+						.withGivenName("Janne")
+						.withLastName("Långben")
+						.withPostalCode("123 45")
 						.build())
 				.withAttachmentEntities(List.of(
 					AttachmentEntity.builder()
@@ -78,7 +91,7 @@ class SambaIntegrationTest {
 	}
 
 	@Test
-	void writeBatchDataToSambaShare() throws MalformedURLException, SmbException {
+	void writeBatchDataToSambaShare() throws IOException {
 
 		// Arrange
 		final var smbPath = "smb://localhost:1445/share/" + DEPARTMENT_1 + "/" + BATCH_ID + "/sandlista-someName.csv";
@@ -91,10 +104,16 @@ class SambaIntegrationTest {
 		try (final var smbFile = new SmbFile(smbPath, sambaIntegration.getContext())) {
 			assertThat(smbFile.exists()).isTrue();
 		}
+
+		//Read the samba file and verify content
+		try (final var smbFile = new SmbFile(smbPath, sambaIntegration.getContext())) {
+			final var content = new String(smbFile.getInputStream().readAllBytes(), StandardCharsets.ISO_8859_1);
+			assertThat(content).isEqualTo(CSV_DATA);
+		}
 	}
 
 	@Test
-	void writeBatchDataToSambaShareWithIssuer() throws MalformedURLException, SmbException {
+	void writeBatchDataToSambaShareWithIssuer() throws IOException {
 		// Arrange
 		final var issuer = "issuer";
 		final var smbPath = "smb://localhost:1445/share/" + DEPARTMENT_1 + "/" + issuer + "_" + BATCH_ID + "/sandlista-someName.csv";
@@ -107,6 +126,11 @@ class SambaIntegrationTest {
 		// Assert
 		try (final var smbFile = new SmbFile(smbPath, sambaIntegration.getContext())) {
 			assertThat(smbFile.exists()).isTrue();
+		}
+
+		try (final var smbFile = new SmbFile(smbPath, sambaIntegration.getContext())) {
+			final var content = new String(smbFile.getInputStream().readAllBytes(), StandardCharsets.ISO_8859_1);
+			assertThat(content).isEqualTo(CSV_DATA);
 		}
 	}
 
