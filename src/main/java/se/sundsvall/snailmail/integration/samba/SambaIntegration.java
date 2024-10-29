@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
@@ -100,7 +101,7 @@ public class SambaIntegration {
 	}
 
 	/**
-	 * Store where csv content should be created (batchPath)
+	 * Store the csv content on the samba server
 	 *
 	 * @param departmentBatchPathMap the map with the csv content for each department and batch
 	 * @param fileNameMap the map with the filename for each batchPath
@@ -119,12 +120,13 @@ public class SambaIntegration {
 				}
 
 				try (var smbFileOutputStream = new SmbFileOutputStream(destinationFile, true); // append mode
-				     var printWriter = new PrintWriter(smbFileOutputStream)) {
+				     var printWriter = new PrintWriter(smbFileOutputStream, false, StandardCharsets.ISO_8859_1)) {  // false for don't flush
 					// Write the headers to the file only if it's a new file
-					LOGGER.info("Writing headers to file: {}", destinationFile);
+					LOGGER.debug("Writing headers to file: {}", destinationFile);
 					printWriter.println(CSV_HEADER);
-					LOGGER.info("Writing address(es) to file: {}", destinationFile);
+					LOGGER.debug("Writing address(es) to file: {}", destinationFile);
 					departmentBatchPathMap.get(departmentPath).forEach(printWriter::print);
+					printWriter.flush();    //Flush the content
 				}
 			} catch (final IOException e) {
 				throw Problem.valueOf(Status.INTERNAL_SERVER_ERROR, "Failed to write to Samba share");
@@ -147,8 +149,8 @@ public class SambaIntegration {
 					.forEach(request -> {
 						// Only save the request data if it's not a windowed envelope
 						if (!EnvelopeType.WINDOWED.equals(request.getAttachmentEntities().getFirst().getEnvelopeType())) {
-							//If the key already exists, append the content
 
+							//If the key already exists, append the content
 							if (departmentBatchPathMap.containsKey(batchPath)) {
 								LOGGER.info("Appending csv information to existing csv content");
 								departmentBatchPathMap.get(batchPath).add(createCsvRow(request));
@@ -179,7 +181,7 @@ public class SambaIntegration {
 		var recipient = request.getRecipientEntity();
 
 		var name = recipient.getGivenName() + " " + recipient.getLastName();
-		var careOf = recipient.getCareOf();
+		var careOf = Optional.ofNullable(recipient.getCareOf()).orElse(""); // If careOf is null, set it to empty string
 		var address = recipient.getAddress();
 		var apartmentNumber = recipient.getApartmentNumber();
 		var postalCode = recipient.getPostalCode();
@@ -256,5 +258,4 @@ public class SambaIntegration {
 	CIFSContext getContext() {
 		return context;
 	}
-
 }

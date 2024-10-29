@@ -75,13 +75,13 @@ public class SnailMailService {
 	}
 
 	private @NotNull BatchEntity getBatchEntity(String municipalityId, SendSnailMailRequest request, String issuer) {
-		LOGGER.info("Finding batch: {} and/or saving", request.getBatchId());
+		LOGGER.info("Getting batch: {} or saving a new one", request.getBatchId());
 		return batchRepository.findByMunicipalityIdAndId(municipalityId, request.getBatchId())
 			.orElseGet(() -> batchRepository.save(BatchEntity.builder().withId(request.getBatchId()).withIssuer(issuer).withMunicipalityId(municipalityId).build()));
 	}
 
 	private @NotNull DepartmentEntity getDepartmentEntity(SendSnailMailRequest request, BatchEntity batch) {
-		LOGGER.info("Finding department: {} and/or saving", request.getDepartment());
+		LOGGER.info("Getting department: {} or saving a new one", request.getDepartment());
 		return departmentRepository.findByNameAndBatchEntityId(request.getDepartment(), batch.getId())
 			.orElseGet(() -> departmentRepository.save(Mapper.toDepartment(request.getDepartment(), batch)));
 	}
