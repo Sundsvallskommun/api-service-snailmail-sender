@@ -24,11 +24,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-
 @Getter
 @Setter
 @ToString
-@EqualsAndHashCode(exclude = {"batchEntity", "requestEntities"})
+@EqualsAndHashCode(exclude = {
+	"batchEntity", "requestEntities"
+})
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(setterPrefix = "with")

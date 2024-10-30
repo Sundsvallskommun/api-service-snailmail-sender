@@ -59,14 +59,14 @@ public final class Mapper {
 
 	static RecipientEntity toRecipient(final SendSnailMailRequest.Address address) {
 		return Optional.ofNullable(address).map(notNull -> RecipientEntity.builder()
-				.withGivenName(address.getFirstName())
-				.withLastName(address.getLastName())
-				.withAddress(address.getAddress())
-				.withApartmentNumber(address.getApartmentNumber())
-				.withPostalCode(address.getZipCode())
-				.withCity(address.getCity())
-				.withCareOf(address.getCareOf())
-				.build())
+			.withGivenName(address.getFirstName())
+			.withLastName(address.getLastName())
+			.withAddress(address.getAddress())
+			.withApartmentNumber(address.getApartmentNumber())
+			.withPostalCode(address.getZipCode())
+			.withCity(address.getCity())
+			.withCareOf(address.getCareOf())
+			.build())
 			.orElse(null);
 	}
 
@@ -96,6 +96,5 @@ public final class Mapper {
 			.withMunicipalityId(request.getMunicipalityId())
 			.build();
 	}
-
 
 }

@@ -27,7 +27,9 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-@EqualsAndHashCode(exclude = {"departmentEntity", "recipientEntity", "attachmentEntities"})
+@EqualsAndHashCode(exclude = {
+	"departmentEntity", "recipientEntity", "attachmentEntities"
+})
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(setterPrefix = "with")
