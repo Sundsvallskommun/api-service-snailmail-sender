@@ -13,7 +13,9 @@ import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
 @Documented
-@Target({FIELD, CONSTRUCTOR, PARAMETER})
+@Target({
+	FIELD, CONSTRUCTOR, PARAMETER
+})
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = ValidFolderNameValidator.class)
 public @interface ValidFolderName {

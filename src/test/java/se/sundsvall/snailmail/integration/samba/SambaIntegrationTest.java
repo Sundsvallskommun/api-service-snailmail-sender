@@ -40,9 +40,8 @@ import jcifs.smb.SmbFile;
 class SambaIntegrationTest {
 
 	@Container
-	public static final DockerComposeContainer<?> sambaContainer =
-		new DockerComposeContainer<>(new File("src/test/resources/docker/docker-compose.yml"))
-			.withStartupTimeout(Duration.ofSeconds(60));
+	public static final DockerComposeContainer<?> sambaContainer = new DockerComposeContainer<>(new File("src/test/resources/docker/docker-compose.yml"))
+		.withStartupTimeout(Duration.ofSeconds(60));
 
 	private static final String SOME_DATA = "someData";
 
@@ -105,7 +104,7 @@ class SambaIntegrationTest {
 			assertThat(smbFile.exists()).isTrue();
 		}
 
-		//Read the samba file and verify content
+		// Read the samba file and verify content
 		try (final var smbFile = new SmbFile(smbPath, sambaIntegration.getContext())) {
 			final var content = new String(smbFile.getInputStream().readAllBytes(), StandardCharsets.ISO_8859_1);
 			assertThat(content).isEqualTo(CSV_DATA);

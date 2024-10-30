@@ -34,7 +34,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping("/{municipalityId}/send")
 @Tag(name = "SnailMailSender", description = "SnailMailSender")
 @ApiResponse(responseCode = "200", description = "Successful Operation", useReturnTypeSchema = true)
-@ApiResponse(responseCode = "400", description = "Bad RequestEntity", content = @Content(schema = @Schema(oneOf = {Problem.class, ConstraintViolation.class})))
+@ApiResponse(responseCode = "400", description = "Bad RequestEntity", content = @Content(schema = @Schema(oneOf = {
+	Problem.class, ConstraintViolation.class
+})))
 @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Problem.class)))
 class SnailMailResource {
 
@@ -50,8 +52,7 @@ class SnailMailResource {
 		@Parameter(name = "x-issuer", description = """
 			Issuer of the request, is used as a prefix in a folder name.
 			Cannot contain any of: '"', '*', '<', '>', '?', '|', '/', '\\', ':'
-			""")
-		@RequestHeader(name = "x-issuer", required = false) @ValidFolderName(nullable = true) final String issuer,
+			""") @RequestHeader(name = "x-issuer", required = false) @ValidFolderName(nullable = true) final String issuer,
 		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @ValidMunicipalityId @PathVariable final String municipalityId,
 		@Valid @RequestBody final SendSnailMailRequest request) {
 

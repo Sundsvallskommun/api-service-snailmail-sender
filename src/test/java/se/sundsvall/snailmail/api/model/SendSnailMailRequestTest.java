@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test;
 
 class SendSnailMailRequestTest {
 
-
 	@Test
 	void testBean() {
 		MatcherAssert.assertThat(SendSnailMailRequest.class, allOf(

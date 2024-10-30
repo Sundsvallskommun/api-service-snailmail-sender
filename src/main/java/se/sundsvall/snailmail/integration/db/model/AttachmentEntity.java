@@ -68,8 +68,10 @@ public class AttachmentEntity {
 
 	@Override
 	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (!(o instanceof AttachmentEntity that)) return false;
+		if (this == o)
+			return true;
+		if (!(o instanceof AttachmentEntity that))
+			return false;
 		return Objects.equals(id, that.id) && Objects.equals(content, that.content) && Objects.equals(name, that.name) && Objects.equals(contentType, that.contentType) && envelopeType == that.envelopeType;
 	}
 

@@ -31,10 +31,9 @@ public class ValidFolderNameValidator implements ConstraintValidator<ValidFolder
 		}
 
 		return INVALID_FOLDER_CHARS.stream()
-			.noneMatch(character ->
-				value.contains(character.toString()) //Doesn't contain invalid characters
-					|| value.endsWith(" ")    //Doesn't end with space
-					|| value.endsWith(".")    //Doesn't end with dot
+			.noneMatch(character -> value.contains(character.toString()) // Doesn't contain invalid characters
+				|| value.endsWith(" ")    // Doesn't end with space
+				|| value.endsWith(".")    // Doesn't end with dot
 					&& isValidPath(value));
 	}
 }

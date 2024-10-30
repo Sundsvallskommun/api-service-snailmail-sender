@@ -37,7 +37,6 @@ class RequestEntityTest {
 		final var deviation = "deviation";
 		final var partyId = "partyId";
 
-
 		final var request = RequestEntity.builder()
 			.withId(id)
 			.withDepartmentEntity(department)
@@ -55,7 +54,6 @@ class RequestEntityTest {
 		assertThat(request.getDeviation()).isEqualTo(deviation);
 		assertThat(request.getPartyId()).isEqualTo(partyId);
 
-
 	}
 
 	@Test
@@ -63,6 +61,5 @@ class RequestEntityTest {
 		assertThat(RequestEntity.builder().build()).hasAllNullFieldsOrProperties();
 		assertThat(new RequestEntity()).hasAllNullFieldsOrProperties();
 	}
-
 
 }

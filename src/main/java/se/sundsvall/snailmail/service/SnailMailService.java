@@ -98,17 +98,17 @@ public class SnailMailService {
 				.withDetail("No address information found for citizen with partyId: " + citizen.getPersonId())
 				.build());
 
-		//Check each required field in the address and save it in the map
-		Map<String, Boolean> validatedFields = new LinkedHashMap<>();   //Preserve insertion order
+		// Check each required field in the address and save it in the map
+		Map<String, Boolean> validatedFields = new LinkedHashMap<>();   // Preserve insertion order
 		validatedFields.put(GIVEN_NAME, isNotBlank(recipientEntity.getGivenName()));
 		validatedFields.put(LAST_NAME, isNotBlank(recipientEntity.getLastName()));
 		validatedFields.put(ADDRESS, isNotBlank(recipientEntity.getAddress()));
 		validatedFields.put(POSTAL_CODE, isNotBlank(recipientEntity.getPostalCode()));
 		validatedFields.put(CITY, isNotBlank(recipientEntity.getCity()));
 
-		//If there are any missing fields (i.e. false in any of the values of the map), throw a Problem
+		// If there are any missing fields (i.e. false in any of the values of the map), throw a Problem
 		if (validatedFields.values().stream().anyMatch(Boolean.FALSE::equals)) {
-			//Create a string with the missing fields
+			// Create a string with the missing fields
 			var missingFields = validatedFields.entrySet().stream()
 				.filter(entry -> !entry.getValue())
 				.map(Map.Entry::getKey)

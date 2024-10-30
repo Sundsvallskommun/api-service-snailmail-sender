@@ -20,7 +20,6 @@ _A component within the messaging ecosystem responsible for the transmission of 
    ```bash
    git clone git@github.com:Sundsvallskommun/api-service-snailmail-sender.git
    ```
-
 2. **Configure the application:**
 
    Before running the application, you need to set up configuration settings.
@@ -34,26 +33,23 @@ _A component within the messaging ecosystem responsible for the transmission of 
 
 4. **Build and run the application:**
 
-     ```bash
-     mvn spring-boot:run
-     ```
+   ```bash
+   mvn spring-boot:run
+   ```
 
 ## Dependencies
 
 This microservice depends on the following services:
 
 - **Citizen**
-
   - **Purpose:** To find address information about a citizen.
   - **Repository:** Not available at this moment.
-  - **Additional Notes:** Citizen is a API serving data from [Metadatakatalogen](https://utveckling.sundsvall.se/digital-infrastruktur/metakatalogen). 
-
+  - **Additional Notes:** Citizen is a API serving data from [Metadatakatalogen](https://utveckling.sundsvall.se/digital-infrastruktur/metakatalogen).
 - **Samba Share**
   - **Purpose:** For uploading the files to ensure they are processed by office services.
-  - **Setup Instructions:** 
+  - **Setup Instructions:**
     1. Ensure you have a SAMBA share set up.
     2. Refer to the [Configuration](#configuration) section for detailed instructions on how to configure the service to use the SAMBA share.
-
 
 Ensure that these services are running and properly configured before starting this microservice.
 
@@ -98,7 +94,6 @@ Configuration is crucial for the application to run successfully. Ensure all nec
       username: your_db_username
       password: your_db_password
   ```
-
 - **Citizen configuration**
 
   ```yaml
@@ -122,6 +117,7 @@ Configuration is crucial for the application to run successfully. Ensure all nec
 
   ```
 - **SAMBA configuration:**
+
   ```yaml
   integration:
     samba:
@@ -146,6 +142,7 @@ spring:
 ```
 
 - **No additional setup is required** for database initialization, as long as the database connection settings are correctly configured.
+
 ### Additional Notes
 
 - **Application Profiles:**

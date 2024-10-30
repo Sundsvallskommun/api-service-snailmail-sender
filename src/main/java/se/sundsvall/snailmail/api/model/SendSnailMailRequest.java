@@ -17,7 +17,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
 @Data
 @Builder(setterPrefix = "with")
 @NoArgsConstructor
@@ -58,7 +57,9 @@ public class SendSnailMailRequest {
 		private String name;
 
 		@OneOf("application/pdf")
-		@Schema(description = "The attachment content type", example = "application/pdf", allowableValues = {"application/pdf"})
+		@Schema(description = "The attachment content type", example = "application/pdf", allowableValues = {
+			"application/pdf"
+		})
 		private String contentType;
 
 		@Schema(description = "The envelope type for the letter", example = "WINDOWED")

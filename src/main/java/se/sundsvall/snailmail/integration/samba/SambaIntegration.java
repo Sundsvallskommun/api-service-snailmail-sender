@@ -77,7 +77,7 @@ public class SambaIntegration {
 		// Add csv content
 		createCsvContent(batchEntity, batchPathCsvMap);
 
-		//Now we save each csv file where it belongs
+		// Now we save each csv file where it belongs
 		saveCsvContent(batchPathCsvMap, batchPathFileNameMap);
 	}
 
@@ -97,22 +97,21 @@ public class SambaIntegration {
 						fileNameMap.put(batchPath, findFile(request, batchPath));
 						request.getAttachmentEntities().forEach(attachmentEntity -> saveAttachment(attachmentEntity, batchPath));
 					});
-			}
-		);
+			});
 	}
 
 	/**
 	 * Store the csv content on the samba server
 	 *
 	 * @param departmentBatchPathMap the map with the csv content for each department and batch
-	 * @param fileNameMap the map with the filename for each batchPath
+	 * @param fileNameMap            the map with the filename for each batchPath
 	 */
 	private void saveCsvContent(Map<String, List<String>> departmentBatchPathMap, Map<String, String> fileNameMap) {
 		LOGGER.info("Starting to write csv content to Samba server");
 		departmentBatchPathMap.keySet().forEach(departmentPath -> {
-			//For each key in the map, create a new file with the content
+			// For each key in the map, create a new file with the content
 			try {
-				//Get the filename from the map.
+				// Get the filename from the map.
 				var fileName = fileNameMap.get(departmentPath);
 				var destinationFile = new SmbFile(fileName, context);
 
@@ -121,13 +120,13 @@ public class SambaIntegration {
 				}
 
 				try (var smbFileOutputStream = new SmbFileOutputStream(destinationFile, true); // append mode
-				     var printWriter = new PrintWriter(smbFileOutputStream, false, StandardCharsets.ISO_8859_1)) {  // false for don't flush
+					var printWriter = new PrintWriter(smbFileOutputStream, false, StandardCharsets.ISO_8859_1)) {  // false for don't flush
 					// Write the headers to the file only if it's a new file
 					LOGGER.debug("Writing headers to file: {}", destinationFile);
 					printWriter.println(CSV_HEADER);
 					LOGGER.debug("Writing address(es) to file: {}", destinationFile);
 					departmentBatchPathMap.get(departmentPath).forEach(printWriter::print);
-					printWriter.flush();    //Flush the content
+					printWriter.flush();    // Flush the content
 				}
 			} catch (final IOException e) {
 				throw Problem.valueOf(Status.INTERNAL_SERVER_ERROR, "Failed to write to Samba share");
@@ -138,7 +137,7 @@ public class SambaIntegration {
 	/**
 	 * Create the csv content for each batch
 	 *
-	 * @param batchEntity the batch entity where everything should be stored
+	 * @param batchEntity            the batch entity where everything should be stored
 	 * @param departmentBatchPathMap the map to be populated with the csv content for each department and batch
 	 */
 	private void createCsvContent(BatchEntity batchEntity, Map<String, List<String>> departmentBatchPathMap) {
@@ -152,12 +151,12 @@ public class SambaIntegration {
 						if (!EnvelopeType.WINDOWED.equals(request.getAttachmentEntities().getFirst().getEnvelopeType())) {
 
 							if (departmentBatchPathMap.containsKey(batchPath)) {
-								//If the key already exists, append the content to the existing list
+								// If the key already exists, append the content to the existing list
 								LOGGER.info("Appending csv information to existing csv content");
 
 								departmentBatchPathMap.get(batchPath).add(createCsvRow(request));
 							} else {
-								//If it doesn't exist, create a new list with the content
+								// If it doesn't exist, create a new list with the content
 								LOGGER.info("Creating new csv content");
 
 								List<String> csvContent = new ArrayList<>();
@@ -166,15 +165,14 @@ public class SambaIntegration {
 							}
 						}
 					});
-			}
-		);
+			});
 	}
 
 	/**
 	 * Create a row for the csv
 	 *
-	 * @param request the request entity
-	 * @return the row that should be saved in the csv file
+	 * @param  request the request entity
+	 * @return         the row that should be saved in the csv file
 	 */
 	private String createCsvRow(final RequestEntity request) {
 		LOGGER.info("Creating csv content");
@@ -202,8 +200,7 @@ public class SambaIntegration {
 
 				var batchPath = getBatchPath(department, batchEntity);
 				createFolder(batchPath);
-			}
-		);
+			});
 
 	}
 
