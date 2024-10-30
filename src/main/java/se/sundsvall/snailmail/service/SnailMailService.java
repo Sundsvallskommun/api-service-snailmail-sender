@@ -2,11 +2,17 @@ package se.sundsvall.snailmail.service;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
+import static se.sundsvall.snailmail.service.Mapper.toBatchEntity;
+import static se.sundsvall.snailmail.service.Mapper.toDepartment;
+import static se.sundsvall.snailmail.service.Mapper.toRecipient;
+import static se.sundsvall.snailmail.service.Mapper.toRequest;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import jakarta.transaction.Transactional;
 
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -22,10 +28,10 @@ import se.sundsvall.snailmail.integration.db.DepartmentRepository;
 import se.sundsvall.snailmail.integration.db.RequestRepository;
 import se.sundsvall.snailmail.integration.db.model.BatchEntity;
 import se.sundsvall.snailmail.integration.db.model.DepartmentEntity;
+import se.sundsvall.snailmail.integration.db.model.RecipientEntity;
 import se.sundsvall.snailmail.integration.samba.SambaIntegration;
 
 import generated.se.sundsvall.citizen.CitizenExtended;
-import jakarta.transaction.Transactional;
 
 @Service
 @Transactional
@@ -34,13 +40,10 @@ public class SnailMailService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SnailMailService.class);
 
 	private final BatchRepository batchRepository;
-
 	private final DepartmentRepository departmentRepository;
-
 	private final RequestRepository requestRepository;
 
 	private final SambaIntegration sambaIntegration;
-
 	private final CitizenIntegration citizenIntegration;
 
 	public static final String GIVEN_NAME = "Given Name";
@@ -49,7 +52,11 @@ public class SnailMailService {
 	public static final String POSTAL_CODE = "Postal Code";
 	public static final String CITY = "City";
 
-	public SnailMailService(final SambaIntegration sambaIntegration, final BatchRepository batchRepository, final DepartmentRepository departmentRepository, final RequestRepository requestRepository, final CitizenIntegration citizenIntegration) {
+	public SnailMailService(final SambaIntegration sambaIntegration,
+		final BatchRepository batchRepository,
+		final DepartmentRepository departmentRepository,
+		final RequestRepository requestRepository,
+		final CitizenIntegration citizenIntegration) {
 		this.batchRepository = batchRepository;
 		this.departmentRepository = departmentRepository;
 		this.requestRepository = requestRepository;
@@ -57,33 +64,39 @@ public class SnailMailService {
 		this.citizenIntegration = citizenIntegration;
 	}
 
-	public synchronized void sendSnailMail(final String municipalityId, final SendSnailMailRequest request, final String issuer) {
-
-		CitizenExtended citizen = null;
-		if (!EnvelopeType.WINDOWED.equals(request.getAttachments().getFirst().getEnvelopeType())) {
-			LOGGER.info("Finding information for citizen: {} ", request.getPartyId());
-			citizen = citizenIntegration.getCitizen(request.getPartyId());
-			validateCitizenAddress(citizen);
-		}
-
+	public synchronized void sendSnailMail(final SendSnailMailRequest request) {
+		// Create recipient entity based on the address or citizen information
+		var recipient = createRecipient(request);
 		LOGGER.info("Saving request for batch: {} and department: {} ", request.getBatchId(), request.getDepartment());
-
-		final var batch = getBatchEntity(municipalityId, request, issuer);
-		final var department = getDepartmentEntity(request, batch);
-
-		requestRepository.save(Mapper.toRequest(request, citizen, department));
+		var batch = getBatchEntity(request);
+		var department = getDepartmentEntity(request, batch);
+		requestRepository.save(toRequest(request, recipient, department));
 	}
 
-	private @NotNull BatchEntity getBatchEntity(String municipalityId, SendSnailMailRequest request, String issuer) {
+	private RecipientEntity createRecipient(final SendSnailMailRequest request) {
+		if (request.getAddress() != null) {
+			return toRecipient(request.getAddress());
+		}
+		if (!EnvelopeType.WINDOWED.equals(request.getAttachments().getFirst().getEnvelopeType())) {
+			LOGGER.info("Finding information for citizen: {} ", request.getPartyId());
+			var citizen = citizenIntegration.getCitizen(request.getPartyId());
+			validateCitizenAddress(citizen);
+			return toRecipient(citizen);
+		}
+
+		return null;
+	}
+
+	private @NotNull BatchEntity getBatchEntity(SendSnailMailRequest request) {
 		LOGGER.info("Getting batch: {} or saving a new one", request.getBatchId());
-		return batchRepository.findByMunicipalityIdAndId(municipalityId, request.getBatchId())
-			.orElseGet(() -> batchRepository.save(BatchEntity.builder().withId(request.getBatchId()).withIssuer(issuer).withMunicipalityId(municipalityId).build()));
+		return batchRepository.findByMunicipalityIdAndId(request.getMunicipalityId(), request.getBatchId())
+			.orElseGet(() -> batchRepository.save(toBatchEntity(request)));
 	}
 
 	private @NotNull DepartmentEntity getDepartmentEntity(SendSnailMailRequest request, BatchEntity batch) {
 		LOGGER.info("Getting department: {} or saving a new one", request.getDepartment());
 		return departmentRepository.findByNameAndBatchEntityId(request.getDepartment(), batch.getId())
-			.orElseGet(() -> departmentRepository.save(Mapper.toDepartment(request.getDepartment(), batch)));
+			.orElseGet(() -> departmentRepository.save(toDepartment(request.getDepartment(), batch)));
 	}
 
 	/**
@@ -91,7 +104,7 @@ public class SnailMailService {
 	 * If any required field is missing, a Problem will be thrown describing the missing fields
 	 */
 	private void validateCitizenAddress(CitizenExtended citizen) {
-		var recipientEntity = Optional.ofNullable(Mapper.toRecipient(citizen))
+		var recipientEntity = Optional.ofNullable(toRecipient(citizen))
 			.orElseThrow(() -> Problem.builder()
 				.withTitle("No address information found for citizen")
 				.withStatus(INTERNAL_SERVER_ERROR)

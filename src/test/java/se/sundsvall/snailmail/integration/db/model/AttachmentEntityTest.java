@@ -1,12 +1,9 @@
 package se.sundsvall.snailmail.integration.db.model;
 
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanConstructor;
-import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanEquals;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanEqualsExcluding;
-import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanHashCode;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanHashCodeExcluding;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanToString;
-import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanToStringExcluding;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidGettersAndSetters;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.allOf;
@@ -30,15 +27,14 @@ class AttachmentEntityTest {
 
 	@Test
 	void testBuilderMethods() {
-		// Set values as variables
-		final var id = 12L;
-		final var request = RequestEntity.builder().build();
-		final var contentType = "contentType";
-		final var envelopeType = EnvelopeType.PLAIN;
-		final var name = "name";
-		final var content = "content";
+		var id = 12L;
+		var request = RequestEntity.builder().build();
+		var contentType = "contentType";
+		var envelopeType = EnvelopeType.PLAIN;
+		var name = "name";
+		var content = "content";
 
-		final var attachment = AttachmentEntity.builder()
+		var attachment = AttachmentEntity.builder()
 			.withId(id)
 			.withRequestEntity(request)
 			.withContentType(contentType)
@@ -54,7 +50,6 @@ class AttachmentEntityTest {
 		assertThat(attachment.getEnvelopeType()).isEqualTo(envelopeType);
 		assertThat(attachment.getName()).isEqualTo(name);
 		assertThat(attachment.getContent()).isEqualTo(content);
-
 	}
 
 	@Test

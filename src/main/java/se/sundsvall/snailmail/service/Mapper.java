@@ -17,14 +17,13 @@ public final class Mapper {
 
 	private Mapper() {}
 
-	static RequestEntity toRequest(final SendSnailMailRequest request, final CitizenExtended citizen, final DepartmentEntity departmentEntity) {
-
+	static RequestEntity toRequest(final SendSnailMailRequest request, final RecipientEntity recipientEntity, final DepartmentEntity departmentEntity) {
 		return Optional.ofNullable(request)
 			.map(req -> {
 				final var newRequest = RequestEntity.builder()
 					.withDepartmentEntity(departmentEntity)
 					.withDeviation(req.getDeviation())
-					.withRecipientEntity(toRecipient(citizen))
+					.withRecipientEntity(recipientEntity)
 					.build();
 
 				final var attachments = Optional.ofNullable(req.getAttachments())
@@ -40,7 +39,6 @@ public final class Mapper {
 	}
 
 	static AttachmentEntity toAttachment(final SendSnailMailRequest.Attachment attachment, final RequestEntity requestEntity) {
-
 		return Optional.ofNullable(attachment)
 			.map(attach -> AttachmentEntity.builder()
 				.withContent(attach.getContent())
@@ -53,11 +51,23 @@ public final class Mapper {
 	}
 
 	static DepartmentEntity toDepartment(final String departmentName, final BatchEntity batchEntity) {
-
 		return DepartmentEntity.builder()
 			.withName(departmentName)
 			.withBatchEntity(batchEntity)
 			.build();
+	}
+
+	static RecipientEntity toRecipient(final SendSnailMailRequest.Address address) {
+		return Optional.ofNullable(address).map(notNull -> RecipientEntity.builder()
+				.withGivenName(address.getFirstName())
+				.withLastName(address.getLastName())
+				.withAddress(address.getAddress())
+				.withApartmentNumber(address.getApartmentNumber())
+				.withPostalCode(address.getZipCode())
+				.withCity(address.getCity())
+				.withCareOf(address.getCareOf())
+				.build())
+			.orElse(null);
 	}
 
 	static RecipientEntity toRecipient(final CitizenExtended citizen) {
@@ -78,5 +88,14 @@ public final class Mapper {
 				.build())
 			.orElse(null);
 	}
+
+	static BatchEntity toBatchEntity(final SendSnailMailRequest request) {
+		return BatchEntity.builder()
+			.withId(request.getBatchId())
+			.withIssuer(request.getIssuer())
+			.withMunicipalityId(request.getMunicipalityId())
+			.build();
+	}
+
 
 }

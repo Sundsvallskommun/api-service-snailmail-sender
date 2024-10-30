@@ -30,6 +30,8 @@ class SnailMailIT extends AbstractAppTest {
 			.withStartupTimeout(Duration.ofSeconds(60));
 
 	private static final String MUNICIPALITY_ID = "2281";
+	private static final String REQUEST_FILE = "request.json";
+	private static final String REQUEST_FILE2 = "request2.json";
 
 	@Autowired
 	private BatchRepository batchRepository;
@@ -39,7 +41,7 @@ class SnailMailIT extends AbstractAppTest {
 		setupCall()
 			.withServicePath("/" + MUNICIPALITY_ID + "/send/snailmail")
 			.withHttpMethod(POST)
-			.withRequest("request.json")
+			.withRequest(REQUEST_FILE)
 			.withExpectedResponseStatus(OK)
 			.sendRequestAndVerifyResponse();
 	}
@@ -60,14 +62,14 @@ class SnailMailIT extends AbstractAppTest {
 		setupCall()
 			.withServicePath("/" + MUNICIPALITY_ID + "/send/snailmail")
 			.withHttpMethod(POST)
-			.withRequest("request.json")
+			.withRequest(REQUEST_FILE)
 			.withExpectedResponseStatus(OK)
 			.sendRequest();
 
 		setupCall()
 			.withServicePath("/" + MUNICIPALITY_ID + "/send/snailmail")
 			.withHttpMethod(POST)
-			.withRequest("request2.json")
+			.withRequest(REQUEST_FILE2)
 			.withExpectedResponseStatus(OK)
 			.sendRequest();
 
@@ -93,8 +95,36 @@ class SnailMailIT extends AbstractAppTest {
 			.withServicePath("/" + MUNICIPALITY_ID + "/send/snailmail")
 			.withHttpMethod(POST)
 			.withHeader("x-issuer", "issuer")
-			.withRequest("request.json")
+			.withRequest(REQUEST_FILE)
 			.withExpectedResponseStatus(OK)
 			.sendRequestAndVerifyResponse();
+	}
+
+	@Test
+	void test5_sendSnailMailWithAddress() {
+		setupCall()
+			.withServicePath("/" + MUNICIPALITY_ID + "/send/snailmail")
+			.withHttpMethod(POST)
+			.withHeader("x-issuer", "issuer")
+			.withRequest(REQUEST_FILE)
+			.withExpectedResponseStatus(OK)
+			.sendRequestAndVerifyResponse();
+
+		var batch = batchRepository.findById("12a96da8-6d76-4fa6-bb92-64f71fdc6aa6").orElseThrow();
+		var department = batch.getDepartmentEntities().stream()
+			.filter(dept44 -> dept44.getName().equals("test5_dummy_department"))
+			.findFirst()
+			.orElseThrow();
+		var request = department.getRequestEntities().getFirst();
+
+		assertThat(request.getRecipientEntity()).satisfies(recipient -> {
+			assertThat(recipient.getGivenName()).isEqualTo("John");
+			assertThat(recipient.getLastName()).isEqualTo("Doe");
+			assertThat(recipient.getCity()).isEqualTo("Test-Town");
+			assertThat(recipient.getApartmentNumber()).isEqualTo("1101");
+			assertThat(recipient.getAddress()).isEqualTo("Test Street 123");
+			assertThat(recipient.getCareOf()).isEqualTo("Johnny Doe");
+			assertThat(recipient.getPostalCode()).isEqualTo("12345");
+		});
 	}
 }

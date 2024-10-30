@@ -7,7 +7,6 @@ import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Base64;
@@ -31,7 +30,6 @@ import se.sundsvall.snailmail.integration.db.model.DepartmentEntity;
 import se.sundsvall.snailmail.integration.db.model.RecipientEntity;
 import se.sundsvall.snailmail.integration.db.model.RequestEntity;
 
-import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
 
 @ActiveProfiles("junit")
@@ -51,7 +49,7 @@ class SambaIntegrationTest {
 
 	private static final String CSV_DATA = """
 		namn,careOf,adress,lagenhet,postnummer,postort
-		Janne Långben,Some CareOf,Some Address 123,,123 45,ÖREBRO
+		Janne Långben,Some CareOf,Some Address 123,1101,123 45,ÖREBRO
 		""";
 
 	@Autowired
@@ -68,6 +66,7 @@ class SambaIntegrationTest {
 						.withGivenName("Janne")
 						.withLastName("Långben")
 						.withPostalCode("123 45")
+						.withApartmentNumber("1101")
 						.build())
 				.withAttachmentEntities(List.of(
 					AttachmentEntity.builder()

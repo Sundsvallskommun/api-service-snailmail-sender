@@ -1,0 +1,23 @@
+{
+	"department": "test5_dummy_department",
+	"batchId": "12a96da8-6d76-4fa6-bb92-64f71fdc6aa6",
+	"address": {
+		"firstName": "John",
+		"lastName": "Doe",
+		"city": "Test-Town",
+		"apartmentNumber": "1101",
+		"organizationNumber": "Never used",
+		"address": "Test Street 123",
+		"careOf": "Johnny Doe",
+		"zipCode": "12345",
+		"country": "Sweden"
+	},
+	"attachments": [
+		{
+			"content": "aGVsbG8gd29ybGQK",
+			"name": "test.pdf",
+			"contentType": "application/pdf",
+			"envelopeType": "PLAIN"
+		}
+	]
+}

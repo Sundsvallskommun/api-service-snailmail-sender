@@ -25,7 +25,6 @@ class RecipientEntityTest {
 
 	@Test
 	void testBuilderMethods() {
-		// Set values as variables
 		var id = 12L;
 		var request = RequestEntity.builder().build();
 		var careOf = "careOf";

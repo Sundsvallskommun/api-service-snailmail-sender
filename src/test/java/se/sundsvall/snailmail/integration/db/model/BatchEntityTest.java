@@ -27,13 +27,12 @@ class BatchEntityTest {
 
 	@Test
 	void testBuilderMethods() {
-		// Set values as variables
-		final String id = "batchId";
-		final String issuer = "issuer";
-		final String municipalityId = "municipalityId";
-		final var department = DepartmentEntity.builder().build();
+		var id = "batchId";
+		var issuer = "issuer";
+		var municipalityId = "municipalityId";
+		var department = DepartmentEntity.builder().build();
 
-		final var batch = BatchEntity.builder()
+		var batch = BatchEntity.builder()
 			.withId(id)
 			.withIssuer(issuer)
 			.withMunicipalityId(municipalityId)

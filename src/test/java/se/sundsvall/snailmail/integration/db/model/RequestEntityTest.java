@@ -1,9 +1,7 @@
 package se.sundsvall.snailmail.integration.db.model;
 
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanConstructor;
-import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanEquals;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanEqualsExcluding;
-import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanHashCode;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanHashCodeExcluding;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanToString;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidGettersAndSetters;
@@ -29,15 +27,14 @@ class RequestEntityTest {
 
 	@Test
 	void testBuilderMethods() {
-		// Set values as variables
-		final var id = 12L;
-		final var department = DepartmentEntity.builder().build();
-		final var recipient = RecipientEntity.builder().build();
-		final var attachment = AttachmentEntity.builder().build();
-		final var deviation = "deviation";
-		final var partyId = "partyId";
+		var id = 12L;
+		var department = DepartmentEntity.builder().build();
+		var recipient = RecipientEntity.builder().build();
+		var attachment = AttachmentEntity.builder().build();
+		var deviation = "deviation";
+		var partyId = "partyId";
 
-		final var request = RequestEntity.builder()
+		var request = RequestEntity.builder()
 			.withId(id)
 			.withDepartmentEntity(department)
 			.withRecipientEntity(recipient)
@@ -53,7 +50,6 @@ class RequestEntityTest {
 		assertThat(request.getAttachmentEntities()).hasSize(1);
 		assertThat(request.getDeviation()).isEqualTo(deviation);
 		assertThat(request.getPartyId()).isEqualTo(partyId);
-
 	}
 
 	@Test
@@ -61,5 +57,4 @@ class RequestEntityTest {
 		assertThat(RequestEntity.builder().build()).hasAllNullFieldsOrProperties();
 		assertThat(new RequestEntity()).hasAllNullFieldsOrProperties();
 	}
-
 }

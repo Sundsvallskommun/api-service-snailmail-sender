@@ -56,7 +56,11 @@ class SnailMailResource {
 		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @ValidMunicipalityId @PathVariable final String municipalityId,
 		@Valid @RequestBody final SendSnailMailRequest request) {
 
-		snailMailService.sendSnailMail(municipalityId, request, issuer);
+		var decoratedRequest = request
+			.withMunicipalityId(municipalityId)
+			.withIssuer(issuer);
+
+		snailMailService.sendSnailMail(decoratedRequest);
 		return ok().build();
 	}
 
