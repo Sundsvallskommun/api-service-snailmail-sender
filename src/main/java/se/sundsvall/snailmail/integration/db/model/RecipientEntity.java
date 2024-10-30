@@ -70,9 +70,12 @@ public class RecipientEntity {
 
 	@Override
 	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (!(o instanceof RecipientEntity that)) return false;
-		return Objects.equals(id, that.id) && Objects.equals(givenName, that.givenName) && Objects.equals(lastName, that.lastName) && Objects.equals(careOf, that.careOf) && Objects.equals(address, that.address) && Objects.equals(apartmentNumber, that.apartmentNumber) && Objects.equals(postalCode, that.postalCode) && Objects.equals(city, that.city);
+		if (this == o)
+			return true;
+		if (!(o instanceof RecipientEntity that))
+			return false;
+		return Objects.equals(id, that.id) && Objects.equals(givenName, that.givenName) && Objects.equals(lastName, that.lastName) && Objects.equals(careOf, that.careOf) && Objects.equals(address, that.address) && Objects.equals(apartmentNumber,
+			that.apartmentNumber) && Objects.equals(postalCode, that.postalCode) && Objects.equals(city, that.city);
 	}
 
 	@Override

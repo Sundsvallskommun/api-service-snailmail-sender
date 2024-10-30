@@ -10,22 +10,12 @@ import jakarta.validation.constraints.NotBlank;
 @ConfigurationProperties("integration.samba")
 public record SambaIntegrationProperties(
 
-		@NotBlank
-		String host,
-		@DefaultValue("445")
-		int port,
-		@NotBlank
-		String domain,
-		@NotBlank
-		String username,
-		@NotBlank
-		String password,
-		@NotBlank
-		String share,
+	@NotBlank String host,
+	@DefaultValue("445") int port,
+	@NotBlank String domain,
+	@NotBlank String username,
+	@NotBlank String password,
+	@NotBlank String share,
 
-		@DefaultValue("PT0.05S")
-		Duration connectTimeout,
-		@DefaultValue("PT0.05S")
-		Duration responseTimeout
-) {}
-
+	@DefaultValue("PT0.05S") Duration connectTimeout,
+	@DefaultValue("PT0.05S") Duration responseTimeout) {}

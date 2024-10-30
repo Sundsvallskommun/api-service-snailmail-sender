@@ -59,8 +59,10 @@ public class DepartmentEntity {
 
 	@Override
 	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (!(o instanceof DepartmentEntity that)) return false;
+		if (this == o)
+			return true;
+		if (!(o instanceof DepartmentEntity that))
+			return false;
 		return Objects.equals(id, that.id) && Objects.equals(name, that.name);
 	}
 

@@ -38,7 +38,6 @@ class AttachmentEntityTest {
 		final var name = "name";
 		final var content = "content";
 
-
 		final var attachment = AttachmentEntity.builder()
 			.withId(id)
 			.withRequestEntity(request)

@@ -23,8 +23,8 @@ public class CitizenIntegration {
 	/**
 	 * Fetch a citizen by partyId
 	 *
-	 * @param partyId the partyId
-	 * @return a {@link CitizenExtended}
+	 * @param  partyId the partyId
+	 * @return         a {@link CitizenExtended}
 	 */
 	public CitizenExtended getCitizen(final String partyId) {
 		log.info("Fetching citizen data for partyId {}", partyId);

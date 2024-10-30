@@ -23,8 +23,8 @@ public interface CitizenClient {
 	/**
 	 * Fetch a citizen by personId, never asks for classified data
 	 *
-	 * @param personId the personId
-	 * @return a {@link CitizenExtended}
+	 * @param  personId the personId
+	 * @return          a {@link CitizenExtended}
 	 */
 	@GetMapping(path = "/{personId}?ShowClassified=false", produces = TEXT_PLAIN_VALUE, consumes = APPLICATION_JSON_VALUE)
 	Optional<CitizenExtended> getCitizen(@PathVariable(name = "personId") String personId);

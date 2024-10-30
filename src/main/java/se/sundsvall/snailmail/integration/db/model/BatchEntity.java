@@ -25,10 +25,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "batch",
-	indexes =
-		{
-			@Index(name = "idx_batch_municipality_id", columnList = "municipality_id")
-		})
+	indexes = {
+		@Index(name = "idx_batch_municipality_id", columnList = "municipality_id")
+	})
 public class BatchEntity {
 
 	@Id
@@ -56,8 +55,10 @@ public class BatchEntity {
 
 	@Override
 	public boolean equals(final Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
 		final BatchEntity that = (BatchEntity) o;
 		return Objects.equals(id, that.id) && Objects.equals(issuer, that.issuer) && Objects.equals(departmentEntities, that.departmentEntities) && Objects.equals(municipalityId, that.municipalityId);
 	}

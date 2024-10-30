@@ -1,7 +1,19 @@
-SET FOREIGN_KEY_CHECKS = 0;
-truncate table attachment;
-truncate table batch;
-truncate table department;
-truncate table recipient;
-truncate table request;
-SET FOREIGN_KEY_CHECKS = 1;
+SET
+FOREIGN_KEY_CHECKS = 0;
+
+truncate TABLE
+    attachment;
+
+truncate TABLE
+    batch;
+
+truncate TABLE
+    department;
+
+truncate TABLE
+    recipient;
+
+truncate TABLE
+    request;
+SET
+FOREIGN_KEY_CHECKS = 1;

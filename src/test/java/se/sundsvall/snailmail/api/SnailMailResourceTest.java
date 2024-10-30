@@ -29,15 +29,13 @@ class SnailMailResourceTest {
 	@MockBean
 	private SnailMailService mockSnailMailService;
 
-
 	@Autowired
 	private WebTestClient webTestClient;
-
 
 	@Test
 	void sendSnailMail() {
 
-		//Arrange
+		// Arrange
 		final var issuer = "issuer";
 		final var municipalityId = "2281";
 		final var request = SendSnailMailRequest.builder()
@@ -46,7 +44,7 @@ class SnailMailResourceTest {
 			.withBatchId(UUID.randomUUID().toString())
 			.build();
 
-		//ACT
+		// ACT
 		webTestClient.post()
 			.uri("/2281/send/snailmail")
 			.header("x-issuer", issuer)
@@ -60,14 +58,13 @@ class SnailMailResourceTest {
 
 	}
 
-
 	@Test
 	void sendBatch() {
 
 		final var uuid = UUID.randomUUID().toString();
 		final var municipalityId = "2281";
 
-		//ACT
+		// ACT
 		webTestClient.post()
 			.uri("/2281/send/batch/" + uuid)
 			.exchange()
@@ -76,13 +73,12 @@ class SnailMailResourceTest {
 
 		verify(mockSnailMailService).sendBatch(municipalityId, uuid);
 
-
 	}
 
 	@Test
 	void sendBatch_notUUID() {
 
-		//ACT
+		// ACT
 		final var response = webTestClient.post()
 			.uri("/2281/send/batch/abc")
 			.exchange()
@@ -92,7 +88,7 @@ class SnailMailResourceTest {
 			.returnResult()
 			.getResponseBody();
 
-		//ASSERT
+		// ASSERT
 		assertThat(response).isNotNull();
 		assertThat(response.getTitle()).isEqualTo("Constraint Violation");
 		assertThat(response.getStatus()).isEqualTo(BAD_REQUEST);
