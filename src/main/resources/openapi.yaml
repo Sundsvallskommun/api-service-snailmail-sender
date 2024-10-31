@@ -7,7 +7,7 @@ info:
     url: https://opensource.org/licenses/MIT
   version: "2.2"
 servers:
-  - url: http://localhost:65308
+  - url: http://localhost:58785
     description: Generated server url
 tags:
   - name: SnailMailSender
@@ -42,6 +42,8 @@ paths:
               $ref: "#/components/schemas/SendSnailMailRequest"
         required: true
       responses:
+        "200":
+          description: Successful Operation
         "400":
           description: Bad RequestEntity
           content:
@@ -49,15 +51,13 @@ paths:
               schema:
                 oneOf:
                   - $ref: "#/components/schemas/Problem"
-                  - $ref: "#/components/schemas/ConstraintViolation"
+                  - $ref: "#/components/schemas/ConstraintViolationProblem"
         "500":
           description: Internal Server Error
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Problem"
-        "200":
-          description: Successful Operation
   /{municipalityId}/send/batch/{batchId}:
     post:
       tags:
@@ -80,6 +80,8 @@ paths:
             type: string
           example: b588d1b7-7911-4e78-89d5-b710b32e0f8e
       responses:
+        "200":
+          description: Successful Operation
         "400":
           description: Bad RequestEntity
           content:
@@ -87,15 +89,13 @@ paths:
               schema:
                 oneOf:
                   - $ref: "#/components/schemas/Problem"
-                  - $ref: "#/components/schemas/ConstraintViolation"
+                  - $ref: "#/components/schemas/ConstraintViolationProblem"
         "500":
           description: Internal Server Error
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Problem"
-        "200":
-          description: Successful Operation
   /api-docs:
     get:
       tags:
@@ -233,71 +233,183 @@ components:
             type: object
         status:
           $ref: "#/components/schemas/StatusType"
-        title:
-          type: string
         detail:
+          type: string
+        title:
           type: string
     StatusType:
       type: object
       properties:
-        reasonPhrase:
-          type: string
         statusCode:
           type: integer
           format: int32
-    ConstraintDescriptorObject:
+        reasonPhrase:
+          type: string
+    ConstraintViolationProblem:
       type: object
       properties:
-        annotation:
-          type: object
-        attributes:
+        cause:
+          $ref: "#/components/schemas/ThrowableProblem"
+        stackTrace:
+          type: array
+          items:
+            type: object
+            properties:
+              classLoaderName:
+                type: string
+              moduleName:
+                type: string
+              moduleVersion:
+                type: string
+              methodName:
+                type: string
+              fileName:
+                type: string
+              lineNumber:
+                type: integer
+                format: int32
+              className:
+                type: string
+              nativeMethod:
+                type: boolean
+        type:
+          type: string
+          format: uri
+        status:
+          $ref: "#/components/schemas/StatusType"
+        violations:
+          type: array
+          items:
+            $ref: "#/components/schemas/Violation"
+        title:
+          type: string
+        message:
+          type: string
+        instance:
+          type: string
+          format: uri
+        parameters:
           type: object
           additionalProperties:
             type: object
-        validationAppliesTo:
+        detail:
           type: string
-          enum:
-            - IMPLICIT
-            - RETURN_VALUE
-            - PARAMETERS
-        composingConstraints:
-          uniqueItems: true
-          type: array
-          items:
-            $ref: "#/components/schemas/ConstraintDescriptorObject"
-        reportAsSingleViolation:
-          type: boolean
-        valueUnwrapping:
-          type: string
-          enum:
-            - DEFAULT
-            - UNWRAP
-            - SKIP
-        messageTemplate:
-          type: string
-    ConstraintViolation:
-      type: object
-      properties:
-        message:
-          type: string
-        propertyPath:
-          $ref: "#/components/schemas/Path"
-        rootBean:
-          type: object
-        executableParameters:
+        suppressed:
           type: array
           items:
             type: object
-        executableReturnValue:
-          type: object
-        constraintDescriptor:
-          $ref: "#/components/schemas/ConstraintDescriptorObject"
-        leafBean:
-          type: object
-        invalidValue:
-          type: object
-        messageTemplate:
+            properties:
+              stackTrace:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    classLoaderName:
+                      type: string
+                    moduleName:
+                      type: string
+                    moduleVersion:
+                      type: string
+                    methodName:
+                      type: string
+                    fileName:
+                      type: string
+                    lineNumber:
+                      type: integer
+                      format: int32
+                    className:
+                      type: string
+                    nativeMethod:
+                      type: boolean
+              message:
+                type: string
+              localizedMessage:
+                type: string
+        localizedMessage:
           type: string
-    Path:
+    ThrowableProblem:
       type: object
+      properties:
+        cause:
+          $ref: "#/components/schemas/ThrowableProblem"
+        stackTrace:
+          type: array
+          items:
+            type: object
+            properties:
+              classLoaderName:
+                type: string
+              moduleName:
+                type: string
+              moduleVersion:
+                type: string
+              methodName:
+                type: string
+              fileName:
+                type: string
+              lineNumber:
+                type: integer
+                format: int32
+              className:
+                type: string
+              nativeMethod:
+                type: boolean
+        message:
+          type: string
+        instance:
+          type: string
+          format: uri
+        type:
+          type: string
+          format: uri
+        parameters:
+          type: object
+          additionalProperties:
+            type: object
+        status:
+          $ref: "#/components/schemas/StatusType"
+        detail:
+          type: string
+        title:
+          type: string
+        suppressed:
+          type: array
+          items:
+            type: object
+            properties:
+              stackTrace:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    classLoaderName:
+                      type: string
+                    moduleName:
+                      type: string
+                    moduleVersion:
+                      type: string
+                    methodName:
+                      type: string
+                    fileName:
+                      type: string
+                    lineNumber:
+                      type: integer
+                      format: int32
+                    className:
+                      type: string
+                    nativeMethod:
+                      type: boolean
+              message:
+                type: string
+              localizedMessage:
+                type: string
+        localizedMessage:
+          type: string
+    Violation:
+      type: object
+      properties:
+        field:
+          type: string
+        message:
+          type: string
   securitySchemes: { }
