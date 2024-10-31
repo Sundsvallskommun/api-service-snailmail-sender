@@ -26,6 +26,8 @@ import se.sundsvall.snailmail.service.SnailMailService;
 @ActiveProfiles("junit")
 class SnailMailResourceTest {
 
+	private static final String MUNICIPALITY_ID = "2281";
+
 	@MockBean
 	private SnailMailService mockSnailMailService;
 
@@ -37,8 +39,9 @@ class SnailMailResourceTest {
 
 		// Arrange
 		final var issuer = "issuer";
-		final var municipalityId = "2281";
 		final var request = SendSnailMailRequest.builder()
+			.withMunicipalityId(MUNICIPALITY_ID)
+			.withIssuer(issuer)
 			.withDepartment("department")
 			.withPartyId(UUID.randomUUID().toString())
 			.withBatchId(UUID.randomUUID().toString())
@@ -46,7 +49,7 @@ class SnailMailResourceTest {
 
 		// ACT
 		webTestClient.post()
-			.uri("/2281/send/snailmail")
+			.uri("/%s/send/snailmail".formatted(MUNICIPALITY_ID))
 			.header("x-issuer", issuer)
 			.bodyValue(request)
 			.exchange()
@@ -54,7 +57,7 @@ class SnailMailResourceTest {
 			.isOk();
 
 		// VERIFY
-		verify(mockSnailMailService).sendSnailMail(municipalityId, request, issuer);
+		verify(mockSnailMailService).sendSnailMail(request);
 
 	}
 
@@ -62,16 +65,15 @@ class SnailMailResourceTest {
 	void sendBatch() {
 
 		final var uuid = UUID.randomUUID().toString();
-		final var municipalityId = "2281";
 
 		// ACT
 		webTestClient.post()
-			.uri("/2281/send/batch/" + uuid)
+			.uri("/%s/send/batch/".formatted(MUNICIPALITY_ID) + uuid)
 			.exchange()
 			.expectStatus()
 			.isOk();
 
-		verify(mockSnailMailService).sendBatch(municipalityId, uuid);
+		verify(mockSnailMailService).sendBatch(MUNICIPALITY_ID, uuid);
 
 	}
 
@@ -80,7 +82,7 @@ class SnailMailResourceTest {
 
 		// ACT
 		final var response = webTestClient.post()
-			.uri("/2281/send/batch/abc")
+			.uri("/%s/send/batch/abc".formatted(MUNICIPALITY_ID))
 			.exchange()
 			.expectStatus()
 			.isBadRequest()

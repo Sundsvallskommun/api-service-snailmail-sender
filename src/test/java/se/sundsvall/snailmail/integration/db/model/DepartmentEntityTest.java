@@ -27,13 +27,12 @@ class DepartmentEntityTest {
 
 	@Test
 	void testBuilderMethods() {
-		// Set values as variables
-		final var id = 12L;
-		final var request = RequestEntity.builder().build();
-		final var batch = BatchEntity.builder().build();
-		final var name = "departmentName";
+		var id = 12L;
+		var request = RequestEntity.builder().build();
+		var batch = BatchEntity.builder().build();
+		var name = "departmentName";
 
-		final var department = DepartmentEntity.builder()
+		var department = DepartmentEntity.builder()
 			.withId(id)
 			.withName(name)
 			.withBatchEntity(batch)

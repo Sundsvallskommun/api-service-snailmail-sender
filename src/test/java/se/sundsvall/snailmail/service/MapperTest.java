@@ -11,6 +11,7 @@ import se.sundsvall.snailmail.api.model.EnvelopeType;
 import se.sundsvall.snailmail.api.model.SendSnailMailRequest;
 import se.sundsvall.snailmail.integration.db.model.BatchEntity;
 import se.sundsvall.snailmail.integration.db.model.DepartmentEntity;
+import se.sundsvall.snailmail.integration.db.model.RecipientEntity;
 import se.sundsvall.snailmail.integration.db.model.RequestEntity;
 
 import generated.se.sundsvall.citizen.CitizenAddress;
@@ -22,10 +23,10 @@ class MapperTest {
 	void toRequestShouldMapCorrectly() {
 		final var deviation = "deviation";
 		final var sendSnailMailRequest = SendSnailMailRequest.builder().withDeviation(deviation).build();
-		final var citizen = new CitizenExtended();
+		final var recipient = new RecipientEntity();
 		final var department = new DepartmentEntity();
 
-		final var result = Mapper.toRequest(sendSnailMailRequest, citizen, department);
+		final var result = Mapper.toRequest(sendSnailMailRequest, recipient, department);
 
 		assertThat(result).isNotNull();
 		assertThat(result.getDepartmentEntity()).isEqualTo(department);
@@ -69,9 +70,38 @@ class MapperTest {
 	}
 
 	@Test
+	void toRecipientShouldMapCorrectlyForNullAddress() {
+		var result = Mapper.toRecipient((SendSnailMailRequest.Address) null);
+
+		assertThat(result).isNull();
+	}
+
+	@Test
+	void toRecipientShouldMapCorrectlyForAddress() {
+		var address = SendSnailMailRequest.Address.builder()
+			.withFirstName("givenName")
+			.withLastName("lastName")
+			.withAddress("address")
+			.withApartmentNumber("apartmentNumber")
+			.withZipCode("postalCode")
+			.withCity("city")
+			.build();
+
+		var result = Mapper.toRecipient(address);
+
+		assertThat(result).isNotNull();
+		assertThat(result.getGivenName()).isEqualTo(address.getFirstName());
+		assertThat(result.getLastName()).isEqualTo(address.getLastName());
+		assertThat(result.getAddress()).isEqualTo(address.getAddress());
+		assertThat(result.getApartmentNumber()).isEqualTo(address.getApartmentNumber());
+		assertThat(result.getPostalCode()).isEqualTo(address.getZipCode());
+		assertThat(result.getCity()).isEqualTo(address.getCity());
+	}
+
+	@Test
 	void toRecipientShouldMapCorrectlyWhenCitizenIsNull() {
 
-		final var result = Mapper.toRecipient(null);
+		final var result = Mapper.toRecipient((CitizenExtended) null);
 
 		assertThat(result).isNull();
 	}

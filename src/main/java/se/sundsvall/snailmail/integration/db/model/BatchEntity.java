@@ -1,7 +1,6 @@
 package se.sundsvall.snailmail.integration.db.model;
 
 import java.util.List;
-import java.util.Objects;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -14,20 +13,21 @@ import jakarta.persistence.Table;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
-@Builder(setterPrefix = "with")
-@Entity
+@ToString
+@EqualsAndHashCode(exclude = "departmentEntities")
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "batch",
-	indexes = {
-		@Index(name = "idx_batch_municipality_id", columnList = "municipality_id")
-	})
+@Builder(setterPrefix = "with")
+@Entity
+@Table(name = "batch", indexes = @Index(name = "idx_batch_municipality_id", columnList = "municipality_id"))
 public class BatchEntity {
 
 	@Id
@@ -43,28 +43,4 @@ public class BatchEntity {
 	@Column(name = "municipality_id")
 	private String municipalityId;
 
-	@Override
-	public String toString() {
-		return "BatchEntity{" +
-			"id='" + id + '\'' +
-			", issuer='" + issuer + '\'' +
-			", departmentEntities=" + departmentEntities +
-			", municipalityId='" + municipalityId + '\'' +
-			'}';
-	}
-
-	@Override
-	public boolean equals(final Object o) {
-		if (this == o)
-			return true;
-		if (o == null || getClass() != o.getClass())
-			return false;
-		final BatchEntity that = (BatchEntity) o;
-		return Objects.equals(id, that.id) && Objects.equals(issuer, that.issuer) && Objects.equals(departmentEntities, that.departmentEntities) && Objects.equals(municipalityId, that.municipalityId);
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(id, issuer, departmentEntities, municipalityId);
-	}
 }
