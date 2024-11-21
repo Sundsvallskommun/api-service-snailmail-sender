@@ -3,12 +3,14 @@ INSERT
         batch(
             id,
             issuer,
-            municipality_id
+            municipality_id,
+            created
         )
     VALUES(
         '123e4567-e89b-12d3-a456-426614174000',
         'issuer',
-        '2281'
+        '2281',
+        '2024-11-21 08:02:06.383722'
     );
 
 INSERT
