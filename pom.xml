@@ -13,6 +13,8 @@
 	<version>2.2</version>
 	<name>api-service-snailmail-sender</name>
 	<properties>
+		<shedlock.version>5.16.0</shedlock.version>
+
 		<!-- Generated sources properties -->
 		<generated-sources-path>${project.build.directory}/generated-sources</generated-sources-path>
 		<jcifs-ng.version>2.1.10</jcifs-ng.version>
@@ -68,6 +70,16 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>net.javacrumbs.shedlock</groupId>
+			<artifactId>shedlock-spring</artifactId>
+			<version>${shedlock.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.javacrumbs.shedlock</groupId>
+			<artifactId>shedlock-provider-jdbc-template</artifactId>
+			<version>${shedlock.version}</version>
 		</dependency>
 	</dependencies>
 	<build>

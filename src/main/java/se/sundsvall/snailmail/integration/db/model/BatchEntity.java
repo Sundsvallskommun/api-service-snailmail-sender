@@ -24,7 +24,7 @@ import org.hibernate.annotations.TimeZoneStorage;
 
 @Getter
 @Setter
-@ToString
+@ToString(exclude = "departmentEntities")
 @EqualsAndHashCode(exclude = "departmentEntities")
 @NoArgsConstructor
 @AllArgsConstructor

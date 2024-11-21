@@ -3,7 +3,7 @@ package se.sundsvall.snailmail.integration.db.model;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanConstructor;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanEqualsExcluding;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanHashCodeExcluding;
-import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanToString;
+import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanToStringExcluding;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidGettersAndSetters;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.allOf;
@@ -20,7 +20,7 @@ class RecipientEntityTest {
 			hasValidGettersAndSetters(),
 			hasValidBeanHashCodeExcluding("requestEntity"),
 			hasValidBeanEqualsExcluding("requestEntity"),
-			hasValidBeanToString()));
+			hasValidBeanToStringExcluding("requestEntity")));
 	}
 
 	@Test

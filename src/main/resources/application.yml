@@ -17,6 +17,12 @@ spring:
           citizen:
             authorization-grant-type: client_credentials
             provider: citizen
+batch:
+  dangling:
+    check-interval: PT10M
+    outdated-after: PT1H
+    name: danglingBatch
+    lock-at-most-for: PT5M
 integration:
   citizen:
     connect-timeout: 5

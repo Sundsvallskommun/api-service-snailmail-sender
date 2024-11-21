@@ -7,7 +7,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -18,7 +17,7 @@ import lombok.ToString;
 
 @Getter
 @Setter
-@ToString
+@ToString(exclude = "requestEntity")
 @EqualsAndHashCode(exclude = "requestEntity")
 @NoArgsConstructor
 @AllArgsConstructor
@@ -55,5 +54,4 @@ public class RecipientEntity {
 
 	@OneToOne(mappedBy = "recipientEntity")
 	private RequestEntity requestEntity;
-
 }

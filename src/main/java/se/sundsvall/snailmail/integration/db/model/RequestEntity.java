@@ -1,7 +1,5 @@
 package se.sundsvall.snailmail.integration.db.model;
 
-import java.util.List;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,7 +13,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -26,9 +24,11 @@ import lombok.ToString;
 
 @Getter
 @Setter
-@ToString
+@ToString(exclude = {
+	"attachmentEntities", "departmentEntity", "recipientEntity"
+})
 @EqualsAndHashCode(exclude = {
-	"departmentEntity", "recipientEntity", "attachmentEntities"
+	"attachmentEntities", "departmentEntity", "recipientEntity"
 })
 @NoArgsConstructor
 @AllArgsConstructor
