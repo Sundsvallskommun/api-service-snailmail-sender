@@ -16,7 +16,6 @@ import se.sundsvall.dept44.test.AbstractAppTest;
 import se.sundsvall.dept44.test.annotation.wiremock.WireMockAppTestSuite;
 import se.sundsvall.snailmail.Application;
 import se.sundsvall.snailmail.integration.db.BatchRepository;
-import se.sundsvall.snailmail.service.BatchScheduler;
 
 @WireMockAppTestSuite(files = "classpath:/SnailMailIT/", classes = Application.class)
 @Sql({"/db/scripts/truncate.sql", "/db/scripts/testdata-it.sql"})

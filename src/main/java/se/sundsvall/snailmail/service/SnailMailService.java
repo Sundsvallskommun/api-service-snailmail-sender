@@ -7,19 +7,19 @@ import static se.sundsvall.snailmail.service.Mapper.toDepartment;
 import static se.sundsvall.snailmail.service.Mapper.toRecipient;
 import static se.sundsvall.snailmail.service.Mapper.toRequest;
 
+import generated.se.sundsvall.citizen.CitizenExtended;
+import jakarta.transaction.Transactional;
+import java.time.OffsetDateTime;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import jakarta.transaction.Transactional;
-
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.zalando.problem.Problem;
-
 import se.sundsvall.snailmail.api.model.EnvelopeType;
 import se.sundsvall.snailmail.api.model.SendSnailMailRequest;
 import se.sundsvall.snailmail.integration.citizen.CitizenIntegration;
@@ -30,8 +30,6 @@ import se.sundsvall.snailmail.integration.db.model.BatchEntity;
 import se.sundsvall.snailmail.integration.db.model.DepartmentEntity;
 import se.sundsvall.snailmail.integration.db.model.RecipientEntity;
 import se.sundsvall.snailmail.integration.samba.SambaIntegration;
-
-import generated.se.sundsvall.citizen.CitizenExtended;
 
 @Service
 @Transactional
@@ -147,5 +145,15 @@ public class SnailMailService {
 		sambaIntegration.writeBatchDataToSambaShare(batch);
 
 		batchRepository.delete(batch);
+	}
+
+	/**
+	 * Get all batches that have not been handled for a certain duration
+	 * 
+	 * @param  outdatedBefore the time before which the batch is considered outdated
+	 * @return                a list of unhandled batches
+	 */
+	public List<BatchEntity> getUnhandledBatches(OffsetDateTime outdatedBefore) {
+		return batchRepository.findBatchEntityByCreatedIsBefore(outdatedBefore);
 	}
 }

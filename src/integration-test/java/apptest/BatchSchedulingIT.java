@@ -32,9 +32,8 @@ class BatchSchedulingIT extends AbstractAppTest {
 	@Autowired
 	private BatchRepository batchRepository;
 	
-	
 	@Test
-	void test1_danglingBatches_shouldBeSent() {
+	void test1_unhandledBatches_shouldBeSent() {
 		setupCall();
 		var batches = batchRepository.findAll();
 		assertThat(batches).hasSize(2);
