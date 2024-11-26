@@ -12,9 +12,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-
-import se.sundsvall.snailmail.api.model.EnvelopeType;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -22,11 +19,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import se.sundsvall.snailmail.api.model.EnvelopeType;
 
 @Getter
 @Setter
-@ToString
-@EqualsAndHashCode
+@ToString(exclude = "requestEntity")
+@EqualsAndHashCode(exclude = "requestEntity")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(setterPrefix = "with")
@@ -56,5 +54,4 @@ public class AttachmentEntity {
 	@Column(name = "envelope_type")
 	@Enumerated(EnumType.STRING)
 	private EnvelopeType envelopeType;
-
 }

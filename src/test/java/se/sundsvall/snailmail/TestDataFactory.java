@@ -1,13 +1,11 @@
 package se.sundsvall.snailmail;
 
-import java.util.List;
-import java.util.UUID;
-
-import se.sundsvall.snailmail.api.model.EnvelopeType;
-import se.sundsvall.snailmail.api.model.SendSnailMailRequest;
-
 import generated.se.sundsvall.citizen.CitizenAddress;
 import generated.se.sundsvall.citizen.CitizenExtended;
+import java.util.List;
+import java.util.UUID;
+import se.sundsvall.snailmail.api.model.EnvelopeType;
+import se.sundsvall.snailmail.api.model.SendSnailMailRequest;
 
 public final class TestDataFactory {
 
@@ -82,5 +80,4 @@ public final class TestDataFactory {
 		citizenAddress.setCo("Kajsa Anka");
 		return citizenAddress;
 	}
-
 }

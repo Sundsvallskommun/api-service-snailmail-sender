@@ -10,7 +10,9 @@ integration:
     share: /share/
     connect-timeout: PT5S
     response-timeout: PT10S
-
+batch:
+  unhandled:
+    check-interval: P100D
 spring:
   datasource:
     driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
