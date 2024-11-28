@@ -1,22 +1,21 @@
 package se.sundsvall.snailmail.api.model;
 
-import java.util.List;
-
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-
-import se.sundsvall.dept44.common.validators.annotation.OneOf;
-import se.sundsvall.dept44.common.validators.annotation.ValidBase64;
-import se.sundsvall.dept44.common.validators.annotation.ValidUuid;
-import se.sundsvall.snailmail.api.validation.ValidFolderName;
-
-import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.With;
+import se.sundsvall.dept44.common.validators.annotation.OneOf;
+import se.sundsvall.dept44.common.validators.annotation.ValidBase64;
+import se.sundsvall.snailmail.api.validation.ValidFolderName;
+
+import java.util.List;
 
 @Data
 @Builder(setterPrefix = "with")
@@ -37,19 +36,17 @@ public class SendSnailMailRequest {
 	@Schema(description = "BatchEntity id to be used for creating a csv-file", example = "6a5c3d04-412d-11ec-973a-0242ac130043")
 	private String batchId;
 
-	@Schema(description = "Party id for the person the letter should be sent to", example = "6a5c3d04-412d-11ec-973a-0242ac130003")
-	@ValidUuid(nullable = true)
-	private String partyId;
-
 	@Schema(description = "The issuer of the request", example = "user123")
 	private String issuer;
 
 	@Schema(description = "The municipality id", example = "2281")
 	private String municipalityId;
 
+	@NotEmpty
 	@Schema(description = "Attachments")
 	private List<@Valid Attachment> attachments;
 
+	@NotNull
 	@Schema(description = "Recipient address")
 	private Address address;
 
@@ -59,12 +56,12 @@ public class SendSnailMailRequest {
 	@Builder(setterPrefix = "with")
 	public static class Attachment {
 
-		@Schema(description = "The attachment (file) content as a BASE64-encoded string", example = "aGVsbG8gd29ybGQK")
 		@ValidBase64
+		@Schema(description = "The attachment (file) content as a BASE64-encoded string", example = "aGVsbG8gd29ybGQK")
 		private String content;
 
-		@Schema(description = "The attachment filename", example = "test.pdf")
 		@NotBlank
+		@Schema(description = "The attachment filename", example = "test.pdf")
 		private String name;
 
 		@OneOf("application/pdf")
@@ -89,17 +86,11 @@ public class SendSnailMailRequest {
 		@Schema(description = "The last name of the recipient", example = "Doe")
 		private String lastName;
 
-		@Schema(description = "The city", example = "Main Street")
-		private String city;
+		@Schema(description = "The address", example = "Main Street 1")
+		private String address;
 
 		@Schema(description = "The apartment number", example = "1101")
 		private String apartmentNumber;
-
-		@Schema(description = "The organization number of the recipient", example = "123456-7890")
-		private String organizationNumber;
-
-		@Schema(description = "The address", example = "Main Street 1")
-		private String address;
 
 		@Schema(description = "The care of", example = "c/o John Doe")
 		private String careOf;
@@ -107,9 +98,13 @@ public class SendSnailMailRequest {
 		@Schema(description = "The zip code", example = "12345")
 		private String zipCode;
 
+		@Schema(description = "The city", example = "Main Street")
+		private String city;
+
 		@Schema(description = "The country", example = "Sweden")
 		private String country;
 
+		@Schema(description = "The organization number of the recipient", example = "123456-7890")
+		private String organizationNumber;
 	}
-
 }

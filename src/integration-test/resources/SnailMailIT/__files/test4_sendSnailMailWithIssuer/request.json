@@ -1,4 +1,12 @@
 {
+	"address": {
+		"firstName": "Dummy",
+		"lastName": "McDummy",
+		"zipCode": "123 45",
+		"country": "Dummy Country",
+		"address": "Dummy Street 123",
+		"city": "Dummy City"
+	},
 	"attachments": [{
 		"envelopeType": "PLAIN",
 		"name": "test.pdf",
@@ -6,6 +14,5 @@
 		"content": "aGVsbG8gd29ybGQK"
 	}],
 	"department": "dummy",
-	"partyId": "58f96da8-6d76-4fa6-bb92-64f71fdc6aa5",
 	"batchId": "58f96da8-6d76-4fa6-bb92-64f71fdc6aa6"
 }

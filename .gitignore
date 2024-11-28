@@ -10,6 +10,9 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+# Spring
+application-default.*
+
 ### STS ###
 .apt_generated
 .classpath

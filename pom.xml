@@ -10,13 +10,10 @@
 	</parent>
 	<groupId>se.sundsvall</groupId>
 	<artifactId>api-service-snailmail-sender</artifactId>
-	<version>2.2</version>
+	<version>3.0</version>
 	<name>api-service-snailmail-sender</name>
 	<properties>
 		<shedlock.version>6.0.1</shedlock.version>
-
-		<!-- Generated sources properties -->
-		<generated-sources-path>${project.build.directory}/generated-sources</generated-sources-path>
 		<jcifs-ng.version>2.1.10</jcifs-ng.version>
 	</properties>
 	<dependencies>
@@ -82,92 +79,4 @@
 			<version>${shedlock.version}</version>
 		</dependency>
 	</dependencies>
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.openapitools</groupId>
-				<artifactId>openapi-generator-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>email-sender-api</id>
-						<goals>
-							<goal>generate</goal>
-						</goals>
-						<configuration>
-							<inputSpec>${project.basedir}/src/generated/email-sender-api.yml</inputSpec>
-							<output>${generated-sources-path}</output>
-							<generatorName>spring</generatorName>
-							<generateApis>false</generateApis>
-							<generateSupportingFiles>false</generateSupportingFiles>
-							<configOptions>
-								<useSpringBoot3>true</useSpringBoot3>
-								<sourceFolder>models</sourceFolder>
-								<dateLibrary>java8</dateLibrary>
-								<apiPackage>generated</apiPackage>
-								<modelPackage>generated.se.sundsvall.emailsender</modelPackage>
-								<openApiNullable>false</openApiNullable>
-								<generatePom>false</generatePom>
-								<useBeanValidation>true</useBeanValidation>
-								<useSwaggerAnnotations>true</useSwaggerAnnotations>
-								<interfaceOnly>true</interfaceOnly>
-							</configOptions>
-						</configuration>
-					</execution>
-					<execution>
-						<id>citizen-api</id>
-						<goals>
-							<goal>generate</goal>
-						</goals>
-						<configuration>
-							<inputSpec>${project.basedir}/src/generated/citizen-api.yml</inputSpec>
-							<output>${generated-sources-path}</output>
-							<generatorName>spring</generatorName>
-							<generateApis>false</generateApis>
-							<generateSupportingFiles>false</generateSupportingFiles>
-							<configOptions>
-								<useSpringBoot3>true</useSpringBoot3>
-								<sourceFolder>models</sourceFolder>
-								<dateLibrary>java8</dateLibrary>
-								<apiPackage>generated</apiPackage>
-								<modelPackage>generated.se.sundsvall.citizen</modelPackage>
-								<openApiNullable>false</openApiNullable>
-								<generatePom>false</generatePom>
-								<useBeanValidation>true</useBeanValidation>
-								<useSwaggerAnnotations>true</useSwaggerAnnotations>
-								<interfaceOnly>true</interfaceOnly>
-							</configOptions>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>build-helper-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>add-generated-source</id>
-						<goals>
-							<goal>add-source</goal>
-						</goals>
-						<phase>initialize</phase>
-						<configuration>
-							<sources>
-								<source>${generated-sources-path}/models</source>
-							</sources>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.jacoco</groupId>
-				<artifactId>jacoco-maven-plugin</artifactId>
-				<configuration>
-					<excludes>
-						<exclude>**/generated/se/sundsvall/**/*</exclude>
-						<!-- API model classes -->
-					</excludes>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
 </project>

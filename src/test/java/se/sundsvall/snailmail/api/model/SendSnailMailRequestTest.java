@@ -26,8 +26,14 @@ class SendSnailMailRequestTest {
 	}
 
 	@Test
+	void testNoDirtOnCreatedBean() {
+		assertThat(SendSnailMailRequest.builder().build()).hasAllNullFieldsOrProperties();
+		assertThat(new SendSnailMailRequest()).hasAllNullFieldsOrProperties();
+	}
+
+	@Test
 	void testBuilder() {
-		final var request = SendSnailMailRequest.builder()
+		var request = SendSnailMailRequest.builder()
 			.withAttachments(List.of(
 				SendSnailMailRequest.Attachment.builder()
 					.withName("someName")
@@ -36,14 +42,12 @@ class SendSnailMailRequestTest {
 					.withEnvelopeType(EnvelopeType.PLAIN)
 					.build()))
 			.withDepartment("someDepartment")
-			.withPartyId("somePartyId")
 			.withBatchId("someBatchId")
 			.withDeviation("someDeviation")
 			.build();
 
 		assertThat(request).isNotNull();
 		assertThat(request.getDepartment()).isEqualTo("someDepartment");
-		assertThat(request.getPartyId()).isEqualTo("somePartyId");
 		assertThat(request.getBatchId()).isEqualTo("someBatchId");
 		assertThat(request.getDeviation()).isEqualTo("someDeviation");
 		assertThat(request.getAttachments()).satisfies(attachments -> {
@@ -55,11 +59,4 @@ class SendSnailMailRequestTest {
 			assertThat(attachments.getFirst().getEnvelopeType()).isEqualByComparingTo(EnvelopeType.PLAIN);
 		});
 	}
-
-	@Test
-	void testNoDirtOnCreatedBean() {
-		assertThat(SendSnailMailRequest.builder().build()).hasAllNullFieldsOrProperties();
-		assertThat(new SendSnailMailRequest()).hasAllNullFieldsOrProperties();
-	}
-
 }

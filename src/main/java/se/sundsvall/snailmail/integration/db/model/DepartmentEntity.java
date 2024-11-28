@@ -13,26 +13,23 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
+import lombok.With;
+
+import java.util.List;
+
+import static lombok.AccessLevel.PACKAGE;
 
 @Getter
 @Setter
-@ToString(exclude = {
-	"batchEntity", "requestEntities"
-})
-@EqualsAndHashCode(exclude = {
-	"batchEntity", "requestEntities"
-})
 @NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor(access = PACKAGE)
 @Builder(setterPrefix = "with")
+@With(PACKAGE)
 @Entity
 @Table(name = "department", indexes = @Index(name = "idx_department_name", columnList = "name"))
 public class DepartmentEntity {
@@ -51,4 +48,22 @@ public class DepartmentEntity {
 
 	@OneToMany(mappedBy = "departmentEntity", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private List<RequestEntity> requestEntities;
+
+	@Override
+	public boolean equals(final Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o instanceof DepartmentEntity other) {
+			return id != null && id.equals(other.id);
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return getClass().hashCode();
+	}
+
 }

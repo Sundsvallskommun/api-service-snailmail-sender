@@ -1,6 +1,4 @@
 integration:
-  citizen:
-    base-url: http://citizen.url
   samba:
     host: localhost
     port: 1445
@@ -36,13 +34,3 @@ spring:
             scripts:
               action: create
               create-target: target/database/generated-schema.sql
-  security:
-    oauth2:
-      client:
-        provider:
-          citizen:
-            token-uri: http://token.url
-        registration:
-          citizen:
-            client-id: the-client-id
-            client-secret: the-client-secret

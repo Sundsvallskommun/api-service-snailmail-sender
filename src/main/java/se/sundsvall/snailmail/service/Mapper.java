@@ -1,6 +1,5 @@
 package se.sundsvall.snailmail.service;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,8 +9,6 @@ import se.sundsvall.snailmail.integration.db.model.BatchEntity;
 import se.sundsvall.snailmail.integration.db.model.DepartmentEntity;
 import se.sundsvall.snailmail.integration.db.model.RecipientEntity;
 import se.sundsvall.snailmail.integration.db.model.RequestEntity;
-
-import generated.se.sundsvall.citizen.CitizenExtended;
 
 public final class Mapper {
 
@@ -70,25 +67,6 @@ public final class Mapper {
 			.orElse(null);
 	}
 
-	static RecipientEntity toRecipient(final CitizenExtended citizen) {
-
-		return Optional.ofNullable(citizen)
-			.flatMap(c -> Optional.ofNullable(c.getAddresses())
-				.orElse(Collections.emptyList())
-				.stream()
-				.findFirst())
-			.map(address -> RecipientEntity.builder()
-				.withGivenName(citizen.getGivenname())
-				.withLastName(citizen.getLastname())
-				.withAddress(address.getAddress())
-				.withApartmentNumber(address.getAppartmentNumber())
-				.withPostalCode(address.getPostalCode())
-				.withCity(address.getCity())
-				.withCareOf(address.getCo())
-				.build())
-			.orElse(null);
-	}
-
 	static BatchEntity toBatchEntity(final SendSnailMailRequest request) {
 		return BatchEntity.builder()
 			.withId(request.getBatchId())
@@ -96,5 +74,4 @@ public final class Mapper {
 			.withMunicipalityId(request.getMunicipalityId())
 			.build();
 	}
-
 }

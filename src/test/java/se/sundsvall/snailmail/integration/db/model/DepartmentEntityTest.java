@@ -1,27 +1,23 @@
 package se.sundsvall.snailmail.integration.db.model;
 
-import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanConstructor;
-import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanEqualsExcluding;
-import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanHashCodeExcluding;
-import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanToStringExcluding;
-import static com.google.code.beanmatchers.BeanMatchers.hasValidGettersAndSetters;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.CoreMatchers.allOf;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.ArgumentsProvider;
+import org.junit.jupiter.params.provider.ArgumentsSource;
 
 import java.util.List;
-import org.hamcrest.MatcherAssert;
-import org.junit.jupiter.api.Test;
+import java.util.stream.Stream;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class DepartmentEntityTest {
 
 	@Test
-	void testBean() {
-		MatcherAssert.assertThat(DepartmentEntity.class, allOf(
-			hasValidBeanConstructor(),
-			hasValidGettersAndSetters(),
-			hasValidBeanHashCodeExcluding("batchEntity", "requestEntities"),
-			hasValidBeanEqualsExcluding("batchEntity", "requestEntities"),
-			hasValidBeanToStringExcluding("batchEntity", "requestEntities")));
+	void testNoDirtOnCreatedBean() {
+		assertThat(DepartmentEntity.builder().build()).hasAllNullFieldsOrProperties();
+		assertThat(new DepartmentEntity()).hasAllNullFieldsOrProperties();
 	}
 
 	@Test
@@ -45,10 +41,34 @@ class DepartmentEntityTest {
 		assertThat(department.getBatchEntity()).isNotNull();
 	}
 
-	@Test
-	void testNoDirtOnCreatedBean() {
-		assertThat(DepartmentEntity.builder().build()).hasAllNullFieldsOrProperties();
-		assertThat(new DepartmentEntity()).hasAllNullFieldsOrProperties();
+	@ParameterizedTest
+	@ArgumentsSource(EqualsArgumentsProvider.class)
+	void testEquals(final Object first, final Object second, final boolean shouldEqual) {
+		if (shouldEqual) {
+			assertThat(first).isEqualTo(second);
+		} else {
+			assertThat(first).isNotEqualTo(second);
+		}
 	}
 
+	@Test
+	void testHashCode() {
+		assertThat(AttachmentEntity.builder().build().hashCode()).isEqualTo(AttachmentEntity.class.hashCode());
+	}
+
+	private static class EqualsArgumentsProvider implements ArgumentsProvider {
+
+		@Override
+		public Stream<? extends Arguments> provideArguments(final ExtensionContext context) {
+			var first = DepartmentEntity.builder().build();
+			var second = DepartmentEntity.builder().build();
+
+			return Stream.of(
+				Arguments.of(first, second, false),
+				Arguments.of(first, first, true),
+				Arguments.of(first, "someString", false),
+				Arguments.of(first.withId(123L), second.withId(123L), true),
+				Arguments.of(first.withId(123L).withName("first"), second.withId(123L).withName("second"), true));
+		}
+	}
 }
