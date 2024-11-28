@@ -80,15 +80,12 @@ public class SendSnailMailRequest {
 	@Builder(setterPrefix = "with")
 	public static class Address {
 
-		@NotBlank
 		@Schema(description = "The first name of the recipient", example = "John")
 		private String firstName;
 
-		@NotBlank
 		@Schema(description = "The last name of the recipient", example = "Doe")
 		private String lastName;
 
-		@NotBlank
 		@Schema(description = "The address", example = "Main Street 1")
 		private String address;
 
@@ -98,11 +95,9 @@ public class SendSnailMailRequest {
 		@Schema(description = "The care of", example = "c/o John Doe")
 		private String careOf;
 
-		@NotBlank
 		@Schema(description = "The zip code", example = "12345")
 		private String zipCode;
 
-		@NotBlank
 		@Schema(description = "The city", example = "Main Street")
 		private String city;
 

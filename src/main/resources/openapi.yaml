@@ -42,14 +42,6 @@ paths:
               $ref: "#/components/schemas/SendSnailMailRequest"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/Problem"
-        "200":
-          description: Successful Operation
         "400":
           description: Bad RequestEntity
           content:
@@ -58,6 +50,14 @@ paths:
                 oneOf:
                 - $ref: "#/components/schemas/Problem"
                 - $ref: "#/components/schemas/ConstraintViolationProblem"
+        "200":
+          description: Successful Operation
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Problem"
   /{municipalityId}/send/batch/{batchId}:
     post:
       tags:
@@ -80,14 +80,6 @@ paths:
           type: string
         example: b588d1b7-7911-4e78-89d5-b710b32e0f8e
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/Problem"
-        "200":
-          description: Successful Operation
         "400":
           description: Bad RequestEntity
           content:
@@ -96,6 +88,14 @@ paths:
                 oneOf:
                 - $ref: "#/components/schemas/Problem"
                 - $ref: "#/components/schemas/ConstraintViolationProblem"
+        "200":
+          description: Successful Operation
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Problem"
   /api-docs:
     get:
       tags:
@@ -115,12 +115,6 @@ paths:
 components:
   schemas:
     Address:
-      required:
-      - address
-      - city
-      - firstName
-      - lastName
-      - zipCode
       type: object
       properties:
         firstName:
@@ -235,12 +229,12 @@ components:
           type: object
           additionalProperties:
             type: object
+        status:
+          $ref: "#/components/schemas/StatusType"
         title:
           type: string
         detail:
           type: string
-        status:
-          $ref: "#/components/schemas/StatusType"
     StatusType:
       type: object
       properties:
@@ -370,12 +364,12 @@ components:
           type: object
           additionalProperties:
             type: object
+        status:
+          $ref: "#/components/schemas/StatusType"
         title:
           type: string
         detail:
           type: string
-        status:
-          $ref: "#/components/schemas/StatusType"
         suppressed:
           type: array
           items:
