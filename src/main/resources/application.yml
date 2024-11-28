@@ -2,6 +2,7 @@ openapi:
   name: api-service-snailmail-sender
   title: SnailMailSender
   version: '@project.version@'
+
 spring:
   application:
     name: api-snailmail-sender
@@ -10,13 +11,7 @@ spring:
       connection-timeout: 5000
   main:
     banner-mode: 'off'
-  security:
-    oauth2:
-      client:
-        registration:
-          citizen:
-            authorization-grant-type: client_credentials
-            provider: citizen
+
 batch:
   unhandled:
     check-interval: PT10M
@@ -24,10 +19,7 @@ batch:
     name: unhandledBatch
     lock-at-most-for: PT5M
     initial-delay: PT1M
-integration:
-  citizen:
-    connect-timeout: 5
-    read-timeout: 30
+
 logbook:
   body-filters:
     # Exclude base64-encoded content from incoming requests.

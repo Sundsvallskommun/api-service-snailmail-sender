@@ -1,7 +1,5 @@
 package se.sundsvall.snailmail.integration.db.model;
 
-import static org.hibernate.annotations.TimeZoneStorageType.NORMALIZE;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,24 +9,26 @@ import jakarta.persistence.Index;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
-import java.time.OffsetDateTime;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
+import lombok.With;
 import org.hibernate.annotations.TimeZoneStorage;
+
+import java.time.OffsetDateTime;
+import java.util.List;
+
+import static lombok.AccessLevel.PACKAGE;
+import static org.hibernate.annotations.TimeZoneStorageType.NORMALIZE;
 
 @Getter
 @Setter
-@ToString(exclude = "departmentEntities")
-@EqualsAndHashCode(exclude = "departmentEntities")
 @NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor(access = PACKAGE)
 @Builder(setterPrefix = "with")
+@With(PACKAGE)
 @Entity
 @Table(name = "batch", indexes = @Index(name = "idx_batch_municipality_id", columnList = "municipality_id"))
 public class BatchEntity {
@@ -53,5 +53,22 @@ public class BatchEntity {
 	@PrePersist
 	public void prePersist() {
 		this.created = OffsetDateTime.now();
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o instanceof BatchEntity other) {
+			return id != null && id.equals(other.id);
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return getClass().hashCode();
 	}
 }

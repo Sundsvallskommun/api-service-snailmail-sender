@@ -14,20 +14,20 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
+import lombok.With;
 import se.sundsvall.snailmail.api.model.EnvelopeType;
+
+import static lombok.AccessLevel.PACKAGE;
 
 @Getter
 @Setter
-@ToString(exclude = "requestEntity")
-@EqualsAndHashCode(exclude = "requestEntity")
 @NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor(access = PACKAGE)
 @Builder(setterPrefix = "with")
+@With(PACKAGE)
 @Entity
 @Table(name = "attachment")
 public class AttachmentEntity {
@@ -54,4 +54,21 @@ public class AttachmentEntity {
 	@Column(name = "envelope_type")
 	@Enumerated(EnumType.STRING)
 	private EnvelopeType envelopeType;
+
+	@Override
+	public boolean equals(final Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o instanceof AttachmentEntity other) {
+			return id != null && id.equals(other.id);
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return getClass().hashCode();
+	}
 }

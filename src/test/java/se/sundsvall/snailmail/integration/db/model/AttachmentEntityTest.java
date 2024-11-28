@@ -1,27 +1,27 @@
 package se.sundsvall.snailmail.integration.db.model;
 
-import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanConstructor;
-import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanEqualsExcluding;
-import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanHashCodeExcluding;
-import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanToStringExcluding;
-import static com.google.code.beanmatchers.BeanMatchers.hasValidGettersAndSetters;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.CoreMatchers.allOf;
-
-import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.ArgumentsProvider;
+import org.junit.jupiter.params.provider.ArgumentsSource;
 import se.sundsvall.snailmail.api.model.EnvelopeType;
+
+import java.util.List;
+import java.util.UUID;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class AttachmentEntityTest {
 
 	@Test
-	void testBean() {
-		MatcherAssert.assertThat(AttachmentEntity.class, allOf(
-			hasValidBeanConstructor(),
-			hasValidGettersAndSetters(),
-			hasValidBeanHashCodeExcluding("requestEntity"),
-			hasValidBeanEqualsExcluding("requestEntity"),
-			hasValidBeanToStringExcluding("requestEntity")));
+	void testNoDirtOnCreatedBean() {
+		assertThat(AttachmentEntity.builder().build()).hasAllNullFieldsOrProperties();
+		assertThat(new AttachmentEntity()).hasAllNullFieldsOrProperties();
 	}
 
 	@Test
@@ -51,10 +51,34 @@ class AttachmentEntityTest {
 		assertThat(attachment.getContent()).isEqualTo(content);
 	}
 
-	@Test
-	void testNoDirtOnCreatedBean() {
-		assertThat(AttachmentEntity.builder().build()).hasAllNullFieldsOrProperties();
-		assertThat(new AttachmentEntity()).hasAllNullFieldsOrProperties();
+	@ParameterizedTest
+	@ArgumentsSource(EqualsArgumentsProvider.class)
+	void testEquals(final Object first, final Object second, final boolean shouldEqual) {
+		if (shouldEqual) {
+			assertThat(first).isEqualTo(second);
+		} else {
+			assertThat(first).isNotEqualTo(second);
+		}
 	}
 
+	@Test
+	void testHashCode() {
+		assertThat(AttachmentEntity.builder().build().hashCode()).isEqualTo(AttachmentEntity.class.hashCode());
+	}
+
+	private static class EqualsArgumentsProvider implements ArgumentsProvider {
+
+		@Override
+		public Stream<? extends Arguments> provideArguments(final ExtensionContext context) {
+			var first = AttachmentEntity.builder().build();
+			var second = AttachmentEntity.builder().build();
+
+			return Stream.of(
+				Arguments.of(first, second, false),
+				Arguments.of(first, first, true),
+				Arguments.of(first, "someString", false),
+				Arguments.of(first.withId(123L), second.withId(123L), true),
+				Arguments.of(first.withId(123L).withName("first"), second.withId(123L).withName("second"), true));
+		}
+	}
 }

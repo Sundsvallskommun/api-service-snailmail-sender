@@ -13,26 +13,23 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
+import lombok.With;
+
+import java.util.List;
+
+import static lombok.AccessLevel.PACKAGE;
 
 @Getter
 @Setter
-@ToString(exclude = {
-	"attachmentEntities", "departmentEntity", "recipientEntity"
-})
-@EqualsAndHashCode(exclude = {
-	"attachmentEntities", "departmentEntity", "recipientEntity"
-})
 @NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor(access = PACKAGE)
 @Builder(setterPrefix = "with")
+@With(PACKAGE)
 @Entity
 @Table(name = "request", uniqueConstraints = @UniqueConstraint(name = "uq_request_recipient", columnNames = "recipient_id"))
 public class RequestEntity {
@@ -58,4 +55,21 @@ public class RequestEntity {
 
 	@Column(name = "party_id")
 	private String partyId;
+
+	@Override
+	public boolean equals(final Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o instanceof RequestEntity other) {
+			return id != null && id.equals(other.id);
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return getClass().hashCode();
+	}
 }
