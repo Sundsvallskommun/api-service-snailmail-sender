@@ -7,12 +7,14 @@
 		"address": "Dummy Street 123",
 		"city": "Dummy City"
 	},
-	"attachments": [{
-		"envelopeType": "PLAIN",
-		"name": "test.pdf",
-		"contentType": "application/pdf",
-		"content": "aGVsbG8gd29ybGQK"
-	}],
+	"attachments": [
+		{
+			"envelopeType": "PLAIN",
+			"name": "test.pdf",
+			"contentType": "application/pdf",
+			"content": "aGVsbG8gd29ybGQK"
+		}
+	],
 	"department": "dummy",
 	"batchId": "c895f6b2-3571-413a-a2f4-8d7780d6c6a5"
 }

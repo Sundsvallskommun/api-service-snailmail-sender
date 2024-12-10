@@ -1,11 +1,9 @@
 package se.sundsvall.snailmail.integration.samba;
 
+import jakarta.validation.constraints.NotBlank;
 import java.time.Duration;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.bind.DefaultValue;
-
-import jakarta.validation.constraints.NotBlank;
 
 @ConfigurationProperties("integration.samba")
 public record SambaIntegrationProperties(

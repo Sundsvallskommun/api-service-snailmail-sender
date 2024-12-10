@@ -1,6 +1,14 @@
 package se.sundsvall.snailmail.service;
 
+import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
+import static se.sundsvall.snailmail.service.Mapper.toBatchEntity;
+import static se.sundsvall.snailmail.service.Mapper.toDepartment;
+import static se.sundsvall.snailmail.service.Mapper.toRecipient;
+import static se.sundsvall.snailmail.service.Mapper.toRequest;
+
 import jakarta.transaction.Transactional;
+import java.time.OffsetDateTime;
+import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,15 +21,6 @@ import se.sundsvall.snailmail.integration.db.RequestRepository;
 import se.sundsvall.snailmail.integration.db.model.BatchEntity;
 import se.sundsvall.snailmail.integration.db.model.DepartmentEntity;
 import se.sundsvall.snailmail.integration.samba.SambaIntegration;
-
-import java.time.OffsetDateTime;
-import java.util.List;
-
-import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
-import static se.sundsvall.snailmail.service.Mapper.toBatchEntity;
-import static se.sundsvall.snailmail.service.Mapper.toDepartment;
-import static se.sundsvall.snailmail.service.Mapper.toRecipient;
-import static se.sundsvall.snailmail.service.Mapper.toRequest;
 
 @Service
 @Transactional

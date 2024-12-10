@@ -13,7 +13,6 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -38,6 +37,42 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("junit")
 class BatchSchedulerShedlockTest {
 
+	private static LocalDateTime mockCalledTime;
+	@Autowired
+	private SnailMailService mockSnailMailService;
+
+	@Autowired
+	private NamedParameterJdbcTemplate jdbcTemplate;
+
+	@Test
+	void verifyShedLockForUnhandledBatches() {
+		// Make sure scheduling occurs multiple times
+		await().until(() -> mockCalledTime != null && LocalDateTime.now().isAfter(mockCalledTime.plusSeconds(2)));
+
+		// Verify lock
+		await().atMost(5, SECONDS)
+			.untilAsserted(() -> assertThat(getLockedAt("unhandledBatch"))
+				.isCloseTo(LocalDateTime.now(systemUTC()), within(10, ChronoUnit.SECONDS)));
+
+		// Only one call should be made as long as sendUnhandledBatches is locked and mock is waiting for first call to finish
+		verify(mockSnailMailService).getUnhandledBatches(any());
+		verifyNoMoreInteractions(mockSnailMailService);
+	}
+
+	private LocalDateTime getLockedAt(final String name) {
+		return jdbcTemplate.query(
+			"SELECT locked_at FROM shedlock WHERE name = :name",
+			Map.of("name", name),
+			this::mapTimestamp);
+	}
+
+	private LocalDateTime mapTimestamp(final ResultSet rs) throws SQLException {
+		if (rs.next()) {
+			return rs.getTimestamp("locked_at").toLocalDateTime();
+		}
+		return null;
+	}
+
 	@TestConfiguration
 	public static class ShedlockTestConfiguration {
 		@Bean
@@ -56,42 +91,5 @@ class BatchSchedulerShedlockTest {
 
 			return mockBean;
 		}
-	}
-
-	@Autowired
-	private SnailMailService mockSnailMailService;
-
-	@Autowired
-	private NamedParameterJdbcTemplate jdbcTemplate;
-
-	private static LocalDateTime mockCalledTime;
-
-	@Test
-	void verifyShedLockForUnhandledBatches() {
-		// Make sure scheduling occurs multiple times
-		await().until(() -> mockCalledTime != null && LocalDateTime.now().isAfter(mockCalledTime.plusSeconds(2)));
-
-		// Verify lock
-		await().atMost(5, SECONDS)
-			.untilAsserted(() -> assertThat(getLockedAt("unhandledBatch"))
-				.isCloseTo(LocalDateTime.now(systemUTC()), within(10, ChronoUnit.SECONDS)));
-
-		// Only one call should be made as long as sendUnhandledBatches is locked and mock is waiting for first call to finish
-		verify(mockSnailMailService).getUnhandledBatches(any());
-		verifyNoMoreInteractions(mockSnailMailService);
-	}
-
-	private LocalDateTime getLockedAt(String name) {
-		return jdbcTemplate.query(
-			"SELECT locked_at FROM shedlock WHERE name = :name",
-			Map.of("name", name),
-			this::mapTimestamp);
-	}
-
-	private LocalDateTime mapTimestamp(final ResultSet rs) throws SQLException {
-		if (rs.next()) {
-			return LocalDateTime.parse(rs.getString("locked_at"), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
-		}
-		return null;
 	}
 }

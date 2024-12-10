@@ -2,6 +2,8 @@ package se.sundsvall.snailmail.integration.samba;
 
 import static java.util.Optional.ofNullable;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import jakarta.transaction.Transactional;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -14,28 +16,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.stereotype.Component;
-import org.zalando.problem.Problem;
-import org.zalando.problem.Status;
-
-import se.sundsvall.snailmail.api.model.EnvelopeType;
-import se.sundsvall.snailmail.integration.db.model.AttachmentEntity;
-import se.sundsvall.snailmail.integration.db.model.BatchEntity;
-import se.sundsvall.snailmail.integration.db.model.DepartmentEntity;
-import se.sundsvall.snailmail.integration.db.model.RequestEntity;
-
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
-import jakarta.transaction.Transactional;
 import jcifs.CIFSContext;
 import jcifs.context.SingletonContext;
 import jcifs.smb.NtlmPasswordAuthenticator;
 import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
 import jcifs.smb.SmbFileOutputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.stereotype.Component;
+import org.zalando.problem.Problem;
+import org.zalando.problem.Status;
+import se.sundsvall.snailmail.api.model.EnvelopeType;
+import se.sundsvall.snailmail.integration.db.model.AttachmentEntity;
+import se.sundsvall.snailmail.integration.db.model.BatchEntity;
+import se.sundsvall.snailmail.integration.db.model.DepartmentEntity;
+import se.sundsvall.snailmail.integration.db.model.RequestEntity;
 
 @Component
 @CircuitBreaker(name = "sambaIntegration")

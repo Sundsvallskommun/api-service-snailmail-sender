@@ -1,5 +1,8 @@
 package se.sundsvall.snailmail.api;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.ResponseEntity.ok;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -22,9 +25,6 @@ import se.sundsvall.dept44.common.validators.annotation.ValidUuid;
 import se.sundsvall.snailmail.api.model.SendSnailMailRequest;
 import se.sundsvall.snailmail.api.validation.ValidFolderName;
 import se.sundsvall.snailmail.service.SnailMailService;
-
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
 @Validated
