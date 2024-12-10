@@ -10,12 +10,14 @@
 		"organizationNumber": "Never used",
 		"apartmentNumber": "1101"
 	},
-	"attachments": [{
-		"envelopeType": "PLAIN",
-		"name": "test.pdf",
-		"contentType": "application/pdf",
-		"content": "aGVsbG8gd29ybGQK"
-	}],
+	"attachments": [
+		{
+			"envelopeType": "PLAIN",
+			"name": "test.pdf",
+			"contentType": "application/pdf",
+			"content": "aGVsbG8gd29ybGQK"
+		}
+	],
 	"department": "test5_dummy_department",
 	"batchId": "12a96da8-6d76-4fa6-bb92-64f71fdc6aa6"
 }

@@ -2,7 +2,6 @@ package se.sundsvall.snailmail.service;
 
 import java.util.List;
 import java.util.Optional;
-
 import se.sundsvall.snailmail.api.model.SendSnailMailRequest;
 import se.sundsvall.snailmail.integration.db.model.AttachmentEntity;
 import se.sundsvall.snailmail.integration.db.model.BatchEntity;
