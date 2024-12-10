@@ -13,8 +13,8 @@ import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.zalando.problem.violations.ConstraintViolationProblem;
 import org.zalando.problem.violations.Violation;
@@ -28,7 +28,7 @@ class SnailMailResourceTest {
 
 	private static final String MUNICIPALITY_ID = "2281";
 
-	@MockBean
+	@MockitoBean
 	private SnailMailService mockSnailMailService;
 
 	@Autowired
@@ -36,8 +36,8 @@ class SnailMailResourceTest {
 
 	@Test
 	void sendSnailMail() {
-		var issuer = "issuer";
-		var request = SendSnailMailRequest.builder()
+		final var issuer = "issuer";
+		final var request = SendSnailMailRequest.builder()
 			.withMunicipalityId(MUNICIPALITY_ID)
 			.withIssuer(issuer)
 			.withDepartment("department")
@@ -63,7 +63,7 @@ class SnailMailResourceTest {
 
 	@Test
 	void sendBatch() {
-		var uuid = UUID.randomUUID().toString();
+		final var uuid = UUID.randomUUID().toString();
 
 		webTestClient.post()
 			.uri("/%s/send/batch/".formatted(MUNICIPALITY_ID) + uuid)
@@ -76,7 +76,7 @@ class SnailMailResourceTest {
 
 	@Test
 	void sendBatch_notUUID() {
-		var response = webTestClient.post()
+		final var response = webTestClient.post()
 			.uri("/%s/send/batch/abc".formatted(MUNICIPALITY_ID))
 			.exchange()
 			.expectStatus()
