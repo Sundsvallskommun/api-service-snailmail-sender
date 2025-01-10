@@ -18,9 +18,9 @@ import static se.sundsvall.snailmail.service.SnailMailService.GIVEN_NAME;
 import static se.sundsvall.snailmail.service.SnailMailService.LAST_NAME;
 import static se.sundsvall.snailmail.service.SnailMailService.POSTAL_CODE;
 
+import generated.se.sundsvall.citizen.CitizenExtended;
 import java.util.Optional;
 import java.util.stream.Stream;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -34,7 +34,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.zalando.problem.Problem;
 import org.zalando.problem.Status;
 import org.zalando.problem.ThrowableProblem;
-
 import se.sundsvall.snailmail.integration.citizen.CitizenIntegration;
 import se.sundsvall.snailmail.integration.db.BatchRepository;
 import se.sundsvall.snailmail.integration.db.DepartmentRepository;
@@ -43,8 +42,6 @@ import se.sundsvall.snailmail.integration.db.model.BatchEntity;
 import se.sundsvall.snailmail.integration.db.model.DepartmentEntity;
 import se.sundsvall.snailmail.integration.db.model.RequestEntity;
 import se.sundsvall.snailmail.integration.samba.SambaIntegration;
-
-import generated.se.sundsvall.citizen.CitizenExtended;
 
 @ExtendWith(MockitoExtension.class)
 class SnailMailServiceTest {

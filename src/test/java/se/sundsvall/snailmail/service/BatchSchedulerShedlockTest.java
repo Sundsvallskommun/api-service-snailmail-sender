@@ -13,7 +13,6 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -38,14 +37,14 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("junit")
 class BatchSchedulerShedlockTest {
 
+	private static LocalDateTime mockCalledTime;
+
 	@TestConfiguration
 	public static class ShedlockTestConfiguration {
 		@Bean
 		@Primary
 		public SnailMailService createMock() {
-
 			final var mockBean = Mockito.mock(SnailMailService.class);
-
 			// Let mock hang
 			doAnswer(invocation -> {
 				mockCalledTime = LocalDateTime.now();
@@ -53,7 +52,6 @@ class BatchSchedulerShedlockTest {
 					.until(() -> false);
 				return null;
 			}).when(mockBean).getUnhandledBatches(any());
-
 			return mockBean;
 		}
 	}
@@ -63,8 +61,6 @@ class BatchSchedulerShedlockTest {
 
 	@Autowired
 	private NamedParameterJdbcTemplate jdbcTemplate;
-
-	private static LocalDateTime mockCalledTime;
 
 	@Test
 	void verifyShedLockForUnhandledBatches() {
@@ -90,7 +86,7 @@ class BatchSchedulerShedlockTest {
 
 	private LocalDateTime mapTimestamp(final ResultSet rs) throws SQLException {
 		if (rs.next()) {
-			return LocalDateTime.parse(rs.getString("locked_at"), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
+			return rs.getTimestamp("locked_at").toLocalDateTime();
 		}
 		return null;
 	}

@@ -2,20 +2,17 @@ package se.sundsvall.snailmail.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import generated.se.sundsvall.citizen.CitizenAddress;
+import generated.se.sundsvall.citizen.CitizenExtended;
 import java.util.Collections;
 import java.util.List;
-
 import org.junit.jupiter.api.Test;
-
 import se.sundsvall.snailmail.api.model.EnvelopeType;
 import se.sundsvall.snailmail.api.model.SendSnailMailRequest;
 import se.sundsvall.snailmail.integration.db.model.BatchEntity;
 import se.sundsvall.snailmail.integration.db.model.DepartmentEntity;
 import se.sundsvall.snailmail.integration.db.model.RecipientEntity;
 import se.sundsvall.snailmail.integration.db.model.RequestEntity;
-
-import generated.se.sundsvall.citizen.CitizenAddress;
-import generated.se.sundsvall.citizen.CitizenExtended;
 
 class MapperTest {
 

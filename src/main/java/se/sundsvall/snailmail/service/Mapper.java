@@ -1,17 +1,15 @@
 package se.sundsvall.snailmail.service;
 
+import generated.se.sundsvall.citizen.CitizenExtended;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
 import se.sundsvall.snailmail.api.model.SendSnailMailRequest;
 import se.sundsvall.snailmail.integration.db.model.AttachmentEntity;
 import se.sundsvall.snailmail.integration.db.model.BatchEntity;
 import se.sundsvall.snailmail.integration.db.model.DepartmentEntity;
 import se.sundsvall.snailmail.integration.db.model.RecipientEntity;
 import se.sundsvall.snailmail.integration.db.model.RequestEntity;
-
-import generated.se.sundsvall.citizen.CitizenExtended;
 
 public final class Mapper {
 

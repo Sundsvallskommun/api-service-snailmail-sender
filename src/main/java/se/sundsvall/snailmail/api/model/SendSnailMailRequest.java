@@ -1,22 +1,19 @@
 package se.sundsvall.snailmail.api.model;
 
-import java.util.List;
-
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-
-import se.sundsvall.dept44.common.validators.annotation.OneOf;
-import se.sundsvall.dept44.common.validators.annotation.ValidBase64;
-import se.sundsvall.dept44.common.validators.annotation.ValidUuid;
-import se.sundsvall.snailmail.api.validation.ValidFolderName;
-
-import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.With;
+import se.sundsvall.dept44.common.validators.annotation.OneOf;
+import se.sundsvall.dept44.common.validators.annotation.ValidBase64;
+import se.sundsvall.dept44.common.validators.annotation.ValidUuid;
+import se.sundsvall.snailmail.api.validation.ValidFolderName;
 
 @Data
 @Builder(setterPrefix = "with")

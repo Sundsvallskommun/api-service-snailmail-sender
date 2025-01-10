@@ -3,11 +3,9 @@ package se.sundsvall.snailmail.api.validation;
 import static java.util.Objects.isNull;
 import static org.springdoc.core.utils.SpringDocUtils.isValidPath;
 
-import java.util.List;
-
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-
+import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 public class ValidFolderNameValidator implements ConstraintValidator<ValidFolderName, String> {

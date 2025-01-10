@@ -11,7 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Base64;
 import java.util.List;
-
+import jcifs.smb.SmbFile;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,6 @@ import org.testcontainers.containers.DockerComposeContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.zalando.problem.Problem;
-
 import se.sundsvall.snailmail.Application;
 import se.sundsvall.snailmail.api.model.EnvelopeType;
 import se.sundsvall.snailmail.integration.db.model.AttachmentEntity;
@@ -29,8 +28,6 @@ import se.sundsvall.snailmail.integration.db.model.BatchEntity;
 import se.sundsvall.snailmail.integration.db.model.DepartmentEntity;
 import se.sundsvall.snailmail.integration.db.model.RecipientEntity;
 import se.sundsvall.snailmail.integration.db.model.RequestEntity;
-
-import jcifs.smb.SmbFile;
 
 @ActiveProfiles("junit")
 @SpringBootTest(classes = Application.class, webEnvironment = RANDOM_PORT)

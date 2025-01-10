@@ -1,14 +1,16 @@
 {
-	"addresses": [{
-		"country": "SVERIGE",
-		"address": "Ankvägen 1",
-		"city": "Ankeborg",
-		"addressType": "POPULATION_REGISTRATION_ADDRESS",
-		"postalCode": "123 45",
-		"realEstateDescription": "BORGEN 1:1",
-		"municipality": "2281",
-		"emigrated": false
-	}],
+	"addresses": [
+		{
+			"country": "SVERIGE",
+			"address": "Ankvägen 1",
+			"city": "Ankeborg",
+			"addressType": "POPULATION_REGISTRATION_ADDRESS",
+			"postalCode": "123 45",
+			"realEstateDescription": "BORGEN 1:1",
+			"municipality": "2281",
+			"emigrated": false
+		}
+	],
 	"gender": "M",
 	"givenname": "Kalle",
 	"nrDate": "123",

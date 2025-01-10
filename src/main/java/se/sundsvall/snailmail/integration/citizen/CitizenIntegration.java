@@ -2,12 +2,11 @@ package se.sundsvall.snailmail.integration.citizen;
 
 import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
 
+import generated.se.sundsvall.citizen.CitizenExtended;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.zalando.problem.Problem;
-
-import generated.se.sundsvall.citizen.CitizenExtended;
 
 @Component
 public class CitizenIntegration {

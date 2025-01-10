@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>se.sundsvall.dept44</groupId>
 		<artifactId>dept44-service-parent</artifactId>
-		<version>6.0.3</version>
+		<version>6.0.5</version>
 		<relativePath />
 		<!-- lookup parent from repository -->
 	</parent>
@@ -13,7 +13,7 @@
 	<version>2.2</version>
 	<name>api-service-snailmail-sender</name>
 	<properties>
-		<shedlock.version>6.0.1</shedlock.version>
+		<shedlock.version>6.0.2</shedlock.version>
 
 		<!-- Generated sources properties -->
 		<generated-sources-path>${project.build.directory}/generated-sources</generated-sources-path>
