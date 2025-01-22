@@ -14,11 +14,11 @@ spring:
 
 batch:
   unhandled:
-    check-interval: PT10M
-    outdated-after: PT1H
+    cron: 0 */10 * * * *
     name: unhandledBatch
+    outdated-after: PT1H
     lock-at-most-for: PT5M
-    initial-delay: PT1M
+    maximum-execution-time: PT2M
 
 logbook:
   body-filters:
