@@ -15,13 +15,13 @@ import org.springframework.validation.annotation.Validated;
 public class BatchProperties {
 
 	@NotBlank
-	private String checkInterval;
-	@NotBlank
-	private String initialDelay;
+	private String cron;
 	@NotBlank
 	private String lockAtMostFor;
 	@NotBlank
 	private String name;
+	@NotBlank
+	private String maximumExecutionTime;
 	@NotBlank
 	private String outdatedAfter;
 }

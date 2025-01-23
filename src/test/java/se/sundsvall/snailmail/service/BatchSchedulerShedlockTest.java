@@ -26,8 +26,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest(properties = {
-	"batch.unhandled.check-interval=PT1S", // Setup to execute every second
-	"batch.unhandled.initial-delay=PT1S",
+	"batch.unhandled.cron=* * * * * *", // Setup to execute every second
 	"spring.flyway.enabled=true",
 	"spring.datasource.driver-class-name=org.testcontainers.jdbc.ContainerDatabaseDriver",
 	"spring.datasource.url=jdbc:tc:mariadb:10.6.4:////",

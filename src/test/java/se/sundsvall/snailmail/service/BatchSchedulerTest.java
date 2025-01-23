@@ -10,31 +10,27 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
-import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.scheduling.annotation.Scheduled;
+import se.sundsvall.dept44.scheduling.Dept44Scheduled;
 import se.sundsvall.snailmail.config.BatchProperties;
 import se.sundsvall.snailmail.integration.db.model.BatchEntity;
 
 @ExtendWith(MockitoExtension.class)
 class BatchSchedulerTest {
 
-	@Mock
-	private SnailMailService mockSnailMailService;
-
-	@Mock
-	private BatchProperties mockBatchProperties;
-
-	@InjectMocks
-	private BatchScheduler batchScheduler;
-
 	private static final String MUNICIPALITY_ID = "2281";
 	private static final String BATCH_ID = "550e8400-e29b-41d4-a716-446655440000";
+	@Mock
+	private SnailMailService mockSnailMailService;
+	@Mock
+	private BatchProperties mockBatchProperties;
+	@InjectMocks
+	private BatchScheduler batchScheduler;
 
 	@Test
 	void testSendBatch_shouldSendUnhandledBatches() {
@@ -63,23 +59,15 @@ class BatchSchedulerTest {
 	}
 
 	@Test
-	void testScheduleAnnotationContainsFixedRateString() {
-		var scheduledAnnotation = findMethod(BatchScheduler.class, "sendUnhandledBatches")
-			.flatMap(sendUnhandledBatches -> findAnnotation(sendUnhandledBatches, Scheduled.class))
+	void testDept44ScheduledAnnotationContainsCorrectValues() {
+		final var dept44ScheduledAnnotation = findMethod(BatchScheduler.class, "sendUnhandledBatches")
+			.flatMap(sendUnhandledBatches -> findAnnotation(sendUnhandledBatches, Dept44Scheduled.class))
 			.orElseThrow(() -> new IllegalStateException("Unable to find the 'sendUnhandledBatches' method on the " + BatchScheduler.class.getName() + " class"));
 
-		assertThat(scheduledAnnotation.fixedRateString()).isEqualTo("#{@batchProperties.getCheckInterval()}");
-		assertThat(scheduledAnnotation.initialDelayString()).isEqualTo("#{@batchProperties.getInitialDelay()}");
-	}
-
-	@Test
-	void testSchedulerLockAnnotationContainsCorrectValues() {
-		var scheduledAnnotation = findMethod(BatchScheduler.class, "sendUnhandledBatches")
-			.flatMap(sendUnhandledBatches -> findAnnotation(sendUnhandledBatches, SchedulerLock.class))
-			.orElseThrow(() -> new IllegalStateException("Unable to find the 'sendUnhandledBatches' method on the " + BatchScheduler.class.getName() + " class"));
-
-		assertThat(scheduledAnnotation.name()).isEqualTo("#{@batchProperties.getName()}");
-		assertThat(scheduledAnnotation.lockAtMostFor()).isEqualTo("#{@batchProperties.getLockAtMostFor()}");
+		assertThat(dept44ScheduledAnnotation.cron()).isEqualTo("${batch.unhandled.cron}");
+		assertThat(dept44ScheduledAnnotation.name()).isEqualTo("${batch.unhandled.name}");
+		assertThat(dept44ScheduledAnnotation.lockAtMostFor()).isEqualTo("${batch.unhandled.lock-at-most-for}");
+		assertThat(dept44ScheduledAnnotation.maximumExecutionTime()).isEqualTo("${batch.unhandled.maximum-execution-time}");
 	}
 
 	private BatchEntity createBatchEntity() {
