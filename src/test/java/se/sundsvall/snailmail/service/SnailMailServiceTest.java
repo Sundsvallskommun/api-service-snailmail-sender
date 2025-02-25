@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -19,6 +20,7 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.zalando.problem.Problem;
 import se.sundsvall.snailmail.integration.db.BatchRepository;
 import se.sundsvall.snailmail.integration.db.DepartmentRepository;
@@ -27,6 +29,7 @@ import se.sundsvall.snailmail.integration.db.model.BatchEntity;
 import se.sundsvall.snailmail.integration.db.model.DepartmentEntity;
 import se.sundsvall.snailmail.integration.db.model.RequestEntity;
 import se.sundsvall.snailmail.integration.samba.SambaIntegration;
+import se.sundsvall.snailmail.integration.sftp.SftpIntegration;
 
 @ExtendWith(MockitoExtension.class)
 class SnailMailServiceTest {
@@ -45,6 +48,9 @@ class SnailMailServiceTest {
 
 	@Mock
 	private SambaIntegration sambaIntegrationMock;
+
+	@Mock
+	private SftpIntegration sftpIntegrationMock;
 
 	@Captor
 	private ArgumentCaptor<RequestEntity> requestEntityArgumentCaptor;
@@ -181,11 +187,15 @@ class SnailMailServiceTest {
 		verifyNoInteractions(sambaIntegrationMock);
 	}
 
+	/**
+	 * Tests the scenario where sambaActive is true and sftpActive is false
+	 */
 	@Test
-	void sendBatch() {
+	void sendBatch_1() {
 		var batchEntity = BatchEntity.builder().build();
 
 		when(batchRepositoryMock.findByMunicipalityIdAndId(MUNICIPALITY_ID, BATCH_ID)).thenReturn(Optional.ofNullable(batchEntity));
+		ReflectionTestUtils.setField(snailMailService, "sambaActive", true);
 
 		snailMailService.sendBatch(MUNICIPALITY_ID, BATCH_ID);
 
@@ -194,6 +204,44 @@ class SnailMailServiceTest {
 		verify(batchRepositoryMock).delete(any(BatchEntity.class));
 		verifyNoMoreInteractions(batchRepositoryMock, sambaIntegrationMock);
 		verifyNoInteractions(departmentRepositoryMock, requestRepositoryMock);
+	}
+
+	/**
+	 * Tests the scenario where sambaActive is false and sftpActive is true
+	 */
+	@Test
+	void sendBatch_2() {
+		var batchEntity = BatchEntity.builder().build();
+
+		when(batchRepositoryMock.findByMunicipalityIdAndId(MUNICIPALITY_ID, BATCH_ID)).thenReturn(Optional.ofNullable(batchEntity));
+		ReflectionTestUtils.setField(snailMailService, "sftpActive", true);
+
+		snailMailService.sendBatch(MUNICIPALITY_ID, BATCH_ID);
+
+		verify(batchRepositoryMock).findByMunicipalityIdAndId(MUNICIPALITY_ID, BATCH_ID);
+		verify(sftpIntegrationMock).writeBatchDataToSftp(any(BatchEntity.class));
+		verify(batchRepositoryMock).delete(any(BatchEntity.class));
+		verifyNoMoreInteractions(batchRepositoryMock, sambaIntegrationMock);
+		verifyNoInteractions(departmentRepositoryMock, requestRepositoryMock);
+	}
+
+	/**
+	 * Tests the scenario where sambaActive is false and sftpActive is false
+	 */
+	@Test
+	void sendBatch_3() {
+		var batchEntity = BatchEntity.builder().build();
+
+		when(batchRepositoryMock.findByMunicipalityIdAndId(MUNICIPALITY_ID, BATCH_ID)).thenReturn(Optional.ofNullable(batchEntity));
+
+		assertThatThrownBy(() -> snailMailService.sendBatch(MUNICIPALITY_ID, BATCH_ID))
+			.isInstanceOf(Problem.class)
+			.hasMessage("Internal Server Error: No integration active");
+
+		verify(batchRepositoryMock).findByMunicipalityIdAndId(MUNICIPALITY_ID, BATCH_ID);
+		verify(batchRepositoryMock, never()).delete(any(BatchEntity.class));
+		verifyNoMoreInteractions(batchRepositoryMock);
+		verifyNoInteractions(departmentRepositoryMock, requestRepositoryMock, sambaIntegrationMock);
 	}
 
 	@Test
