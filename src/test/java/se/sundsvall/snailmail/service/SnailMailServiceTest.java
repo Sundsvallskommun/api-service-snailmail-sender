@@ -277,6 +277,7 @@ class SnailMailServiceTest {
 		var batchEntity = BatchEntity.builder().build();
 
 		when(batchRepositoryMock.findByMunicipalityIdAndId(MUNICIPALITY_ID, BATCH_ID)).thenReturn(Optional.ofNullable(batchEntity));
+		ReflectionTestUtils.setField(snailMailService, "sambaActive", false);
 		ReflectionTestUtils.setField(snailMailService, "sftpActive", true);
 
 		snailMailService.sendBatch(MUNICIPALITY_ID, BATCH_ID);
@@ -296,6 +297,8 @@ class SnailMailServiceTest {
 		var batchEntity = BatchEntity.builder().build();
 
 		when(batchRepositoryMock.findByMunicipalityIdAndId(MUNICIPALITY_ID, BATCH_ID)).thenReturn(Optional.ofNullable(batchEntity));
+		ReflectionTestUtils.setField(snailMailService, "sambaActive", false);
+		ReflectionTestUtils.setField(snailMailService, "sftpActive", false);
 
 		assertThatThrownBy(() -> snailMailService.sendBatch(MUNICIPALITY_ID, BATCH_ID))
 			.isInstanceOf(Problem.class)
@@ -305,6 +308,27 @@ class SnailMailServiceTest {
 		verify(batchRepositoryMock, never()).delete(any(BatchEntity.class));
 		verifyNoMoreInteractions(batchRepositoryMock);
 		verifyNoInteractions(departmentRepositoryMock, requestRepositoryMock, sambaIntegrationMock);
+	}
+
+	/**
+	 * Tests the scenario where sambaActive is true and sftpActive is true
+	 */
+	@Test
+	void sendBatch_4() {
+		var batchEntity = BatchEntity.builder().build();
+
+		when(batchRepositoryMock.findByMunicipalityIdAndId(MUNICIPALITY_ID, BATCH_ID)).thenReturn(Optional.ofNullable(batchEntity));
+		ReflectionTestUtils.setField(snailMailService, "sambaActive", true);
+		ReflectionTestUtils.setField(snailMailService, "sftpActive", true);
+
+		snailMailService.sendBatch(MUNICIPALITY_ID, BATCH_ID);
+
+		verify(batchRepositoryMock).findByMunicipalityIdAndId(MUNICIPALITY_ID, BATCH_ID);
+		verify(batchRepositoryMock).delete(any(BatchEntity.class));
+		verify(sftpIntegrationMock).writeBatchDataToSftp(any(BatchEntity.class));
+		verify(sambaIntegrationMock).writeBatchDataToSambaShare(any(BatchEntity.class));
+		verifyNoMoreInteractions(batchRepositoryMock, sftpIntegrationMock, sambaIntegrationMock);
+		verifyNoInteractions(departmentRepositoryMock, requestRepositoryMock);
 	}
 
 	@Test
