@@ -1,10 +1,20 @@
 package se.sundsvall.snailmail;
 
+import java.util.Base64;
 import java.util.List;
+import org.jetbrains.annotations.NotNull;
 import se.sundsvall.snailmail.api.model.EnvelopeType;
 import se.sundsvall.snailmail.api.model.SendSnailMailRequest;
+import se.sundsvall.snailmail.integration.db.model.AttachmentEntity;
+import se.sundsvall.snailmail.integration.db.model.BatchEntity;
+import se.sundsvall.snailmail.integration.db.model.DepartmentEntity;
+import se.sundsvall.snailmail.integration.db.model.RecipientEntity;
+import se.sundsvall.snailmail.integration.db.model.RequestEntity;
 
 public final class TestDataFactory {
+
+	public static final String SOME_DATA = "someData";
+	public static final String DEPARTMENT_1 = "department1";
 
 	private TestDataFactory() {
 		// Intentionally empty to prevent instantiation
@@ -42,4 +52,39 @@ public final class TestDataFactory {
 			.withEnvelopeType(EnvelopeType.PLAIN)
 			.build();
 	}
+
+	public static @NotNull List<RequestEntity> getRequestEntities(final String name) {
+		return List.of(
+			RequestEntity.builder()
+				.withRecipientEntity(
+					RecipientEntity.builder()
+						.withAddress("Some Address 123")
+						.withCity("ÖREBRO")
+						.withCareOf("Some CareOf")
+						.withGivenName("Janne")
+						.withLastName("Långben")
+						.withPostalCode("123 45")
+						.withApartmentNumber("1101")
+						.build())
+				.withAttachmentEntities(List.of(
+					AttachmentEntity.builder()
+						.withEnvelopeType(EnvelopeType.PLAIN)
+						.withContent(Base64.getEncoder().encodeToString(SOME_DATA.getBytes()))
+						.withName(name)
+						.build()))
+				.build());
+	}
+
+	public static BatchEntity getBatchEntity(final String batchId, final String name) {
+		return BatchEntity.builder()
+			.withId(batchId)
+			.withMunicipalityId("2281")
+			.withDepartmentEntities(List.of(
+				DepartmentEntity.builder()
+					.withName(DEPARTMENT_1)
+					.withRequestEntities(getRequestEntities(name))
+					.build()))
+			.build();
+	}
+
 }

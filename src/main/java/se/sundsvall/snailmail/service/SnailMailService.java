@@ -12,6 +12,7 @@ import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.zalando.problem.Problem;
 import se.sundsvall.snailmail.api.model.SendSnailMailRequest;
@@ -21,6 +22,7 @@ import se.sundsvall.snailmail.integration.db.RequestRepository;
 import se.sundsvall.snailmail.integration.db.model.BatchEntity;
 import se.sundsvall.snailmail.integration.db.model.DepartmentEntity;
 import se.sundsvall.snailmail.integration.samba.SambaIntegration;
+import se.sundsvall.snailmail.integration.sftp.SftpIntegration;
 
 @Service
 @Transactional
@@ -29,14 +31,24 @@ public class SnailMailService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SnailMailService.class);
 
 	private final SambaIntegration sambaIntegration;
+	private final SftpIntegration sftpIntegration;
+
 	private final BatchRepository batchRepository;
 	private final DepartmentRepository departmentRepository;
 	private final RequestRepository requestRepository;
 
+	@Value("${integration.samba.active}")
+	private boolean sambaActive;
+
+	@Value("${integration.sftp.active}")
+	private boolean sftpActive;
+
 	public SnailMailService(final SambaIntegration sambaIntegration,
+		final SftpIntegration sftpIntegration,
 		final BatchRepository batchRepository,
 		final DepartmentRepository departmentRepository,
 		final RequestRepository requestRepository) {
+		this.sftpIntegration = sftpIntegration;
 		this.batchRepository = batchRepository;
 		this.departmentRepository = departmentRepository;
 		this.requestRepository = requestRepository;
@@ -72,14 +84,25 @@ public class SnailMailService {
 				.withDetail("Failed to fetch batch data from database")
 				.build());
 
-		sambaIntegration.writeBatchDataToSambaShare(batch);
+		if (sambaActive) {
+			LOGGER.info("Writing batch data to Samba share");
+			sambaIntegration.writeBatchDataToSambaShare(batch);
+		}
+		if (sftpActive) {
+			LOGGER.info("Writing batch data to SFTP server");
+			sftpIntegration.writeBatchDataToSftp(batch);
+		}
+		if (!sambaActive && !sftpActive) {
+			LOGGER.warn("No integration active, nothing to do");
+			throw Problem.valueOf(INTERNAL_SERVER_ERROR, "No integration active");
+		}
 
 		batchRepository.delete(batch);
 	}
 
 	/**
 	 * Get all batches that have not been handled for a certain duration
-	 * 
+	 *
 	 * @param  outdatedBefore the time before which the batch is considered outdated
 	 * @return                a list of unhandled batches
 	 */

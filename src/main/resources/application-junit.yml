@@ -1,5 +1,6 @@
 integration:
   samba:
+    active: true
     host: localhost
     port: 1445
     domain: WORKGROUP
@@ -8,7 +9,14 @@ integration:
     share: /share/
     connect-timeout: PT5S
     response-timeout: PT10S
-batch:
+  sftp:
+    active: true
+    username: user
+    password: password
+    host: localhost
+    port: 22
+    default-path: /upload/
+    allow-unknown-keys: true
   unhandled:
     check-interval: P100D
 spring:
