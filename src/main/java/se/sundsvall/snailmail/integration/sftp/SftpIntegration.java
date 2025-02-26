@@ -143,31 +143,29 @@ public class SftpIntegration {
 	}
 
 	private void createCsvContent(final BatchEntity batchEntity, final Map<String, List<String>> departmentBatchPathMap) {
-		batchEntity.getDepartmentEntities().forEach(
-			department -> {
-				var batchPath = getBatchPath(department, batchEntity);
+		batchEntity.getDepartmentEntities().forEach(department -> {
+			var batchPath = getBatchPath(department, batchEntity);
 
-				department.getRequestEntities()
-					.forEach(request -> {
-						// Only save the request data if it's not a windowed envelope
-						if (!EnvelopeType.WINDOWED.equals(request.getAttachmentEntities().getFirst().getEnvelopeType())) {
+			department.getRequestEntities().forEach(request -> {
+				// Only save the request data if it's not a windowed envelope
+				if (!EnvelopeType.WINDOWED.equals(request.getAttachmentEntities().getFirst().getEnvelopeType())) {
 
-							if (departmentBatchPathMap.containsKey(batchPath)) {
-								// If the key already exists, append the content to the existing list
-								LOGGER.info("Appending csv information to existing csv content");
+					if (departmentBatchPathMap.containsKey(batchPath)) {
+						// If the key already exists, append the content to the existing list
+						LOGGER.info("Appending csv information to existing csv content");
 
-								departmentBatchPathMap.get(batchPath).add(createCsvRow(request));
-							} else {
-								// If it doesn't exist, create a new list with the content
-								LOGGER.info("Creating new csv content");
+						departmentBatchPathMap.get(batchPath).add(createCsvRow(request));
+					} else {
+						// If it doesn't exist, create a new list with the content
+						LOGGER.info("Creating new csv content");
 
-								List<String> csvContent = new ArrayList<>();
-								csvContent.add(createCsvRow(request));
-								departmentBatchPathMap.put(batchPath, csvContent);
-							}
-						}
-					});
+						List<String> csvContent = new ArrayList<>();
+						csvContent.add(createCsvRow(request));
+						departmentBatchPathMap.put(batchPath, csvContent);
+					}
+				}
 			});
+		});
 	}
 
 	/**
@@ -200,7 +198,7 @@ public class SftpIntegration {
 	 * @param fileNameMap            the map with the filename for each batchPath
 	 */
 	private void saveCsvContent(Map<String, List<String>> departmentBatchPathMap, Map<String, String> fileNameMap) {
-
+		LOGGER.info("Starting to write csv content to SFTP server");
 		departmentBatchPathMap.forEach((departmentPath, contentList) -> {
 			try {
 				var remoteFilePath = fileNameMap.get(departmentPath);
@@ -224,16 +222,12 @@ public class SftpIntegration {
 						printWriter.print(existingContent);
 					}
 
-					if (!existingContent.isEmpty()) {
-						printWriter.println();
-					}
-
-					contentList.forEach(printWriter::println);
+					contentList.forEach(printWriter::print);
 
 					printWriter.flush();
 
 					sftpSession.write(new ByteArrayInputStream(baos.toByteArray()), remoteFilePath);
-					LOGGER.info("Successfully appended CSV data to: {}", remoteFilePath);
+					LOGGER.info("Successfully wrote CSV data to: {}", remoteFilePath);
 				}
 			} catch (IOException e) {
 				LOGGER.error("Failed to write to SFTP server", e);
