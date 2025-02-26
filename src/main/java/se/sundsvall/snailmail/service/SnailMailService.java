@@ -87,10 +87,13 @@ public class SnailMailService {
 		if (sambaActive) {
 			LOGGER.info("Writing batch data to Samba share");
 			sambaIntegration.writeBatchDataToSambaShare(batch);
-		} else if (sftpActive) {
+		}
+		if (sftpActive) {
 			LOGGER.info("Writing batch data to SFTP server");
 			sftpIntegration.writeBatchDataToSftp(batch);
-		} else {
+		}
+		if (!sambaActive && !sftpActive) {
+			LOGGER.warn("No integration active, nothing to do");
 			throw Problem.valueOf(INTERNAL_SERVER_ERROR, "No integration active");
 		}
 
