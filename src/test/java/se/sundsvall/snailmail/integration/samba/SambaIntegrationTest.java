@@ -67,11 +67,11 @@ class SambaIntegrationTest {
 	@Test
 	void writeBatchDataToSambaShareWithIssuer() throws IOException {
 		// Arrange
-		final var issuer = "issuer";
-		final var smbPath = "smb://localhost:1445/share/" + DEPARTMENT_1 + "/" + issuer + "_" + BATCH_ID + "/sandlista-someName.csv";
+		final var sentBy = "joe01doe";
+		final var smbPath = "smb://localhost:1445/share/" + DEPARTMENT_1 + "/" + sentBy + "_" + BATCH_ID + "/sandlista-someName.csv";
 
 		final var batchEntity = getBatchEntity(BATCH_ID, "someName.pdf");
-		batchEntity.setIssuer(issuer);
+		batchEntity.setSentBy(sentBy);
 
 		sambaIntegration.writeBatchDataToSambaShare(batchEntity);
 

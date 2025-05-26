@@ -36,8 +36,8 @@ public class BatchEntity {
 	@Column(name = "id")
 	private String id;
 
-	@Column(name = "issuer")
-	private String issuer;
+	@Column(name = "sent_by")
+	private String sentBy;
 
 	@OneToMany(mappedBy = "batchEntity", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private List<DepartmentEntity> departmentEntities;

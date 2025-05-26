@@ -86,8 +86,8 @@ public class SftpIntegration {
 	}
 
 	private String getBatchPath(final DepartmentEntity departmentEntity, final BatchEntity batchEntity) {
-		return ofNullable(batchEntity.getIssuer())
-			.map(issuer -> getDepartmentPath(departmentEntity) + File.separator + issuer + "_" + batchEntity.getId())
+		return ofNullable(batchEntity.getSentBy())
+			.map(sentBy -> getDepartmentPath(departmentEntity) + File.separator + sentBy + "_" + batchEntity.getId())
 			.orElse(getDepartmentPath(departmentEntity) + File.separator + batchEntity.getId());
 	}
 

@@ -9,13 +9,13 @@
 		primary key (id)
 	) engine=InnoDB;
 
-	create table batch (
-		created datetime(6),
-		id varchar(255) not null,
-		issuer varchar(255),
-		municipality_id varchar(255),
-		primary key (id)
-	) engine=InnoDB;
+    create table batch (
+        created datetime(6),
+        id varchar(255) not null,
+        municipality_id varchar(255),
+        sent_by varchar(255),
+        primary key (id)
+    ) engine=InnoDB;
 
 	create table department (
 		id bigint not null auto_increment,

@@ -10,6 +10,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.Optional;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,6 +24,7 @@ import org.zalando.problem.Problem;
 import org.zalando.problem.violations.ConstraintViolationProblem;
 import se.sundsvall.dept44.common.validators.annotation.ValidMunicipalityId;
 import se.sundsvall.dept44.common.validators.annotation.ValidUuid;
+import se.sundsvall.dept44.support.Identifier;
 import se.sundsvall.snailmail.api.model.SendSnailMailRequest;
 import se.sundsvall.snailmail.api.validation.ValidFolderName;
 import se.sundsvall.snailmail.service.SnailMailService;
@@ -39,6 +42,8 @@ class SnailMailResource {
 
 	private final SnailMailService snailMailService;
 
+	public static final String X_ISSUER_HEADER = "x-issuer";
+
 	SnailMailResource(final SnailMailService snailMailService) {
 		this.snailMailService = snailMailService;
 	}
@@ -46,16 +51,17 @@ class SnailMailResource {
 	@PostMapping(path = "/snailmail", consumes = APPLICATION_JSON_VALUE)
 	@Operation(summary = "Prepare snail mail for batch")
 	ResponseEntity<Void> sendSnailMail(
-		@Parameter(name = "x-issuer", description = """
+		@Deprecated(since = "2025-05-26", forRemoval = true) @Parameter(deprecated = true, name = X_ISSUER_HEADER, description = """
+			**DEPRECATED**: This parameter will be removed in a future version, use X-Sent-By instead.
 			Issuer of the request, is used as a prefix in a folder name.
 			Cannot contain any of: '"', '*', '<', '>', '?', '|', '/', '\\', ':'
-			""") @RequestHeader(name = "x-issuer", required = false) @ValidFolderName(nullable = true) final String issuer,
+			""") @RequestHeader(name = X_ISSUER_HEADER, required = false) @ValidFolderName(nullable = true) final String issuer,
 		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @ValidMunicipalityId @PathVariable final String municipalityId,
 		@Valid @RequestBody final SendSnailMailRequest request) {
 
 		var decoratedRequest = request
 			.withMunicipalityId(municipalityId)
-			.withIssuer(issuer);
+			.withIssuer(resolveSentBy(issuer));
 
 		snailMailService.sendSnailMail(decoratedRequest);
 		return ok().build();
@@ -70,4 +76,12 @@ class SnailMailResource {
 		return ok().build();
 	}
 
+	// Determine the value of the "sentBy" header, if present use it, otherwise try to get the value from the
+	// x-issuer-header
+	private String resolveSentBy(final String issuer) {
+		return Optional.ofNullable(Identifier.get())
+			.map(Identifier::getValue)
+			.filter(StringUtils::isNotBlank)
+			.orElseGet(() -> StringUtils.isNotBlank(issuer) ? issuer : null);
+	}
 }

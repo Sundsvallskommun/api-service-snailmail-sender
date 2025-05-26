@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>se.sundsvall</groupId>
 	<artifactId>api-service-snailmail-sender</artifactId>
-	<version>3.0</version>
+	<version>3.1</version>
 	<name>api-service-snailmail-sender</name>
 	<properties>
 		<jcifs-ng.version>2.1.10</jcifs-ng.version>

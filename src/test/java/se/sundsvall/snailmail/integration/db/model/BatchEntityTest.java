@@ -23,21 +23,21 @@ class BatchEntityTest {
 	@Test
 	void testBuilderMethods() {
 		var id = "batchId";
-		var issuer = "issuer";
+		var sentBy = "jeo01doe";
 		var municipalityId = "municipalityId";
 		var department = DepartmentEntity.builder().build();
 		var created = OffsetDateTime.now();
 
 		var batch = BatchEntity.builder()
 			.withId(id)
-			.withIssuer(issuer)
+			.withSentBy(sentBy)
 			.withMunicipalityId(municipalityId)
 			.withDepartmentEntities(List.of(department))
 			.withCreated(created)
 			.build();
 
 		assertThat(batch).isNotNull().hasNoNullFieldsOrProperties();
-		assertThat(batch.getIssuer()).isEqualTo(issuer);
+		assertThat(batch.getSentBy()).isEqualTo(sentBy);
 		assertThat(batch.getId()).isEqualTo(id);
 		assertThat(batch.getMunicipalityId()).isEqualTo(municipalityId);
 		assertThat(batch.getDepartmentEntities()).hasSize(1);
@@ -71,7 +71,7 @@ class BatchEntityTest {
 				Arguments.of(first, first, true),
 				Arguments.of(first, "someString", false),
 				Arguments.of(first.withId("id"), second.withId("id"), true),
-				Arguments.of(first.withId("id").withIssuer("issuer1"), second.withId("id").withIssuer("issuer2"), true));
+				Arguments.of(first.withId("id").withSentBy("joe01doe"), second.withId("id").withSentBy("joe02doe"), true));
 		}
 	}
 }

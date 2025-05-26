@@ -1,11 +1,13 @@
 package apptest;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpStatus.OK;
 
 import java.io.File;
 import java.time.Duration;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
@@ -16,6 +18,8 @@ import se.sundsvall.dept44.test.AbstractAppTest;
 import se.sundsvall.dept44.test.annotation.wiremock.WireMockAppTestSuite;
 import se.sundsvall.snailmail.Application;
 import se.sundsvall.snailmail.integration.db.BatchRepository;
+import se.sundsvall.snailmail.integration.db.model.BatchEntity;
+import se.sundsvall.snailmail.integration.db.model.DepartmentEntity;
 
 @WireMockAppTestSuite(files = "classpath:/SnailMailIT/", classes = Application.class)
 @Sql({"/db/scripts/truncate.sql", "/db/scripts/testdata-it.sql"})
@@ -30,6 +34,8 @@ class SnailMailIT extends AbstractAppTest {
 	private static final String MUNICIPALITY_ID = "2281";
 	private static final String REQUEST_FILE = "request.json";
 	private static final String REQUEST_FILE2 = "request2.json";
+	private static final String X_SENT_BY_HEADER = "X-Sent-By";
+	private static final String X_SENT_BY_VALUE = "type=adAccount; joe01doe";
 
 	@Autowired
 	private BatchRepository batchRepository;
@@ -60,6 +66,7 @@ class SnailMailIT extends AbstractAppTest {
 		setupCall()
 			.withServicePath("/" + MUNICIPALITY_ID + "/send/snailmail")
 			.withHttpMethod(POST)
+			.withHeader(X_SENT_BY_HEADER, X_SENT_BY_VALUE)
 			.withRequest(REQUEST_FILE)
 			.withExpectedResponseStatus(OK)
 			.sendRequest();
@@ -67,43 +74,35 @@ class SnailMailIT extends AbstractAppTest {
 		setupCall()
 			.withServicePath("/" + MUNICIPALITY_ID + "/send/snailmail")
 			.withHttpMethod(POST)
+			.withHeader(X_SENT_BY_HEADER, X_SENT_BY_VALUE)
 			.withRequest(REQUEST_FILE2)
 			.withExpectedResponseStatus(OK)
 			.sendRequest();
 
 		final var batchEntityList = batchRepository.findAll();
-
-		//Verify that two separate batches has been created
-		assertThat(batchEntityList.stream()
-			.anyMatch(entity -> entity.getId().equalsIgnoreCase("58f96da8-6d76-4fa6-bb92-64f71fdc6aa7")))
-			.isTrue();
-		assertThat(batchEntityList.stream()
-			.anyMatch(entity -> entity.getId().equalsIgnoreCase("c895f6b2-3571-413a-a2f4-8d7780d6c6a5")))
-			.isTrue();
-		//Also verify that they have the same department
-		assertThat(batchEntityList.stream()
-			.anyMatch(entity -> entity.getDepartmentEntities().stream()
-				.allMatch(departmentEntity -> departmentEntity.getName().equalsIgnoreCase("dummy"))))
-			.isTrue();
+		
+		assertThat(batchEntityList)
+			.extracting(
+				BatchEntity::getId,
+				BatchEntity::getMunicipalityId,
+				BatchEntity::getSentBy,
+				batch -> batch.getDepartmentEntities().stream()
+					.map(DepartmentEntity::getName)
+					.toList())
+			.containsExactlyInAnyOrder(
+				tuple("123e4567-e89b-12d3-a456-426614174000", MUNICIPALITY_ID, "joe01doe", List.of("A Department")),
+				tuple("58f96da8-6d76-4fa6-bb92-64f71fdc6aa7", MUNICIPALITY_ID, "joe01doe", List.of("Dummy Department")),
+				tuple("c895f6b2-3571-413a-a2f4-8d7780d6c6a5", MUNICIPALITY_ID, "joe01doe", List.of("McDummy Department")),
+				tuple("fa0cc3d7-5002-404b-8675-758598d4221d", MUNICIPALITY_ID, "joe01doe", List.of("Another Department"))
+			);
 	}
-
+	
 	@Test
-	void test4_sendSnailMailWithIssuer() {
+	void test4_sendSnailMailWithAddress() {
 		setupCall()
 			.withServicePath("/" + MUNICIPALITY_ID + "/send/snailmail")
 			.withHttpMethod(POST)
-			.withHeader("x-issuer", "issuer")
-			.withRequest(REQUEST_FILE)
-			.withExpectedResponseStatus(OK)
-			.sendRequestAndVerifyResponse();
-	}
-
-	@Test
-	void test5_sendSnailMailWithAddress() {
-		setupCall()
-			.withServicePath("/" + MUNICIPALITY_ID + "/send/snailmail")
-			.withHttpMethod(POST)
-			.withHeader("x-issuer", "issuer")
+			.withHeader(X_SENT_BY_HEADER, X_SENT_BY_VALUE)
 			.withRequest(REQUEST_FILE)
 			.withExpectedResponseStatus(OK)
 			.sendRequestAndVerifyResponse();

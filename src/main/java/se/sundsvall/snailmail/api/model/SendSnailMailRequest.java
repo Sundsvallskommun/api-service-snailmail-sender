@@ -35,7 +35,7 @@ public class SendSnailMailRequest {
 	@Schema(description = "BatchEntity id to be used for creating a csv-file", example = "6a5c3d04-412d-11ec-973a-0242ac130043")
 	private String batchId;
 
-	@Schema(description = "The issuer of the request", example = "user123")
+	@Schema(deprecated = true, description = "The issuer of the request. **DEPRECATED**: This parameter will be removed in a future version, use X-Sent-By instead.", example = "user123")
 	private String issuer;
 
 	@Schema(description = "The municipality id", example = "2281")
