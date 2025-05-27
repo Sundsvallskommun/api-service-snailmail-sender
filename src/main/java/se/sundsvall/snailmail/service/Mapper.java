@@ -69,7 +69,7 @@ public final class Mapper {
 	static BatchEntity toBatchEntity(final SendSnailMailRequest request) {
 		return BatchEntity.builder()
 			.withId(request.getBatchId())
-			.withIssuer(request.getIssuer())
+			.withSentBy(request.getIssuer())
 			.withMunicipalityId(request.getMunicipalityId())
 			.build();
 	}

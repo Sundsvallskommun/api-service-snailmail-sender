@@ -2,19 +2,19 @@ INSERT
     INTO
         batch(
             id,
-            issuer,
+            sent_by,
             municipality_id,
             created
         )
     VALUES(
         '123e4567-e89b-12d3-a456-426614174000',
-        'issuer',
+        'joe01doe',
         '2281',
         '2024-11-21 08:02:06.383722'
     ),
     (
         'fa0cc3d7-5002-404b-8675-758598d4221d',
-        'issuer',
+        'joe01doe',
         '2281',
         '2024-11-21 08:02:06.383722'
     );

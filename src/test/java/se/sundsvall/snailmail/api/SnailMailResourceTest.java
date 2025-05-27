@@ -37,6 +37,36 @@ class SnailMailResourceTest {
 	@Test
 	void sendSnailMail() {
 		final var issuer = "issuer";
+		final var sentBy = "type=adAccount; joe01doe";
+		final var sentByValue = "joe01doe";
+		final var request = SendSnailMailRequest.builder()
+			.withMunicipalityId(MUNICIPALITY_ID)
+			.withIssuer(sentByValue)
+			.withDepartment("department")
+			.withBatchId(UUID.randomUUID().toString())
+			.withAddress(SendSnailMailRequest.Address.builder().build())
+			.withAttachments(List.of(SendSnailMailRequest.Attachment.builder()
+				.withName("name")
+				.withContent("Y29udGVudA==")
+				.withContentType(APPLICATION_PDF_VALUE)
+				.build()))
+			.build();
+
+		webTestClient.post()
+			.uri("/%s/send/snailmail".formatted(MUNICIPALITY_ID))
+			.header("X-Sent-By", sentBy)
+			.header("x-issuer", issuer)
+			.bodyValue(request)
+			.exchange()
+			.expectStatus()
+			.isOk();
+
+		verify(mockSnailMailService).sendSnailMail(request);
+	}
+
+	@Test
+	void sendSnailMail_shouldPreserveOldHeaders() {
+		final var issuer = "issuer";
 		final var request = SendSnailMailRequest.builder()
 			.withMunicipalityId(MUNICIPALITY_ID)
 			.withIssuer(issuer)
