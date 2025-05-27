@@ -42,7 +42,7 @@ public class BatchEntity {
 	@OneToMany(mappedBy = "batchEntity", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private List<DepartmentEntity> departmentEntities;
 
-	@Column(name = "municipality_id")
+	@Column(name = "municipality_id", length = 4)
 	private String municipalityId;
 
 	@Column(name = "created")

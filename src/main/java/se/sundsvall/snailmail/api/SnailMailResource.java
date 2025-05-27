@@ -81,7 +81,6 @@ class SnailMailResource {
 	private String resolveSentBy(final String issuer) {
 		return Optional.ofNullable(Identifier.get())
 			.map(Identifier::getValue)
-			.filter(StringUtils::isNotBlank)
 			.orElseGet(() -> StringUtils.isNotBlank(issuer) ? issuer : null);
 	}
 }
