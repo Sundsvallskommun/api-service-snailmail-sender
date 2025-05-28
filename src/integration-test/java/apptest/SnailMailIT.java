@@ -5,13 +5,14 @@ import static org.assertj.core.api.Assertions.tuple;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpStatus.OK;
 
-import java.io.File;
 import java.time.Duration;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.jdbc.Sql;
-import org.testcontainers.containers.DockerComposeContainer;
+import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import se.sundsvall.dept44.test.AbstractAppTest;
@@ -26,10 +27,25 @@ import se.sundsvall.snailmail.integration.db.model.DepartmentEntity;
 @Testcontainers
 class SnailMailIT extends AbstractAppTest {
 
+	private static final int ORIGINAL_SAMBA_PORT = 445;
+
 	@Container
-	public static final DockerComposeContainer<?> sambaContainer =
-		new DockerComposeContainer<>(new File("src/test/resources/docker/docker-compose.yml"))
-			.withStartupTimeout(Duration.ofSeconds(60));
+	public static final GenericContainer<?> sambaContainer = new GenericContainer<>("dperson/samba")
+		.withCommand("-s", "share;/share/;yes;no;no;user;none;user;none",
+			"-u", "user;1234",
+			"-w", "WORKGROUP",
+			"-p")
+		.withExposedPorts(ORIGINAL_SAMBA_PORT)
+		//.waitingFor(Wait.forLogMessage(".*smbd version.*started.*", 1)
+		//	.withStartupTimeout(Duration.ofSeconds(60)))
+		.withStartupTimeout(Duration.ofSeconds(60))
+		.withReuse(true);
+
+	@DynamicPropertySource
+	static void configureProperties(DynamicPropertyRegistry registry) {
+		registry.add("integration.samba.port", () -> sambaContainer.getMappedPort(ORIGINAL_SAMBA_PORT));
+		registry.add("integration.samba.host", sambaContainer::getHost);
+	}
 
 	private static final String MUNICIPALITY_ID = "2281";
 	private static final String REQUEST_FILE = "request.json";
