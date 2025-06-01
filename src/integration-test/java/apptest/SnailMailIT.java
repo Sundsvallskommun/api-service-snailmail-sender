@@ -36,8 +36,6 @@ class SnailMailIT extends AbstractAppTest {
 			"-w", "WORKGROUP",
 			"-p")
 		.withExposedPorts(ORIGINAL_SAMBA_PORT)
-		//.waitingFor(Wait.forLogMessage(".*smbd version.*started.*", 1)
-		//	.withStartupTimeout(Duration.ofSeconds(60)))
 		.withStartupTimeout(Duration.ofSeconds(60))
 		.withReuse(true);
 
