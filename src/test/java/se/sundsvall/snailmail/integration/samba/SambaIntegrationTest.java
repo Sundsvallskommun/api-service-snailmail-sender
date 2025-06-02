@@ -6,7 +6,6 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
 import static se.sundsvall.snailmail.TestDataFactory.getBatchEntity;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -15,7 +14,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.testcontainers.containers.DockerComposeContainer;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.zalando.problem.Problem;
@@ -26,9 +27,23 @@ import se.sundsvall.snailmail.Application;
 @Testcontainers
 class SambaIntegrationTest {
 
+	private static final int ORIGINAL_SAMBA_PORT = 445;
+
 	@Container
-	public static final DockerComposeContainer<?> sambaContainer = new DockerComposeContainer<>(new File("src/test/resources/docker/docker-compose.yml"))
-		.withStartupTimeout(Duration.ofSeconds(60));
+	public static final GenericContainer<?> sambaContainer = new GenericContainer<>("dperson/samba")
+		.withCommand("-s", "share;/share/;yes;no;no;user;none;user;none",
+			"-u", "user;1234",
+			"-w", "WORKGROUP",
+			"-p")
+		.withExposedPorts(ORIGINAL_SAMBA_PORT)
+		.withStartupTimeout(Duration.ofSeconds(60))
+		.withReuse(true);
+
+	@DynamicPropertySource
+	static void configureProperties(DynamicPropertyRegistry registry) {
+		registry.add("integration.samba.port", () -> sambaContainer.getMappedPort(ORIGINAL_SAMBA_PORT));
+		registry.add("integration.samba.host", sambaContainer::getHost);
+	}
 
 	private static final String DEPARTMENT_1 = "department1";
 
@@ -46,7 +61,7 @@ class SambaIntegrationTest {
 	void writeBatchDataToSambaShare() throws IOException {
 
 		// Arrange
-		final var smbPath = "smb://localhost:1445/share/" + DEPARTMENT_1 + "/" + BATCH_ID + "/sandlista-someName.csv";
+		final var smbPath = "smb://localhost:" + sambaContainer.getMappedPort(ORIGINAL_SAMBA_PORT) + "/share/" + DEPARTMENT_1 + "/" + BATCH_ID + "/sandlista-someName.csv";
 
 		final var batchEntity = getBatchEntity(BATCH_ID, "someName.pdf");
 
@@ -68,7 +83,7 @@ class SambaIntegrationTest {
 	void writeBatchDataToSambaShareWithIssuer() throws IOException {
 		// Arrange
 		final var sentBy = "joe01doe";
-		final var smbPath = "smb://localhost:1445/share/" + DEPARTMENT_1 + "/" + sentBy + "_" + BATCH_ID + "/sandlista-someName.csv";
+		final var smbPath = "smb://localhost:" + sambaContainer.getMappedPort(ORIGINAL_SAMBA_PORT) + "/share/" + DEPARTMENT_1 + "/" + sentBy + "_" + BATCH_ID + "/sandlista-someName.csv";
 
 		final var batchEntity = getBatchEntity(BATCH_ID, "someName.pdf");
 		batchEntity.setSentBy(sentBy);

@@ -1,7 +1,0 @@
-version: '3'
-services:
-  samba:
-    image: dperson/samba
-    command: -s "share;/share/;yes;no;no;user;none;user;none" -u "user;1234" -w WORKGROUP -p
-    ports:
-      - "1445:445"
