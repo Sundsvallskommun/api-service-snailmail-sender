@@ -6,7 +6,6 @@ import static se.sundsvall.snailmail.service.Mapper.toDepartment;
 import static se.sundsvall.snailmail.service.Mapper.toRecipient;
 import static se.sundsvall.snailmail.service.Mapper.toRequest;
 
-import jakarta.transaction.Transactional;
 import java.time.OffsetDateTime;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
@@ -14,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.zalando.problem.Problem;
 import se.sundsvall.snailmail.api.model.SendSnailMailRequest;
 import se.sundsvall.snailmail.integration.db.BatchRepository;
@@ -55,7 +55,7 @@ public class SnailMailService {
 		this.sambaIntegration = sambaIntegration;
 	}
 
-	public synchronized void sendSnailMail(final SendSnailMailRequest request) {
+	public void sendSnailMail(final SendSnailMailRequest request) {
 		// Create recipient entity based on the address or citizen information
 		var recipient = toRecipient(request.getAddress());
 		LOGGER.info("Saving request for batch: {} and department: {} ", request.getBatchId(), request.getDepartment());
