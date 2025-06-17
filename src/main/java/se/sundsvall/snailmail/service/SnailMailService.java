@@ -8,7 +8,6 @@ import static se.sundsvall.snailmail.service.Mapper.toRequest;
 
 import java.time.OffsetDateTime;
 import java.util.List;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,12 +19,10 @@ import se.sundsvall.snailmail.integration.db.BatchRepository;
 import se.sundsvall.snailmail.integration.db.DepartmentRepository;
 import se.sundsvall.snailmail.integration.db.RequestRepository;
 import se.sundsvall.snailmail.integration.db.model.BatchEntity;
-import se.sundsvall.snailmail.integration.db.model.DepartmentEntity;
 import se.sundsvall.snailmail.integration.samba.SambaIntegration;
 import se.sundsvall.snailmail.integration.sftp.SftpIntegration;
 
 @Service
-@Transactional
 public class SnailMailService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SnailMailService.class);
@@ -55,27 +52,24 @@ public class SnailMailService {
 		this.sambaIntegration = sambaIntegration;
 	}
 
+	@Transactional
 	public void sendSnailMail(final SendSnailMailRequest request) {
 		// Create recipient entity based on the address or citizen information
-		var recipient = toRecipient(request.getAddress());
 		LOGGER.info("Saving request for batch: {} and department: {} ", request.getBatchId(), request.getDepartment());
-		var batch = getBatchEntity(request);
-		var department = getDepartmentEntity(request, batch);
+		var recipient = toRecipient(request.getAddress());
+
+		LOGGER.info("Getting batch: {} or saving a new one", request.getBatchId());
+		var batch = batchRepository.findByMunicipalityIdAndId(request.getMunicipalityId(), request.getBatchId())
+			.orElseGet(() -> batchRepository.save(toBatchEntity(request)));
+
+		LOGGER.info("Getting department: {} or saving a new one", request.getDepartment());
+		var department = departmentRepository.findByNameAndBatchEntityId(request.getDepartment(), batch.getId())
+			.orElseGet(() -> departmentRepository.save(toDepartment(request.getDepartment(), batch)));
+
 		requestRepository.save(toRequest(request, recipient, department));
 	}
 
-	private @NotNull BatchEntity getBatchEntity(SendSnailMailRequest request) {
-		LOGGER.info("Getting batch: {} or saving a new one", request.getBatchId());
-		return batchRepository.findByMunicipalityIdAndId(request.getMunicipalityId(), request.getBatchId())
-			.orElseGet(() -> batchRepository.save(toBatchEntity(request)));
-	}
-
-	private @NotNull DepartmentEntity getDepartmentEntity(SendSnailMailRequest request, BatchEntity batch) {
-		LOGGER.info("Getting department: {} or saving a new one", request.getDepartment());
-		return departmentRepository.findByNameAndBatchEntityId(request.getDepartment(), batch.getId())
-			.orElseGet(() -> departmentRepository.save(toDepartment(request.getDepartment(), batch)));
-	}
-
+	@Transactional
 	public void sendBatch(final String municipalityId, final String batchId) {
 		var batch = batchRepository.findByMunicipalityIdAndId(municipalityId, batchId)
 			.orElseThrow(() -> Problem.builder()
@@ -106,6 +100,7 @@ public class SnailMailService {
 	 * @param  outdatedBefore the time before which the batch is considered outdated
 	 * @return                a list of unhandled batches
 	 */
+	@Transactional
 	public List<BatchEntity> getUnhandledBatches(OffsetDateTime outdatedBefore) {
 		return batchRepository.findBatchEntityByCreatedIsBefore(outdatedBefore);
 	}
