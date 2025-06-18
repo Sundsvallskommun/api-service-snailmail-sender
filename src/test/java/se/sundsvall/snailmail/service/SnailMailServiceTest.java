@@ -4,7 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -20,6 +22,7 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.zalando.problem.Problem;
 import se.sundsvall.snailmail.integration.db.BatchRepository;
@@ -298,5 +301,34 @@ class SnailMailServiceTest {
 		verify(requestRepositoryMock).save(any());
 		verifyNoMoreInteractions(batchRepositoryMock, departmentRepositoryMock, requestRepositoryMock);
 		verifyNoInteractions(sambaIntegrationMock);
+	}
+
+	// Concurrency / race condition tests
+	@Test
+	void sendSnailMailWhenBatchAndDepartmentIsCreatedBetweenFindAndSave() {
+		var batchEntity = BatchEntity.builder().withId(BATCH_ID).withMunicipalityId(MUNICIPALITY_ID).build();
+		var request = buildSendSnailMailRequest();
+
+		// Simulate that the batch has been created between find and save
+		when(batchRepositoryMock.findByMunicipalityIdAndId(MUNICIPALITY_ID, request.getBatchId())).thenReturn(Optional.empty())
+			.thenReturn(Optional.ofNullable(batchEntity));
+		doThrow(new DataIntegrityViolationException("Duplicate entry")).when(batchRepositoryMock).save(any(BatchEntity.class));
+
+		// Simulate that the department has been created between find and save
+		when(departmentRepositoryMock.findByNameAndBatchEntityId(anyString(), anyString())).thenReturn(Optional.empty())
+			.thenReturn(Optional.ofNullable(DepartmentEntity.builder().build()));
+		doThrow(new DataIntegrityViolationException("Duplicate entry")).when(departmentRepositoryMock).save(any(DepartmentEntity.class));
+
+		when(requestRepositoryMock.save(any(RequestEntity.class))).thenReturn(RequestEntity.builder().build());
+
+		snailMailService.sendSnailMail(request);
+
+		verify(batchRepositoryMock, times(2)).findByMunicipalityIdAndId(MUNICIPALITY_ID, request.getBatchId());
+		verify(batchRepositoryMock).save(any(BatchEntity.class));
+		verify(departmentRepositoryMock, times(2)).findByNameAndBatchEntityId(anyString(), anyString());
+		verify(departmentRepositoryMock).save(any(DepartmentEntity.class));
+		verify(requestRepositoryMock).save(any(RequestEntity.class));
+		verifyNoMoreInteractions(batchRepositoryMock, departmentRepositoryMock, requestRepositoryMock);
+		verifyNoInteractions(sambaIntegrationMock, sftpIntegrationMock);
 	}
 }
