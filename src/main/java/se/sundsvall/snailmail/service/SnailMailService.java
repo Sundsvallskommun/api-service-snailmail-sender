@@ -11,6 +11,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.zalando.problem.Problem;
@@ -19,6 +20,7 @@ import se.sundsvall.snailmail.integration.db.BatchRepository;
 import se.sundsvall.snailmail.integration.db.DepartmentRepository;
 import se.sundsvall.snailmail.integration.db.RequestRepository;
 import se.sundsvall.snailmail.integration.db.model.BatchEntity;
+import se.sundsvall.snailmail.integration.db.model.DepartmentEntity;
 import se.sundsvall.snailmail.integration.samba.SambaIntegration;
 import se.sundsvall.snailmail.integration.sftp.SftpIntegration;
 
@@ -52,21 +54,70 @@ public class SnailMailService {
 		this.sambaIntegration = sambaIntegration;
 	}
 
+	/**
+	 * Sends a snail mail.
+	 * Since this method may experience high concurrency with lots of reading and saving to the DB it is prone to race
+	 * conditions.
+	 * In the rare case we get a DataIntegrityViolationException, we assume another thread has already created the batch (or
+	 * department) and we fetch it instead.
+	 * If it fails to create and fetch the batch or department, we cannot do anything, hopefully should never happen but it
+	 * is handled.
+	 * 
+	 * @param request the request containing the snail mail details
+	 */
 	@Transactional
 	public void sendSnailMail(final SendSnailMailRequest request) {
-		// Create recipient entity based on the address or citizen information
-		LOGGER.info("Saving request for batch: {} and department: {} ", request.getBatchId(), request.getDepartment());
-		var recipient = toRecipient(request.getAddress());
+		var recipientEntity = toRecipient(request.getAddress());
+		var batch = getOrCreateBatchSafely(request);
+		var departmentEntity = getOrCreateDepartmentSafely(request.getDepartment(), batch);
 
-		LOGGER.info("Getting batch: {} or saving a new one", request.getBatchId());
-		var batch = batchRepository.findByMunicipalityIdAndId(request.getMunicipalityId(), request.getBatchId())
-			.orElseGet(() -> batchRepository.save(toBatchEntity(request)));
+		requestRepository.save(toRequest(request, recipientEntity, departmentEntity));
+	}
 
-		LOGGER.info("Getting department: {} or saving a new one", request.getDepartment());
-		var department = departmentRepository.findByNameAndBatchEntityId(request.getDepartment(), batch.getId())
-			.orElseGet(() -> departmentRepository.save(toDepartment(request.getDepartment(), batch)));
+	private BatchEntity getOrCreateBatchSafely(SendSnailMailRequest request) {
+		// Try to find existing batch
+		var existingBatchEntity = batchRepository.findByMunicipalityIdAndId(request.getMunicipalityId(), request.getBatchId());
+		if (existingBatchEntity.isPresent()) {
+			return existingBatchEntity.get();
+		}
 
-		requestRepository.save(toRequest(request, recipient, department));
+		try {
+			// If not found, create a new batch
+			LOGGER.info("Creating new batch: {}", request.getBatchId());
+			return batchRepository.save(toBatchEntity(request));
+		} catch (DataIntegrityViolationException e) {
+			// Race condition: another thread might have created the batch, try to fetch it or else throw an error
+			LOGGER.info("Batch creation probably failed due to a race condition, fetching existing batch: {}", request.getBatchId());
+			return batchRepository.findByMunicipalityIdAndId(request.getMunicipalityId(), request.getBatchId())
+				.orElseThrow(() -> Problem.builder()
+					.withStatus(INTERNAL_SERVER_ERROR)
+					.withTitle("Failed to retrieve or create batch: " + request.getBatchId())
+					.build());
+		}
+	}
+
+	private DepartmentEntity getOrCreateDepartmentSafely(String departmentName, BatchEntity batchEntity) {
+		// Try to find existing department
+		var existingBatchEntity = departmentRepository.findByNameAndBatchEntityId(departmentName, batchEntity.getId());
+
+		if (existingBatchEntity.isPresent()) {
+			return existingBatchEntity.get();
+		}
+
+		// If not found, try to create a new department
+		try {
+			// If not found, create a new batch
+			LOGGER.info("Creating new department: {} for batch: {}", departmentName, batchEntity.getId());
+			return departmentRepository.save(toDepartment(departmentName, batchEntity));
+		} catch (DataIntegrityViolationException e) {
+			// Race condition: another thread might have created the department, try and fetch it or else throw an error
+			LOGGER.info("Department creation probably failed due to a race condition, fetching existing department: {} for batch: {}", departmentName, batchEntity.getId());
+			return departmentRepository.findByNameAndBatchEntityId(batchEntity.getMunicipalityId(), batchEntity.getId())
+				.orElseThrow(() -> Problem.builder()
+					.withStatus(INTERNAL_SERVER_ERROR)
+					.withTitle("Failed to retrieve or create department: " + departmentName + " for batch: " + batchEntity.getId())
+					.build());
+		}
 	}
 
 	@Transactional
