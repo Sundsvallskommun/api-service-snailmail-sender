@@ -8,10 +8,11 @@ import static se.sundsvall.snailmail.service.Mapper.toRequest;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.zalando.problem.Problem;
@@ -35,6 +36,7 @@ public class SnailMailService {
 	private final BatchRepository batchRepository;
 	private final DepartmentRepository departmentRepository;
 	private final RequestRepository requestRepository;
+	private final Semaphore semaphore;
 
 	@Value("${integration.samba.active}")
 	private boolean sambaActive;
@@ -46,12 +48,13 @@ public class SnailMailService {
 		final SftpIntegration sftpIntegration,
 		final BatchRepository batchRepository,
 		final DepartmentRepository departmentRepository,
-		final RequestRepository requestRepository) {
+		final RequestRepository requestRepository, Semaphore semaphore) {
 		this.sftpIntegration = sftpIntegration;
 		this.batchRepository = batchRepository;
 		this.departmentRepository = departmentRepository;
 		this.requestRepository = requestRepository;
 		this.sambaIntegration = sambaIntegration;
+		this.semaphore = semaphore;
 	}
 
 	/**
@@ -67,11 +70,22 @@ public class SnailMailService {
 	 */
 	@Transactional
 	public void sendSnailMail(final SendSnailMailRequest request) {
-		var recipientEntity = toRecipient(request.getAddress());
-		var batch = getOrCreateBatchSafely(request);
-		var departmentEntity = getOrCreateDepartmentSafely(request.getDepartment(), batch);
+		try {
+			// Quick-fix (hopefully) to avoid race conditions.
+			if (!semaphore.tryAcquire(5, TimeUnit.SECONDS)) {
+				throw Problem.valueOf(INTERNAL_SERVER_ERROR, "Couldn't acquire lock for sending snail mail request");
+			}
 
-		requestRepository.save(toRequest(request, recipientEntity, departmentEntity));
+			var recipientEntity = toRecipient(request.getAddress());
+			var batch = getOrCreateBatchSafely(request);
+			var departmentEntity = getOrCreateDepartmentSafely(request.getDepartment(), batch);
+
+			requestRepository.save(toRequest(request, recipientEntity, departmentEntity));
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+		} finally {
+			semaphore.release();
+		}
 	}
 
 	private BatchEntity getOrCreateBatchSafely(SendSnailMailRequest request) {
@@ -81,19 +95,8 @@ public class SnailMailService {
 			return existingBatchEntity.get();
 		}
 
-		try {
-			// If not found, create a new batch
-			LOGGER.info("Creating new batch: {}", request.getBatchId());
-			return batchRepository.save(toBatchEntity(request));
-		} catch (DataIntegrityViolationException e) {
-			// Race condition: another thread might have created the batch, try to fetch it or else throw an error
-			LOGGER.info("Batch creation probably failed due to a race condition, fetching existing batch: {}", request.getBatchId());
-			return batchRepository.findByMunicipalityIdAndId(request.getMunicipalityId(), request.getBatchId())
-				.orElseThrow(() -> Problem.builder()
-					.withStatus(INTERNAL_SERVER_ERROR)
-					.withTitle("Failed to retrieve or create batch: " + request.getBatchId())
-					.build());
-		}
+		LOGGER.info("Creating new batch: {}", request.getBatchId());
+		return batchRepository.save(toBatchEntity(request));
 	}
 
 	private DepartmentEntity getOrCreateDepartmentSafely(String departmentName, BatchEntity batchEntity) {
@@ -104,20 +107,8 @@ public class SnailMailService {
 			return existingBatchEntity.get();
 		}
 
-		// If not found, try to create a new department
-		try {
-			// If not found, create a new batch
-			LOGGER.info("Creating new department: {} for batch: {}", departmentName, batchEntity.getId());
-			return departmentRepository.save(toDepartment(departmentName, batchEntity));
-		} catch (DataIntegrityViolationException e) {
-			// Race condition: another thread might have created the department, try and fetch it or else throw an error
-			LOGGER.info("Department creation probably failed due to a race condition, fetching existing department: {} for batch: {}", departmentName, batchEntity.getId());
-			return departmentRepository.findByNameAndBatchEntityId(batchEntity.getMunicipalityId(), batchEntity.getId())
-				.orElseThrow(() -> Problem.builder()
-					.withStatus(INTERNAL_SERVER_ERROR)
-					.withTitle("Failed to retrieve or create department: " + departmentName + " for batch: " + batchEntity.getId())
-					.build());
-		}
+		LOGGER.info("Creating new department: {} for batch: {}", departmentName, batchEntity.getId());
+		return departmentRepository.save(toDepartment(departmentName, batchEntity));
 	}
 
 	@Transactional
