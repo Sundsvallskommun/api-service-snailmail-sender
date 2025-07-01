@@ -61,10 +61,7 @@ public class SnailMailService {
 	 * Sends a snail mail.
 	 * Since this method may experience high concurrency with lots of reading and saving to the DB it is prone to race
 	 * conditions.
-	 * In the rare case we get a DataIntegrityViolationException, we assume another thread has already created the batch (or
-	 * department) and we fetch it instead.
-	 * If it fails to create and fetch the batch or department, we cannot do anything, hopefully should never happen but it
-	 * is handled.
+	 * To mitigate this, a semaphore is used to limit the number of concurrent requests to 1.
 	 * 
 	 * @param request the request containing the snail mail details
 	 */
@@ -72,7 +69,7 @@ public class SnailMailService {
 	public void sendSnailMail(final SendSnailMailRequest request) {
 		try {
 			// Quick-fix (hopefully) to avoid race conditions.
-			if (!semaphore.tryAcquire(5, TimeUnit.SECONDS)) {
+			if (!semaphore.tryAcquire(10, TimeUnit.SECONDS)) {
 				throw Problem.valueOf(INTERNAL_SERVER_ERROR, "Couldn't acquire lock for sending snail mail request");
 			}
 
