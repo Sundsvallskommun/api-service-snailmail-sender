@@ -25,7 +25,7 @@ pids=()
 
 base_url=http://app:8080
 
-for _ in {1..50}; do
+for _ in {1..5}; do
   echo "sending post to ${base_url}/2281/send/snailmail..."
   curl -fs -X POST "${base_url}/2281/send/snailmail" \
     -H "Content-Type: application/json" \

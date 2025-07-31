@@ -5,7 +5,7 @@ set -xe
 cd test
 
 if [ "$1" = '-f' ]; then
-  docker compose down -v
+  docker compose down
 fi
 
 if docker compose ps app | grep -q '(healthy)'; then
