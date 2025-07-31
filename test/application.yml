@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    url: jdbc:mariadb://db:3306/test
+    username: test
+    password: test
+  flyway:
+    enabled: true
+
+integration:
+  samba:
+    active: false
+  sftp:
+    active: false
