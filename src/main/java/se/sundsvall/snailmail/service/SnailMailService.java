@@ -1,7 +1,9 @@
 package se.sundsvall.snailmail.service;
 
 import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
-import static se.sundsvall.snailmail.service.Mapper.*;
+import static se.sundsvall.snailmail.service.Mapper.toDepartment;
+import static se.sundsvall.snailmail.service.Mapper.toRecipient;
+import static se.sundsvall.snailmail.service.Mapper.toRequest;
 
 import java.time.OffsetDateTime;
 import java.util.List;
