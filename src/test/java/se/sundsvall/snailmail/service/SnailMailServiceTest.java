@@ -40,6 +40,9 @@ class SnailMailServiceTest {
 	private static final String BATCH_ID = "batchId";
 
 	@Mock
+	private BatchService batchServiceMock;
+
+	@Mock
 	private BatchRepository batchRepositoryMock;
 
 	@Mock
@@ -68,6 +71,7 @@ class SnailMailServiceTest {
 		var batchEntity = BatchEntity.builder().withId(BATCH_ID).build();
 		var request = buildSendSnailMailRequest();
 		when(semaphoreMock.tryAcquire(10L, TimeUnit.SECONDS)).thenReturn(true);
+		when(batchServiceMock.getRepository()).thenReturn(batchRepositoryMock);
 		when(batchRepositoryMock.findByMunicipalityIdAndId(MUNICIPALITY_ID, request.getBatchId())).thenReturn(Optional.ofNullable(batchEntity));
 		when(departmentRepositoryMock.findByNameAndBatchEntityId(any(String.class), anyString())).thenReturn(Optional.ofNullable(DepartmentEntity.builder().build()));
 
@@ -78,7 +82,7 @@ class SnailMailServiceTest {
 		verify(departmentRepositoryMock).findByNameAndBatchEntityId("someDepartment", batchEntity.getId());
 		verify(requestRepositoryMock).save(any(RequestEntity.class));
 		verify(semaphoreMock).release();
-		verifyNoMoreInteractions(batchRepositoryMock, departmentRepositoryMock, requestRepositoryMock, semaphoreMock);
+		verifyNoMoreInteractions(batchServiceMock, batchRepositoryMock, departmentRepositoryMock, requestRepositoryMock, semaphoreMock);
 		verifyNoInteractions(sambaIntegrationMock);
 	}
 
@@ -89,8 +93,9 @@ class SnailMailServiceTest {
 		var request = buildSendSnailMailRequest();
 
 		when(semaphoreMock.tryAcquire(10L, TimeUnit.SECONDS)).thenReturn(true);
+		when(batchServiceMock.createEntity(request)).thenReturn(batchEntity);
+		when(batchServiceMock.getRepository()).thenReturn(batchRepositoryMock);
 		when(batchRepositoryMock.findByMunicipalityIdAndId(MUNICIPALITY_ID, request.getBatchId())).thenReturn(Optional.empty());
-		when(batchRepositoryMock.save(any(BatchEntity.class))).thenReturn(batchEntity);
 		when(departmentRepositoryMock.findByNameAndBatchEntityId(anyString(), anyString())).thenReturn(Optional.empty());
 		when(departmentRepositoryMock.save(any(DepartmentEntity.class))).thenReturn(departmentEntity);
 		when(requestRepositoryMock.save(any(RequestEntity.class))).thenReturn(RequestEntity.builder().build());
@@ -98,13 +103,13 @@ class SnailMailServiceTest {
 		snailMailService.sendSnailMail(request);
 
 		verify(semaphoreMock).tryAcquire(10L, TimeUnit.SECONDS);
+		verify(batchServiceMock).createEntity(request);
 		verify(batchRepositoryMock).findByMunicipalityIdAndId(MUNICIPALITY_ID, request.getBatchId());
-		verify(batchRepositoryMock).save(any(BatchEntity.class));
 		verify(departmentRepositoryMock).findByNameAndBatchEntityId("someDepartment", batchEntity.getId());
 		verify(departmentRepositoryMock).save(any(DepartmentEntity.class));
 		verify(requestRepositoryMock).save(any(RequestEntity.class));
 		verify(semaphoreMock).release();
-		verifyNoMoreInteractions(batchRepositoryMock, departmentRepositoryMock, requestRepositoryMock, semaphoreMock);
+		verifyNoMoreInteractions(batchServiceMock, batchRepositoryMock, departmentRepositoryMock, requestRepositoryMock, semaphoreMock);
 		verifyNoInteractions(sambaIntegrationMock);
 	}
 
@@ -114,6 +119,7 @@ class SnailMailServiceTest {
 		var request = buildSendSnailMailRequest();
 
 		when(semaphoreMock.tryAcquire(10L, TimeUnit.SECONDS)).thenReturn(true);
+		when(batchServiceMock.getRepository()).thenReturn(batchRepositoryMock);
 		when(batchRepositoryMock.findByMunicipalityIdAndId(MUNICIPALITY_ID, request.getBatchId())).thenReturn(Optional.ofNullable(batchEntity));
 		when(departmentRepositoryMock.findByNameAndBatchEntityId(any(String.class), any())).thenReturn(Optional.empty());
 		when(departmentRepositoryMock.save(any(DepartmentEntity.class))).thenReturn(DepartmentEntity.builder().build());
@@ -127,71 +133,77 @@ class SnailMailServiceTest {
 		verify(departmentRepositoryMock).save(any(DepartmentEntity.class));
 		verify(requestRepositoryMock).save(any(RequestEntity.class));
 		verify(semaphoreMock).release();
-		verifyNoMoreInteractions(batchRepositoryMock, departmentRepositoryMock, requestRepositoryMock, semaphoreMock);
+		verifyNoMoreInteractions(batchServiceMock, batchRepositoryMock, departmentRepositoryMock, requestRepositoryMock, semaphoreMock);
 		verifyNoInteractions(sambaIntegrationMock);
 	}
 
 	@Test
 	void sendMailWithNewBatchAndDepartment() throws InterruptedException {
 		var request = buildSendSnailMailRequest();
+		var batchEntity = BatchEntity.builder().build();
 
 		when(semaphoreMock.tryAcquire(10L, TimeUnit.SECONDS)).thenReturn(true);
+		when(batchServiceMock.createEntity(request)).thenReturn(batchEntity);
+		when(batchServiceMock.getRepository()).thenReturn(batchRepositoryMock);
 		when(batchRepositoryMock.findByMunicipalityIdAndId(MUNICIPALITY_ID, request.getBatchId())).thenReturn(Optional.empty());
-		when(batchRepositoryMock.save(any(BatchEntity.class))).thenReturn(BatchEntity.builder().build());
 		when(departmentRepositoryMock.findByNameAndBatchEntityId(any(String.class), any())).thenReturn(Optional.empty());
 		when(departmentRepositoryMock.save(any(DepartmentEntity.class))).thenReturn(DepartmentEntity.builder().build());
 
 		snailMailService.sendSnailMail(request);
 
 		verify(semaphoreMock).tryAcquire(10L, TimeUnit.SECONDS);
+		verify(batchServiceMock).createEntity(request);
 		verify(batchRepositoryMock).findByMunicipalityIdAndId(MUNICIPALITY_ID, request.getBatchId());
-		verify(batchRepositoryMock).save(any(BatchEntity.class));
 		verify(departmentRepositoryMock).findByNameAndBatchEntityId(anyString(), any());
 		verify(departmentRepositoryMock).save(any(DepartmentEntity.class));
 		verify(requestRepositoryMock).save(any(RequestEntity.class));
 		verify(semaphoreMock).release();
-		verifyNoMoreInteractions(batchRepositoryMock, departmentRepositoryMock, requestRepositoryMock, semaphoreMock);
+		verifyNoMoreInteractions(batchServiceMock, batchRepositoryMock, departmentRepositoryMock, requestRepositoryMock, semaphoreMock);
 		verifyNoInteractions(sambaIntegrationMock);
 	}
 
 	@Test
 	void sendMailWithNewBatchAndDepartmentAndCitizen() throws InterruptedException {
 		var request = buildSendSnailMailRequest();
+		var batchEntity = BatchEntity.builder().build();
 
 		when(semaphoreMock.tryAcquire(10L, TimeUnit.SECONDS)).thenReturn(true);
+		when(batchServiceMock.createEntity(request)).thenReturn(batchEntity);
+		when(batchServiceMock.getRepository()).thenReturn(batchRepositoryMock);
 		when(batchRepositoryMock.findByMunicipalityIdAndId(MUNICIPALITY_ID, request.getBatchId())).thenReturn(Optional.empty());
-		when(batchRepositoryMock.save(any(BatchEntity.class))).thenReturn(BatchEntity.builder().build());
 		when(departmentRepositoryMock.findByNameAndBatchEntityId(any(String.class), any())).thenReturn(Optional.empty());
 		when(departmentRepositoryMock.save(any(DepartmentEntity.class))).thenReturn(DepartmentEntity.builder().build());
 
 		snailMailService.sendSnailMail(request);
 
 		verify(semaphoreMock).tryAcquire(10L, TimeUnit.SECONDS);
+		verify(batchServiceMock).createEntity(request);
 		verify(batchRepositoryMock).findByMunicipalityIdAndId(MUNICIPALITY_ID, request.getBatchId());
-		verify(batchRepositoryMock).save(any(BatchEntity.class));
 		verify(departmentRepositoryMock).findByNameAndBatchEntityId(any(String.class), any());
 		verify(departmentRepositoryMock).save(any(DepartmentEntity.class));
 		verify(requestRepositoryMock).save(any(RequestEntity.class));
 		verify(semaphoreMock).release();
-		verifyNoMoreInteractions(batchRepositoryMock, departmentRepositoryMock, requestRepositoryMock, semaphoreMock, semaphoreMock);
+		verifyNoMoreInteractions(batchServiceMock, batchRepositoryMock, departmentRepositoryMock, requestRepositoryMock, semaphoreMock, semaphoreMock);
 		verifyNoInteractions(sambaIntegrationMock);
 	}
 
 	@Test
 	void sendMailWithNewBatchAndDepartmentWithAddress() throws InterruptedException {
 		var request = buildSendSnailMailRequest().withAddress(buildSendSnailMailAddress());
+		var batchEntity = BatchEntity.builder().build();
 
 		when(semaphoreMock.tryAcquire(10L, TimeUnit.SECONDS)).thenReturn(true);
+		when(batchServiceMock.createEntity(request)).thenReturn(batchEntity);
+		when(batchServiceMock.getRepository()).thenReturn(batchRepositoryMock);
 		when(batchRepositoryMock.findByMunicipalityIdAndId(MUNICIPALITY_ID, request.getBatchId())).thenReturn(Optional.empty());
-		when(batchRepositoryMock.save(any(BatchEntity.class))).thenReturn(BatchEntity.builder().build());
 		when(departmentRepositoryMock.findByNameAndBatchEntityId(any(String.class), any())).thenReturn(Optional.empty());
 		when(departmentRepositoryMock.save(any(DepartmentEntity.class))).thenReturn(DepartmentEntity.builder().build());
 
 		snailMailService.sendSnailMail(request);
 
 		verify(semaphoreMock).tryAcquire(10L, TimeUnit.SECONDS);
+		verify(batchServiceMock).createEntity(request);
 		verify(batchRepositoryMock).findByMunicipalityIdAndId(MUNICIPALITY_ID, request.getBatchId());
-		verify(batchRepositoryMock).save(any(BatchEntity.class));
 		verify(departmentRepositoryMock).findByNameAndBatchEntityId(any(String.class), any());
 		verify(departmentRepositoryMock).save(any(DepartmentEntity.class));
 		verify(requestRepositoryMock).save(requestEntityArgumentCaptor.capture());
@@ -208,7 +220,7 @@ class SnailMailServiceTest {
 			assertThat(recipientEntity.getCity()).isEqualTo(request.getAddress().getCity());
 			assertThat(recipientEntity.getCareOf()).isEqualTo(request.getAddress().getCareOf());
 		});
-		verifyNoMoreInteractions(batchRepositoryMock, departmentRepositoryMock, requestRepositoryMock, semaphoreMock);
+		verifyNoMoreInteractions(batchServiceMock, batchRepositoryMock, departmentRepositoryMock, requestRepositoryMock, semaphoreMock);
 		verifyNoInteractions(sambaIntegrationMock);
 	}
 
@@ -219,6 +231,7 @@ class SnailMailServiceTest {
 	void sendBatch_1() {
 		var batchEntity = BatchEntity.builder().build();
 
+		when(batchServiceMock.getRepository()).thenReturn(batchRepositoryMock);
 		when(batchRepositoryMock.findByMunicipalityIdAndId(MUNICIPALITY_ID, BATCH_ID)).thenReturn(Optional.ofNullable(batchEntity));
 		ReflectionTestUtils.setField(snailMailService, "sambaActive", true);
 		ReflectionTestUtils.setField(snailMailService, "sftpActive", false);
@@ -239,6 +252,7 @@ class SnailMailServiceTest {
 	void sendBatch_2() {
 		var batchEntity = BatchEntity.builder().build();
 
+		when(batchServiceMock.getRepository()).thenReturn(batchRepositoryMock);
 		when(batchRepositoryMock.findByMunicipalityIdAndId(MUNICIPALITY_ID, BATCH_ID)).thenReturn(Optional.ofNullable(batchEntity));
 		ReflectionTestUtils.setField(snailMailService, "sambaActive", false);
 		ReflectionTestUtils.setField(snailMailService, "sftpActive", true);
@@ -259,6 +273,7 @@ class SnailMailServiceTest {
 	void sendBatch_3() {
 		var batchEntity = BatchEntity.builder().build();
 
+		when(batchServiceMock.getRepository()).thenReturn(batchRepositoryMock);
 		when(batchRepositoryMock.findByMunicipalityIdAndId(MUNICIPALITY_ID, BATCH_ID)).thenReturn(Optional.ofNullable(batchEntity));
 		ReflectionTestUtils.setField(snailMailService, "sambaActive", false);
 		ReflectionTestUtils.setField(snailMailService, "sftpActive", false);
@@ -280,6 +295,7 @@ class SnailMailServiceTest {
 	void sendBatch_4() {
 		var batchEntity = BatchEntity.builder().build();
 
+		when(batchServiceMock.getRepository()).thenReturn(batchRepositoryMock);
 		when(batchRepositoryMock.findByMunicipalityIdAndId(MUNICIPALITY_ID, BATCH_ID)).thenReturn(Optional.ofNullable(batchEntity));
 		ReflectionTestUtils.setField(snailMailService, "sambaActive", true);
 		ReflectionTestUtils.setField(snailMailService, "sftpActive", true);
@@ -296,6 +312,7 @@ class SnailMailServiceTest {
 
 	@Test
 	void sendBatchWithNoBatchFound() {
+		when(batchServiceMock.getRepository()).thenReturn(batchRepositoryMock);
 		when(batchRepositoryMock.findByMunicipalityIdAndId(MUNICIPALITY_ID, BATCH_ID)).thenReturn(Optional.empty());
 
 		assertThatThrownBy(() -> snailMailService.sendBatch(MUNICIPALITY_ID, BATCH_ID))
@@ -314,6 +331,7 @@ class SnailMailServiceTest {
 		request.getAttachments().getFirst().setEnvelopeType(null);
 
 		when(semaphoreMock.tryAcquire(10L, TimeUnit.SECONDS)).thenReturn(true);
+		when(batchServiceMock.getRepository()).thenReturn(batchRepositoryMock);
 		when(batchRepositoryMock.findByMunicipalityIdAndId(MUNICIPALITY_ID, request.getBatchId())).thenReturn(Optional.ofNullable(batchEntity));
 		when(departmentRepositoryMock.findByNameAndBatchEntityId(any(String.class), anyString())).thenReturn(Optional.ofNullable(DepartmentEntity.builder().build()));
 
@@ -341,6 +359,6 @@ class SnailMailServiceTest {
 		verify(semaphoreMock).tryAcquire(10L, TimeUnit.SECONDS);
 		verify(semaphoreMock).release();
 		verifyNoMoreInteractions(semaphoreMock);
-		verifyNoInteractions(batchRepositoryMock, departmentRepositoryMock, requestRepositoryMock, sambaIntegrationMock);
+		verifyNoInteractions(batchServiceMock, batchRepositoryMock, departmentRepositoryMock, requestRepositoryMock, sambaIntegrationMock);
 	}
 }

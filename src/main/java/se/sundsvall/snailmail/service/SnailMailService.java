@@ -1,10 +1,7 @@
 package se.sundsvall.snailmail.service;
 
 import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
-import static se.sundsvall.snailmail.service.Mapper.toBatchEntity;
-import static se.sundsvall.snailmail.service.Mapper.toDepartment;
-import static se.sundsvall.snailmail.service.Mapper.toRecipient;
-import static se.sundsvall.snailmail.service.Mapper.toRequest;
+import static se.sundsvall.snailmail.service.Mapper.*;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -17,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.zalando.problem.Problem;
 import se.sundsvall.snailmail.api.model.SendSnailMailRequest;
-import se.sundsvall.snailmail.integration.db.BatchRepository;
 import se.sundsvall.snailmail.integration.db.DepartmentRepository;
 import se.sundsvall.snailmail.integration.db.RequestRepository;
 import se.sundsvall.snailmail.integration.db.model.BatchEntity;
@@ -33,7 +29,7 @@ public class SnailMailService {
 	private final SambaIntegration sambaIntegration;
 	private final SftpIntegration sftpIntegration;
 
-	private final BatchRepository batchRepository;
+	private final BatchService batchService;
 	private final DepartmentRepository departmentRepository;
 	private final RequestRepository requestRepository;
 	private final Semaphore semaphore;
@@ -46,11 +42,11 @@ public class SnailMailService {
 
 	public SnailMailService(final SambaIntegration sambaIntegration,
 		final SftpIntegration sftpIntegration,
-		final BatchRepository batchRepository,
+		final BatchService batchService,
 		final DepartmentRepository departmentRepository,
 		final RequestRepository requestRepository, Semaphore semaphore) {
 		this.sftpIntegration = sftpIntegration;
-		this.batchRepository = batchRepository;
+		this.batchService = batchService;
 		this.departmentRepository = departmentRepository;
 		this.requestRepository = requestRepository;
 		this.sambaIntegration = sambaIntegration;
@@ -62,7 +58,7 @@ public class SnailMailService {
 	 * Since this method may experience high concurrency with lots of reading and saving to the DB it is prone to race
 	 * conditions.
 	 * To mitigate this, a semaphore is used to limit the number of concurrent requests to 1.
-	 * 
+	 *
 	 * @param request the request containing the snail mail details
 	 */
 	@Transactional
@@ -86,14 +82,15 @@ public class SnailMailService {
 	}
 
 	private BatchEntity getOrCreateBatchSafely(SendSnailMailRequest request) {
-		// Try to find existing batch
-		var existingBatchEntity = batchRepository.findByMunicipalityIdAndId(request.getMunicipalityId(), request.getBatchId());
+		final var existingBatchEntity = batchService.getRepository().findByMunicipalityIdAndId(request.getMunicipalityId(), request.getBatchId());
 		if (existingBatchEntity.isPresent()) {
-			return existingBatchEntity.get();
+			final var entity = existingBatchEntity.get();
+			LOGGER.info("Found existing batch: {}", entity.getId());
+			return entity;
 		}
 
 		LOGGER.info("Creating new batch: {}", request.getBatchId());
-		return batchRepository.save(toBatchEntity(request));
+		return batchService.createEntity(request);
 	}
 
 	private DepartmentEntity getOrCreateDepartmentSafely(String departmentName, BatchEntity batchEntity) {
@@ -110,7 +107,7 @@ public class SnailMailService {
 
 	@Transactional
 	public void sendBatch(final String municipalityId, final String batchId) {
-		var batch = batchRepository.findByMunicipalityIdAndId(municipalityId, batchId)
+		var batch = batchService.getRepository().findByMunicipalityIdAndId(municipalityId, batchId)
 			.orElseThrow(() -> Problem.builder()
 				.withTitle("No batch found")
 				.withStatus(INTERNAL_SERVER_ERROR)
@@ -130,7 +127,7 @@ public class SnailMailService {
 			throw Problem.valueOf(INTERNAL_SERVER_ERROR, "No integration active");
 		}
 
-		batchRepository.delete(batch);
+		batchService.getRepository().delete(batch);
 	}
 
 	/**
@@ -141,6 +138,6 @@ public class SnailMailService {
 	 */
 	@Transactional
 	public List<BatchEntity> getUnhandledBatches(OffsetDateTime outdatedBefore) {
-		return batchRepository.findBatchEntityByCreatedIsBefore(outdatedBefore);
+		return batchService.getRepository().findBatchEntityByCreatedIsBefore(outdatedBefore);
 	}
 }

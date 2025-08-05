@@ -10,6 +10,7 @@ spring:
     driver-class-name: org.mariadb.jdbc.Driver
     hikari:
       connection-timeout: 5000
+      transaction-isolation: TRANSACTION_READ_COMMITTED
   main:
     banner-mode: 'off'
 
