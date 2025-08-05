@@ -1,7 +1,6 @@
 package se.sundsvall.snailmail.service;
 
 import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
-import static se.sundsvall.snailmail.service.Mapper.toBatchEntity;
 import static se.sundsvall.snailmail.service.Mapper.toDepartment;
 import static se.sundsvall.snailmail.service.Mapper.toRecipient;
 import static se.sundsvall.snailmail.service.Mapper.toRequest;
@@ -30,6 +29,7 @@ public class SnailMailService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SnailMailService.class);
 
+	private final BatchService batchService;
 	private final SambaIntegration sambaIntegration;
 	private final SftpIntegration sftpIntegration;
 
@@ -44,11 +44,13 @@ public class SnailMailService {
 	@Value("${integration.sftp.active}")
 	private boolean sftpActive;
 
-	public SnailMailService(final SambaIntegration sambaIntegration,
+	public SnailMailService(final BatchService batchService,
+		final SambaIntegration sambaIntegration,
 		final SftpIntegration sftpIntegration,
 		final BatchRepository batchRepository,
 		final DepartmentRepository departmentRepository,
 		final RequestRepository requestRepository, Semaphore semaphore) {
+		this.batchService = batchService;
 		this.sftpIntegration = sftpIntegration;
 		this.batchRepository = batchRepository;
 		this.departmentRepository = departmentRepository;
@@ -62,7 +64,7 @@ public class SnailMailService {
 	 * Since this method may experience high concurrency with lots of reading and saving to the DB it is prone to race
 	 * conditions.
 	 * To mitigate this, a semaphore is used to limit the number of concurrent requests to 1.
-	 * 
+	 *
 	 * @param request the request containing the snail mail details
 	 */
 	@Transactional
@@ -89,11 +91,12 @@ public class SnailMailService {
 		// Try to find existing batch
 		var existingBatchEntity = batchRepository.findByMunicipalityIdAndId(request.getMunicipalityId(), request.getBatchId());
 		if (existingBatchEntity.isPresent()) {
-			return existingBatchEntity.get();
+			final var entity = existingBatchEntity.get();
+			LOGGER.info("Found existing batch: {}", entity.getId());
+			return entity;
 		}
 
-		LOGGER.info("Creating new batch: {}", request.getBatchId());
-		return batchRepository.save(toBatchEntity(request));
+		return batchService.createBatchEntity(request);
 	}
 
 	private DepartmentEntity getOrCreateDepartmentSafely(String departmentName, BatchEntity batchEntity) {
