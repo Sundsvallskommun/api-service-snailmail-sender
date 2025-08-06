@@ -7,6 +7,7 @@ import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import se.sundsvall.dept44.util.LogUtils;
 import se.sundsvall.snailmail.integration.db.DepartmentRepository;
 import se.sundsvall.snailmail.integration.db.model.BatchEntity;
 import se.sundsvall.snailmail.integration.db.model.DepartmentEntity;
@@ -30,7 +31,9 @@ public class DepartmentService {
 			return entity;
 		}
 
-		LOGGER.info("Creating new department: {} for batch: {}", departmentName, batchEntity.getId());
+		LOGGER.info("Creating new department: {} for batch: {}",
+			LogUtils.sanitizeForLogging(departmentName),
+			LogUtils.sanitizeForLogging(batchEntity.getId()));
 		return createDepartment(departmentName, batchEntity);
 	}
 

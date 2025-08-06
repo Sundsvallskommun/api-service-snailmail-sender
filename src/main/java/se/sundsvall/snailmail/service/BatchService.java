@@ -10,6 +10,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import se.sundsvall.dept44.util.LogUtils;
 import se.sundsvall.snailmail.api.model.SendSnailMailRequest;
 import se.sundsvall.snailmail.integration.db.BatchRepository;
 import se.sundsvall.snailmail.integration.db.model.BatchEntity;
@@ -41,7 +42,7 @@ public class BatchService {
 			return entity;
 		}
 
-		LOGGER.info("Creating new batch: {}", request.getBatchId());
+		LOGGER.info("Creating new batch: {}", LogUtils.sanitizeForLogging(request.getBatchId()));
 		return createBatch(request);
 	}
 
