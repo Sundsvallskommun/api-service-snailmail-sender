@@ -34,6 +34,10 @@ public class BatchService {
 		return batchRepository.findBatchEntityByCreatedIsBefore(outdatedBefore);
 	}
 
+	/**
+	 * Ensures that a new transaction is started
+	 */
+	@Transactional(REQUIRES_NEW)
 	public BatchEntity getOrCreateBatch(final SendSnailMailRequest request) {
 		final var existingBatchEntity = batchRepository.findByMunicipalityIdAndId(request.getMunicipalityId(), request.getBatchId());
 		if (existingBatchEntity.isPresent()) {
@@ -42,20 +46,12 @@ public class BatchService {
 			return entity;
 		}
 
-		return createBatch(request);
+		LOGGER.info("Creating new batch: {}", LogUtils.sanitizeForLogging(request.getBatchId()));
+		final var entity = toBatchEntity(request);
+		return batchRepository.save(entity);
 	}
 
 	public void deleteBatch(final BatchEntity batchEntity) {
 		batchRepository.delete(batchEntity);
-	}
-
-	/**
-	 * Ensures that a new transaction is started and committed when inserting entities.
-	 */
-	@Transactional(REQUIRES_NEW)
-	public BatchEntity createBatch(final SendSnailMailRequest request) {
-		LOGGER.info("Creating new batch: {}", LogUtils.sanitizeForLogging(request.getBatchId()));
-		final var entity = toBatchEntity(request);
-		return batchRepository.save(entity);
 	}
 }

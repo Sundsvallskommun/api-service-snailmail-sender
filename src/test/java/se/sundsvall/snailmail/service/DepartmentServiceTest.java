@@ -73,20 +73,4 @@ class DepartmentServiceTest {
 		assertThat(value.getName()).isEqualTo(DEPARTMENT_NAME);
 		assertThat(value.getBatchEntity()).isEqualTo(batchEntity);
 	}
-
-	@Test
-	void createDepartment() {
-		final var batchEntity = BatchEntity.builder()
-			.withId(BATCH_ID)
-			.build();
-
-		departmentService.createDepartment(DEPARTMENT_NAME, batchEntity);
-
-		final var captor = ArgumentCaptor.forClass(DepartmentEntity.class);
-		verify(departmentRepositoryMock).save(captor.capture());
-
-		final var value = captor.getValue();
-		assertThat(value.getName()).isEqualTo(DEPARTMENT_NAME);
-		assertThat(value.getBatchEntity()).isEqualTo(batchEntity);
-	}
 }

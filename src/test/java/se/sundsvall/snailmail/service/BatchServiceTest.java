@@ -84,21 +84,4 @@ class BatchServiceTest {
 
 		verify(batchRepositoryMock).delete(batchEntity);
 	}
-
-	@Test
-	void createBatch() {
-		final var request = SendSnailMailRequest.builder()
-			.withBatchId(BATCH_ID)
-			.withMunicipalityId(MUNICIPALITY_ID)
-			.build();
-
-		batchService.createBatch(request);
-
-		final var captor = ArgumentCaptor.forClass(BatchEntity.class);
-		verify(batchRepositoryMock).save(captor.capture());
-
-		final var value = captor.getValue();
-		assertThat(value.getId()).isEqualTo(BATCH_ID);
-		assertThat(value.getMunicipalityId()).isEqualTo(MUNICIPALITY_ID);
-	}
 }
