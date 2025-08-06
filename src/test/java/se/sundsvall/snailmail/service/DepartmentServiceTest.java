@@ -1,6 +1,6 @@
 package se.sundsvall.snailmail.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -43,8 +43,8 @@ class DepartmentServiceTest {
 			.thenReturn(Optional.of(expectedEntity));
 
 		final var result = departmentService.getOrCreateDepartment(DEPARTMENT_NAME, batchEntity);
-		assertEquals(DEPARTMENT_NAME, result.getName());
-		assertEquals(batchEntity, result.getBatchEntity());
+		assertThat(DEPARTMENT_NAME).isEqualTo(result.getName());
+		assertThat(batchEntity).isEqualTo(result.getBatchEntity());
 
 		verify(departmentRepositoryMock, never()).save(any());
 	}
@@ -64,13 +64,29 @@ class DepartmentServiceTest {
 		when(departmentRepositoryMock.save(any(DepartmentEntity.class))).thenReturn(expectedEntity);
 
 		final var result = departmentService.getOrCreateDepartment(DEPARTMENT_NAME, batchEntity);
-		assertEquals(DEPARTMENT_NAME, result.getName());
+		assertThat(DEPARTMENT_NAME).isEqualTo(result.getName());
 
 		final var captor = ArgumentCaptor.forClass(DepartmentEntity.class);
 		verify(departmentRepositoryMock).save(captor.capture());
 
 		final var value = captor.getValue();
-		assertEquals(DEPARTMENT_NAME, value.getName());
-		assertEquals(batchEntity, value.getBatchEntity());
+		assertThat(DEPARTMENT_NAME).isEqualTo(value.getName());
+		assertThat(batchEntity).isEqualTo(value.getBatchEntity());
+	}
+
+	@Test
+	void createDepartment() {
+		final var batchEntity = BatchEntity.builder()
+			.withId(BATCH_ID)
+			.build();
+
+		departmentService.createDepartment(DEPARTMENT_NAME, batchEntity);
+
+		final var captor = ArgumentCaptor.forClass(DepartmentEntity.class);
+		verify(departmentRepositoryMock).save(captor.capture());
+
+		final var value = captor.getValue();
+		assertThat(DEPARTMENT_NAME).isEqualTo(value.getName());
+		assertThat(batchEntity).isEqualTo(value.getBatchEntity());
 	}
 }

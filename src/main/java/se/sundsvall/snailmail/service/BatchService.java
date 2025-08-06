@@ -42,7 +42,6 @@ public class BatchService {
 			return entity;
 		}
 
-		LOGGER.info("Creating new batch: {}", LogUtils.sanitizeForLogging(request.getBatchId()));
 		return createBatch(request);
 	}
 
@@ -54,7 +53,8 @@ public class BatchService {
 	 * Ensures that a new transaction is started and committed when inserting entities.
 	 */
 	@Transactional(REQUIRES_NEW)
-	private BatchEntity createBatch(final SendSnailMailRequest request) {
+	public BatchEntity createBatch(final SendSnailMailRequest request) {
+		LOGGER.info("Creating new batch: {}", LogUtils.sanitizeForLogging(request.getBatchId()));
 		final var entity = toBatchEntity(request);
 		return batchRepository.save(entity);
 	}

@@ -31,9 +31,6 @@ public class DepartmentService {
 			return entity;
 		}
 
-		LOGGER.info("Creating new department: {} for batch: {}",
-			LogUtils.sanitizeForLogging(departmentName),
-			LogUtils.sanitizeForLogging(batchEntity.getId()));
 		return createDepartment(departmentName, batchEntity);
 	}
 
@@ -41,7 +38,10 @@ public class DepartmentService {
 	 * Ensures that a new transaction is started and committed when inserting entities.
 	 */
 	@Transactional(REQUIRES_NEW)
-	private DepartmentEntity createDepartment(final String departmentName, final BatchEntity batch) {
+	public DepartmentEntity createDepartment(final String departmentName, final BatchEntity batch) {
+		LOGGER.info("Creating new department: {} for batch: {}",
+			LogUtils.sanitizeForLogging(departmentName),
+			LogUtils.sanitizeForLogging(batch.getId()));
 		final var entity = toDepartment(departmentName, batch);
 		return departmentRepository.save(entity);
 	}

@@ -1,7 +1,8 @@
 package se.sundsvall.snailmail.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -43,8 +44,8 @@ class BatchServiceTest {
 		when(batchRepositoryMock.findByMunicipalityIdAndId(MUNICIPALITY_ID, BATCH_ID)).thenReturn(Optional.of(expectedEntity));
 
 		final var result = batchService.getOrCreateBatch(request);
-		assertEquals(BATCH_ID, result.getId());
-		assertEquals(MUNICIPALITY_ID, result.getMunicipalityId());
+		assertThat(BATCH_ID).isEqualTo(result.getId());
+		assertThat(MUNICIPALITY_ID).isEqualTo(result.getMunicipalityId());
 
 		verify(batchRepositoryMock, never()).save(any());
 	}
@@ -63,14 +64,42 @@ class BatchServiceTest {
 		when(batchRepositoryMock.save(any(BatchEntity.class))).thenReturn(expectedEntity);
 
 		final var result = batchService.getOrCreateBatch(request);
-		assertEquals(BATCH_ID, result.getId());
-		assertEquals(MUNICIPALITY_ID, result.getMunicipalityId());
+		assertThat(BATCH_ID).isEqualTo(result.getId());
+		assertThat(MUNICIPALITY_ID).isEqualTo(result.getMunicipalityId());
 
 		final var captor = ArgumentCaptor.forClass(BatchEntity.class);
 		verify(batchRepositoryMock).save(captor.capture());
 
 		final var value = captor.getValue();
-		assertEquals(BATCH_ID, value.getId());
-		assertEquals(MUNICIPALITY_ID, value.getMunicipalityId());
+		assertThat(BATCH_ID).isEqualTo(value.getId());
+		assertThat(MUNICIPALITY_ID).isEqualTo(value.getMunicipalityId());
+	}
+
+	@Test
+	void deleteBatch() {
+		final var batchEntity = BatchEntity.builder()
+			.withId(BATCH_ID)
+			.build();
+
+		batchService.deleteBatch(batchEntity);
+
+		verify(batchRepositoryMock).delete(eq(batchEntity));
+	}
+
+	@Test
+	void createBatch() {
+		final var request = SendSnailMailRequest.builder()
+			.withBatchId(BATCH_ID)
+			.withMunicipalityId(MUNICIPALITY_ID)
+			.build();
+
+		batchService.createBatch(request);
+
+		final var captor = ArgumentCaptor.forClass(BatchEntity.class);
+		verify(batchRepositoryMock).save(captor.capture());
+
+		final var value = captor.getValue();
+		assertThat(BATCH_ID).isEqualTo(value.getId());
+		assertThat(MUNICIPALITY_ID).isEqualTo(value.getMunicipalityId());
 	}
 }
