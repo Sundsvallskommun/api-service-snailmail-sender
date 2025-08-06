@@ -2,7 +2,6 @@ package se.sundsvall.snailmail.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -44,8 +43,8 @@ class BatchServiceTest {
 		when(batchRepositoryMock.findByMunicipalityIdAndId(MUNICIPALITY_ID, BATCH_ID)).thenReturn(Optional.of(expectedEntity));
 
 		final var result = batchService.getOrCreateBatch(request);
-		assertThat(BATCH_ID).isEqualTo(result.getId());
-		assertThat(MUNICIPALITY_ID).isEqualTo(result.getMunicipalityId());
+		assertThat(result.getId()).isEqualTo(BATCH_ID);
+		assertThat(result.getMunicipalityId()).isEqualTo(MUNICIPALITY_ID);
 
 		verify(batchRepositoryMock, never()).save(any());
 	}
@@ -64,15 +63,15 @@ class BatchServiceTest {
 		when(batchRepositoryMock.save(any(BatchEntity.class))).thenReturn(expectedEntity);
 
 		final var result = batchService.getOrCreateBatch(request);
-		assertThat(BATCH_ID).isEqualTo(result.getId());
-		assertThat(MUNICIPALITY_ID).isEqualTo(result.getMunicipalityId());
+		assertThat(result.getId()).isEqualTo(BATCH_ID);
+		assertThat(result.getMunicipalityId()).isEqualTo(MUNICIPALITY_ID);
 
 		final var captor = ArgumentCaptor.forClass(BatchEntity.class);
 		verify(batchRepositoryMock).save(captor.capture());
 
 		final var value = captor.getValue();
-		assertThat(BATCH_ID).isEqualTo(value.getId());
-		assertThat(MUNICIPALITY_ID).isEqualTo(value.getMunicipalityId());
+		assertThat(value.getId()).isEqualTo(BATCH_ID);
+		assertThat(value.getMunicipalityId()).isEqualTo(MUNICIPALITY_ID);
 	}
 
 	@Test
@@ -83,7 +82,7 @@ class BatchServiceTest {
 
 		batchService.deleteBatch(batchEntity);
 
-		verify(batchRepositoryMock).delete(eq(batchEntity));
+		verify(batchRepositoryMock).delete(batchEntity);
 	}
 
 	@Test
@@ -99,7 +98,7 @@ class BatchServiceTest {
 		verify(batchRepositoryMock).save(captor.capture());
 
 		final var value = captor.getValue();
-		assertThat(BATCH_ID).isEqualTo(value.getId());
-		assertThat(MUNICIPALITY_ID).isEqualTo(value.getMunicipalityId());
+		assertThat(value.getId()).isEqualTo(BATCH_ID);
+		assertThat(value.getMunicipalityId()).isEqualTo(MUNICIPALITY_ID);
 	}
 }

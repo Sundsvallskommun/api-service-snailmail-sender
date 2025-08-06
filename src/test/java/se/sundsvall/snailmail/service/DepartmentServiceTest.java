@@ -43,8 +43,8 @@ class DepartmentServiceTest {
 			.thenReturn(Optional.of(expectedEntity));
 
 		final var result = departmentService.getOrCreateDepartment(DEPARTMENT_NAME, batchEntity);
-		assertThat(DEPARTMENT_NAME).isEqualTo(result.getName());
-		assertThat(batchEntity).isEqualTo(result.getBatchEntity());
+		assertThat(result.getName()).isEqualTo(DEPARTMENT_NAME);
+		assertThat(result.getBatchEntity()).isEqualTo(batchEntity);
 
 		verify(departmentRepositoryMock, never()).save(any());
 	}
@@ -64,14 +64,14 @@ class DepartmentServiceTest {
 		when(departmentRepositoryMock.save(any(DepartmentEntity.class))).thenReturn(expectedEntity);
 
 		final var result = departmentService.getOrCreateDepartment(DEPARTMENT_NAME, batchEntity);
-		assertThat(DEPARTMENT_NAME).isEqualTo(result.getName());
+		assertThat(result.getName()).isEqualTo(DEPARTMENT_NAME);
 
 		final var captor = ArgumentCaptor.forClass(DepartmentEntity.class);
 		verify(departmentRepositoryMock).save(captor.capture());
 
 		final var value = captor.getValue();
-		assertThat(DEPARTMENT_NAME).isEqualTo(value.getName());
-		assertThat(batchEntity).isEqualTo(value.getBatchEntity());
+		assertThat(value.getName()).isEqualTo(DEPARTMENT_NAME);
+		assertThat(value.getBatchEntity()).isEqualTo(batchEntity);
 	}
 
 	@Test
@@ -86,7 +86,7 @@ class DepartmentServiceTest {
 		verify(departmentRepositoryMock).save(captor.capture());
 
 		final var value = captor.getValue();
-		assertThat(DEPARTMENT_NAME).isEqualTo(value.getName());
-		assertThat(batchEntity).isEqualTo(value.getBatchEntity());
+		assertThat(value.getName()).isEqualTo(DEPARTMENT_NAME);
+		assertThat(value.getBatchEntity()).isEqualTo(batchEntity);
 	}
 }
