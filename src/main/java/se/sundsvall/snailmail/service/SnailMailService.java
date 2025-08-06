@@ -1,8 +1,6 @@
 package se.sundsvall.snailmail.service;
 
 import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
-import static se.sundsvall.snailmail.service.Mapper.toBatchEntity;
-import static se.sundsvall.snailmail.service.Mapper.toDepartment;
 import static se.sundsvall.snailmail.service.Mapper.toRecipient;
 import static se.sundsvall.snailmail.service.Mapper.toRequest;
 
@@ -17,11 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.zalando.problem.Problem;
 import se.sundsvall.snailmail.api.model.SendSnailMailRequest;
-import se.sundsvall.snailmail.integration.db.BatchRepository;
-import se.sundsvall.snailmail.integration.db.DepartmentRepository;
 import se.sundsvall.snailmail.integration.db.RequestRepository;
 import se.sundsvall.snailmail.integration.db.model.BatchEntity;
-import se.sundsvall.snailmail.integration.db.model.DepartmentEntity;
 import se.sundsvall.snailmail.integration.samba.SambaIntegration;
 import se.sundsvall.snailmail.integration.sftp.SftpIntegration;
 
@@ -33,8 +28,8 @@ public class SnailMailService {
 	private final SambaIntegration sambaIntegration;
 	private final SftpIntegration sftpIntegration;
 
-	private final BatchRepository batchRepository;
-	private final DepartmentRepository departmentRepository;
+	private final BatchService batchService;
+	private final DepartmentService departmentService;
 	private final RequestRepository requestRepository;
 	private final Semaphore semaphore;
 
@@ -46,12 +41,12 @@ public class SnailMailService {
 
 	public SnailMailService(final SambaIntegration sambaIntegration,
 		final SftpIntegration sftpIntegration,
-		final BatchRepository batchRepository,
-		final DepartmentRepository departmentRepository,
+		final BatchService batchService,
+		final DepartmentService departmentService,
 		final RequestRepository requestRepository, Semaphore semaphore) {
 		this.sftpIntegration = sftpIntegration;
-		this.batchRepository = batchRepository;
-		this.departmentRepository = departmentRepository;
+		this.batchService = batchService;
+		this.departmentService = departmentService;
 		this.requestRepository = requestRepository;
 		this.sambaIntegration = sambaIntegration;
 		this.semaphore = semaphore;
@@ -62,7 +57,7 @@ public class SnailMailService {
 	 * Since this method may experience high concurrency with lots of reading and saving to the DB it is prone to race
 	 * conditions.
 	 * To mitigate this, a semaphore is used to limit the number of concurrent requests to 1.
-	 * 
+	 *
 	 * @param request the request containing the snail mail details
 	 */
 	@Transactional
@@ -74,8 +69,8 @@ public class SnailMailService {
 			}
 
 			var recipientEntity = toRecipient(request.getAddress());
-			var batch = getOrCreateBatchSafely(request);
-			var departmentEntity = getOrCreateDepartmentSafely(request.getDepartment(), batch);
+			var batch = batchService.getOrCreateBatch(request);
+			var departmentEntity = departmentService.getOrCreateDepartment(request.getDepartment(), batch);
 
 			requestRepository.save(toRequest(request, recipientEntity, departmentEntity));
 		} catch (InterruptedException e) {
@@ -85,32 +80,9 @@ public class SnailMailService {
 		}
 	}
 
-	private BatchEntity getOrCreateBatchSafely(SendSnailMailRequest request) {
-		// Try to find existing batch
-		var existingBatchEntity = batchRepository.findByMunicipalityIdAndId(request.getMunicipalityId(), request.getBatchId());
-		if (existingBatchEntity.isPresent()) {
-			return existingBatchEntity.get();
-		}
-
-		LOGGER.info("Creating new batch: {}", request.getBatchId());
-		return batchRepository.save(toBatchEntity(request));
-	}
-
-	private DepartmentEntity getOrCreateDepartmentSafely(String departmentName, BatchEntity batchEntity) {
-		// Try to find existing department
-		var existingBatchEntity = departmentRepository.findByNameAndBatchEntityId(departmentName, batchEntity.getId());
-
-		if (existingBatchEntity.isPresent()) {
-			return existingBatchEntity.get();
-		}
-
-		LOGGER.info("Creating new department: {} for batch: {}", departmentName, batchEntity.getId());
-		return departmentRepository.save(toDepartment(departmentName, batchEntity));
-	}
-
 	@Transactional
 	public void sendBatch(final String municipalityId, final String batchId) {
-		var batch = batchRepository.findByMunicipalityIdAndId(municipalityId, batchId)
+		var batch = batchService.findBatchByMunicipalityIdAndId(municipalityId, batchId)
 			.orElseThrow(() -> Problem.builder()
 				.withTitle("No batch found")
 				.withStatus(INTERNAL_SERVER_ERROR)
@@ -130,7 +102,7 @@ public class SnailMailService {
 			throw Problem.valueOf(INTERNAL_SERVER_ERROR, "No integration active");
 		}
 
-		batchRepository.delete(batch);
+		batchService.deleteBatch(batch);
 	}
 
 	/**
@@ -141,6 +113,6 @@ public class SnailMailService {
 	 */
 	@Transactional
 	public List<BatchEntity> getUnhandledBatches(OffsetDateTime outdatedBefore) {
-		return batchRepository.findBatchEntityByCreatedIsBefore(outdatedBefore);
+		return batchService.findOutdatedBatches(outdatedBefore);
 	}
 }
