@@ -84,7 +84,7 @@ public class SambaIntegration {
 	 * @param batchEntity the batch entity
 	 * @param fileNameMap the map with the filename for each batchPath
 	 */
-	private void saveAttachments(BatchEntity batchEntity, Map<String, String> fileNameMap) {
+	private void saveAttachments(final BatchEntity batchEntity, final Map<String, String> fileNameMap) {
 		batchEntity.getDepartmentEntities().forEach(
 			department -> {
 				var batchPath = getBatchPath(department, batchEntity);
@@ -103,7 +103,7 @@ public class SambaIntegration {
 	 * @param departmentBatchPathMap the map with the csv content for each department and batch
 	 * @param fileNameMap            the map with the filename for each batchPath
 	 */
-	private void saveCsvContent(Map<String, List<String>> departmentBatchPathMap, Map<String, String> fileNameMap) {
+	private void saveCsvContent(final Map<String, List<String>> departmentBatchPathMap, final Map<String, String> fileNameMap) {
 		LOGGER.info("Starting to write csv content to Samba server");
 		departmentBatchPathMap.keySet().forEach(departmentPath -> {
 			// For each key in the map, create a new file with the content
@@ -137,7 +137,7 @@ public class SambaIntegration {
 	 * @param batchEntity            the batch entity where everything should be stored
 	 * @param departmentBatchPathMap the map to be populated with the csv content for each department and batch
 	 */
-	private void createCsvContent(BatchEntity batchEntity, Map<String, List<String>> departmentBatchPathMap) {
+	private void createCsvContent(final BatchEntity batchEntity, final Map<String, List<String>> departmentBatchPathMap) {
 		batchEntity.getDepartmentEntities().forEach(
 			department -> {
 				var batchPath = getBatchPath(department, batchEntity);
@@ -188,7 +188,7 @@ public class SambaIntegration {
 		return stringWriter.toString();
 	}
 
-	private void createDepartmentAndBatchFolders(BatchEntity batchEntity) {
+	private void createDepartmentAndBatchFolders(final BatchEntity batchEntity) {
 		LOGGER.info("Creating department and batch folders");
 		batchEntity.getDepartmentEntities().forEach(
 			department -> {
@@ -201,11 +201,14 @@ public class SambaIntegration {
 
 	}
 
-	private String getDepartmentPath(DepartmentEntity departmentEntity) {
-		return shareUrl + departmentEntity.getName();
+	private String getDepartmentPath(final DepartmentEntity departmentEntity) {
+		if (departmentEntity.getFolderName() == null || departmentEntity.getFolderName().isBlank()) {
+			return shareUrl + departmentEntity.getName();
+		}
+		return shareUrl + departmentEntity.getFolderName() + "/" + departmentEntity.getName();
 	}
 
-	private String getBatchPath(DepartmentEntity departmentEntity, BatchEntity batchEntity) {
+	private String getBatchPath(final DepartmentEntity departmentEntity, final BatchEntity batchEntity) {
 		return ofNullable(batchEntity.getSentBy())
 			.map(sentBy -> getDepartmentPath(departmentEntity) + File.separator + sentBy + "_" + batchEntity.getId())
 			.orElse(getDepartmentPath(departmentEntity) + File.separator + batchEntity.getId());
@@ -241,7 +244,7 @@ public class SambaIntegration {
 		try (var folderFile = new SmbFile(folder, context)) {
 			if (!folderFile.exists()) {
 				LOGGER.info("Folder: {}, doesn't exist, creating it.", folderFile);
-				folderFile.mkdir();
+				folderFile.mkdirs();
 			} else {
 				LOGGER.info("Folder: {}, exits, not creating it", folderFile);
 			}

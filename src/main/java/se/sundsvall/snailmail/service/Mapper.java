@@ -46,10 +46,11 @@ public final class Mapper {
 			.orElse(null);
 	}
 
-	static DepartmentEntity toDepartment(final String departmentName, final BatchEntity batchEntity) {
+	static DepartmentEntity toDepartment(final String departmentName, final String folderName, final BatchEntity batchEntity) {
 		return DepartmentEntity.builder()
 			.withName(departmentName)
 			.withBatchEntity(batchEntity)
+			.withFolderName(folderName)
 			.build();
 	}
 

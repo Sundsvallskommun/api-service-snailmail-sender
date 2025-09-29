@@ -27,8 +27,8 @@ public class DepartmentService {
 	 * Ensures that a new transaction is started
 	 */
 	@Transactional(REQUIRES_NEW)
-	public DepartmentEntity getOrCreateDepartment(final String departmentName, final BatchEntity batchEntity) {
-		final var existingDepartmentEntity = departmentRepository.findByNameAndBatchEntityId(departmentName, batchEntity.getId());
+	public DepartmentEntity getOrCreateDepartment(final String departmentName, final String folderName, final BatchEntity batchEntity) {
+		final var existingDepartmentEntity = departmentRepository.findByNameAndFolderNameAndBatchEntityId(departmentName, folderName, batchEntity.getId());
 		if (existingDepartmentEntity.isPresent()) {
 			final var entity = existingDepartmentEntity.get();
 			LOGGER.info("Found existing department: {}", entity.getId());
@@ -38,7 +38,7 @@ public class DepartmentService {
 		LOGGER.info("Creating new department: {} for batch: {}",
 			LogUtils.sanitizeForLogging(departmentName),
 			LogUtils.sanitizeForLogging(batchEntity.getId()));
-		final var entity = toDepartment(departmentName, batchEntity);
+		final var entity = toDepartment(departmentName, folderName, batchEntity);
 		return departmentRepository.save(entity);
 	}
 }

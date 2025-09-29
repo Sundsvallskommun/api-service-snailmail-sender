@@ -92,7 +92,10 @@ public class SftpIntegration {
 	}
 
 	private String getDepartmentPath(final DepartmentEntity departmentEntity) {
-		return sftpProperties.defaultPath() + departmentEntity.getName();
+		if (departmentEntity.getFolderName() == null || departmentEntity.getFolderName().isBlank()) {
+			return sftpProperties.defaultPath() + departmentEntity.getName();
+		}
+		return sftpProperties.defaultPath() + departmentEntity.getFolderName() + File.separator + departmentEntity.getName();
 	}
 
 	private void createFolder(final String folder) {
@@ -197,7 +200,7 @@ public class SftpIntegration {
 	 * @param departmentBatchPathMap the map with the csv content for each department and batch
 	 * @param fileNameMap            the map with the filename for each batchPath
 	 */
-	private void saveCsvContent(Map<String, List<String>> departmentBatchPathMap, Map<String, String> fileNameMap) {
+	private void saveCsvContent(final Map<String, List<String>> departmentBatchPathMap, final Map<String, String> fileNameMap) {
 		LOGGER.info("Starting to write csv content to SFTP server");
 		departmentBatchPathMap.forEach((departmentPath, contentList) -> {
 			try {
@@ -212,8 +215,8 @@ public class SftpIntegration {
 				boolean isNewFile = !sftpSession.exists(remoteFilePath);
 				var existingContent = readExistingContent(remoteFilePath, isNewFile);
 
-				try (var baos = new ByteArrayOutputStream();
-					var writer = new OutputStreamWriter(baos, StandardCharsets.ISO_8859_1);
+				try (var byteArrayOutputStream = new ByteArrayOutputStream();
+					var writer = new OutputStreamWriter(byteArrayOutputStream, StandardCharsets.ISO_8859_1);
 					var printWriter = new PrintWriter(writer, false)) {
 
 					if (isNewFile) {
@@ -226,7 +229,7 @@ public class SftpIntegration {
 
 					printWriter.flush();
 
-					sftpSession.write(new ByteArrayInputStream(baos.toByteArray()), remoteFilePath);
+					sftpSession.write(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()), remoteFilePath);
 					LOGGER.info("Successfully wrote CSV data to: {}", remoteFilePath);
 				}
 			} catch (IOException e) {
@@ -243,7 +246,7 @@ public class SftpIntegration {
 	 * @param  isNewFile      if the file is new
 	 * @return                the existing content of the file
 	 */
-	private String readExistingContent(String remoteFilePath, boolean isNewFile) {
+	private String readExistingContent(final String remoteFilePath, boolean isNewFile) {
 		if (isNewFile) {
 			return "";
 		}

@@ -26,6 +26,7 @@ public final class TestDataFactory {
 			.withIssuer("someIssuer")
 			.withBatchId("550e8400-e29b-41d4-a716-446655440000")
 			.withDepartment("someDepartment")
+			.withFolderName("someFolder")
 			.withDeviation("someDeviation")
 			.withAttachments(List.of(buildAttachmentList()))
 			.build();
@@ -83,6 +84,7 @@ public final class TestDataFactory {
 				DepartmentEntity.builder()
 					.withName(DEPARTMENT_1)
 					.withRequestEntities(getRequestEntities(name))
+					.withFolderName("someFolder")
 					.build()))
 			.build();
 	}

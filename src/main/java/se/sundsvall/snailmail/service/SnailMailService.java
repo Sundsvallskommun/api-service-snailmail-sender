@@ -53,10 +53,8 @@ public class SnailMailService {
 	}
 
 	/**
-	 * Sends a snail mail.
-	 * Since this method may experience high concurrency with lots of reading and saving to the DB it is prone to race
-	 * conditions.
-	 * To mitigate this, a semaphore is used to limit the number of concurrent requests to 1.
+	 * Sends a snail mail. Since this method may experience high concurrency with lots of reading and saving to the DB it is
+	 * prone to race conditions. To mitigate this, a semaphore is used to limit the number of concurrent requests to 1.
 	 *
 	 * @param request the request containing the snail mail details
 	 */
@@ -70,7 +68,7 @@ public class SnailMailService {
 
 			var recipientEntity = toRecipient(request.getAddress());
 			var batch = batchService.getOrCreateBatch(request);
-			var departmentEntity = departmentService.getOrCreateDepartment(request.getDepartment(), batch);
+			var departmentEntity = departmentService.getOrCreateDepartment(request.getDepartment(), request.getFolderName(), batch);
 
 			requestRepository.save(toRequest(request, recipientEntity, departmentEntity));
 		} catch (InterruptedException e) {

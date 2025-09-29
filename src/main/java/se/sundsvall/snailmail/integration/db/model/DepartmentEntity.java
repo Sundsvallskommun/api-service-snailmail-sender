@@ -41,6 +41,9 @@ public class DepartmentEntity {
 	@Column(name = "name")
 	private String name;
 
+	@Column(name = "folder_name")
+	private String folderName;
+
 	@ManyToOne
 	@JoinColumn(name = "batch_id", foreignKey = @ForeignKey(name = "fk_department_batch"))
 	private BatchEntity batchEntity;

@@ -8,6 +8,6 @@ import se.sundsvall.snailmail.integration.db.model.DepartmentEntity;
 @CircuitBreaker(name = "departmentRepository")
 public interface DepartmentRepository extends JpaRepository<DepartmentEntity, Long> {
 
-	Optional<DepartmentEntity> findByNameAndBatchEntityId(String departmentName, String batchEntityId);
+	Optional<DepartmentEntity> findByNameAndFolderNameAndBatchEntityId(final String departmentName, final String folderName, final String batchEntityId);
 
 }

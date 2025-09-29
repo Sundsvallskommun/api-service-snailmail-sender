@@ -46,6 +46,7 @@ class SambaIntegrationTest {
 	}
 
 	private static final String DEPARTMENT_1 = "department1";
+	private static final String FOLDER_1 = "someFolder";
 
 	private static final String BATCH_ID = "123e4567-e89b-12d3-a456-426614174000";
 
@@ -61,7 +62,7 @@ class SambaIntegrationTest {
 	void writeBatchDataToSambaShare() throws IOException {
 
 		// Arrange
-		final var smbPath = "smb://localhost:" + sambaContainer.getMappedPort(ORIGINAL_SAMBA_PORT) + "/share/" + DEPARTMENT_1 + "/" + BATCH_ID + "/sandlista-someName.csv";
+		final var smbPath = "smb://localhost:" + sambaContainer.getMappedPort(ORIGINAL_SAMBA_PORT) + "/share/" + FOLDER_1 + "/" + DEPARTMENT_1 + "/" + BATCH_ID + "/sandlista-someName.csv";
 
 		final var batchEntity = getBatchEntity(BATCH_ID, "someName.pdf");
 
@@ -83,7 +84,7 @@ class SambaIntegrationTest {
 	void writeBatchDataToSambaShareWithIssuer() throws IOException {
 		// Arrange
 		final var sentBy = "joe01doe";
-		final var smbPath = "smb://localhost:" + sambaContainer.getMappedPort(ORIGINAL_SAMBA_PORT) + "/share/" + DEPARTMENT_1 + "/" + sentBy + "_" + BATCH_ID + "/sandlista-someName.csv";
+		final var smbPath = "smb://localhost:" + sambaContainer.getMappedPort(ORIGINAL_SAMBA_PORT) + "/share/" + FOLDER_1 + "/" + DEPARTMENT_1 + "/" + sentBy + "_" + BATCH_ID + "/sandlista-someName.csv";
 
 		final var batchEntity = getBatchEntity(BATCH_ID, "someName.pdf");
 		batchEntity.setSentBy(sentBy);
@@ -104,7 +105,7 @@ class SambaIntegrationTest {
 	@Test
 	void writeBatchDataToSambaShareFailedToCreateFolder() {
 
-		final var batchEntity = getBatchEntity("asd/asd", "someName.pdf");
+		final var batchEntity = getBatchEntity("asd/_\\asd", "someName.pdf");
 
 		assertThatThrownBy(() -> sambaIntegration.writeBatchDataToSambaShare(batchEntity))
 			.isInstanceOf(Problem.class)

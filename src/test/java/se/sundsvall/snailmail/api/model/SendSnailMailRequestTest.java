@@ -41,12 +41,14 @@ class SendSnailMailRequestTest {
 					.withEnvelopeType(EnvelopeType.PLAIN)
 					.build()))
 			.withDepartment("someDepartment")
+			.withFolderName("someFolder")
 			.withBatchId("someBatchId")
 			.withDeviation("someDeviation")
 			.build();
 
 		assertThat(request).isNotNull();
 		assertThat(request.getDepartment()).isEqualTo("someDepartment");
+		assertThat(request.getFolderName()).isEqualTo("someFolder");
 		assertThat(request.getBatchId()).isEqualTo("someBatchId");
 		assertThat(request.getDeviation()).isEqualTo("someDeviation");
 		assertThat(request.getAttachments()).satisfies(attachments -> {
