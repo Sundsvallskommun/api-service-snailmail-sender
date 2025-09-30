@@ -66,13 +66,13 @@ class SnailMailServiceTest {
 		var request = buildSendSnailMailRequest();
 		when(semaphoreMock.tryAcquire(10L, TimeUnit.SECONDS)).thenReturn(true);
 		when(batchServiceMock.getOrCreateBatch(request)).thenReturn(batchEntity);
-		when(departmentServiceMock.getOrCreateDepartment(request.getDepartment(), batchEntity)).thenReturn(DepartmentEntity.builder().build());
+		when(departmentServiceMock.getOrCreateDepartment(request.getDepartment(), request.getFolderName(), batchEntity)).thenReturn(DepartmentEntity.builder().build());
 
 		snailMailService.sendSnailMail(request);
 
 		verify(semaphoreMock).tryAcquire(10L, TimeUnit.SECONDS);
 		verify(batchServiceMock).getOrCreateBatch(request);
-		verify(departmentServiceMock).getOrCreateDepartment("someDepartment", batchEntity);
+		verify(departmentServiceMock).getOrCreateDepartment("someDepartment", "someFolder", batchEntity);
 		verify(requestRepositoryMock).save(any(RequestEntity.class));
 		verify(semaphoreMock).release();
 		verifyNoMoreInteractions(batchServiceMock, departmentServiceMock, requestRepositoryMock, semaphoreMock);
@@ -100,13 +100,13 @@ class SnailMailServiceTest {
 
 		when(semaphoreMock.tryAcquire(10L, TimeUnit.SECONDS)).thenReturn(true);
 		when(batchServiceMock.getOrCreateBatch(request)).thenReturn(batch);
-		when(departmentServiceMock.getOrCreateDepartment(request.getDepartment(), batch)).thenReturn(department);
+		when(departmentServiceMock.getOrCreateDepartment(request.getDepartment(), request.getFolderName(), batch)).thenReturn(department);
 
 		snailMailService.sendSnailMail(request);
 
 		verify(semaphoreMock).tryAcquire(10L, TimeUnit.SECONDS);
 		verify(batchServiceMock).getOrCreateBatch(request);
-		verify(departmentServiceMock).getOrCreateDepartment(request.getDepartment(), batch);
+		verify(departmentServiceMock).getOrCreateDepartment(request.getDepartment(), request.getFolderName(), batch);
 		verify(requestRepositoryMock).save(requestEntityArgumentCaptor.capture());
 		verify(semaphoreMock).release();
 

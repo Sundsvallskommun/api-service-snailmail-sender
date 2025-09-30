@@ -28,6 +28,10 @@ public class SendSnailMailRequest {
 	@Schema(description = "DepartmentEntity and unit that should be billed", example = "SBK(Gatuavdelningen, Trafiksektionen)")
 	private String department;
 
+	@ValidFolderName(nullable = true)
+	@Schema(description = "Used to set the name of the organization folder in the share", example = "Sundsvalls Kommun", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+	private String folderName;
+
 	@Schema(description = "If the letter to send deviates from the standard", example = "A3 Ritning")
 	private String deviation;
 

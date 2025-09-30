@@ -21,6 +21,7 @@ import se.sundsvall.snailmail.integration.db.model.DepartmentEntity;
 class DepartmentServiceTest {
 
 	private static final String DEPARTMENT_NAME = "dept44";
+	private static final String FOLDER_NAME = "Sundsvalls Kommun";
 	private static final String BATCH_ID = "123";
 
 	@Mock
@@ -39,10 +40,10 @@ class DepartmentServiceTest {
 			.withBatchEntity(batchEntity)
 			.build();
 
-		when(departmentRepositoryMock.findByNameAndBatchEntityId(DEPARTMENT_NAME, BATCH_ID))
+		when(departmentRepositoryMock.findByNameAndFolderNameAndBatchEntityId(DEPARTMENT_NAME, FOLDER_NAME, BATCH_ID))
 			.thenReturn(Optional.of(expectedEntity));
 
-		final var result = departmentService.getOrCreateDepartment(DEPARTMENT_NAME, batchEntity);
+		final var result = departmentService.getOrCreateDepartment(DEPARTMENT_NAME, FOLDER_NAME, batchEntity);
 		assertThat(result.getName()).isEqualTo(DEPARTMENT_NAME);
 		assertThat(result.getBatchEntity()).isEqualTo(batchEntity);
 
@@ -59,11 +60,11 @@ class DepartmentServiceTest {
 			.withBatchEntity(batchEntity)
 			.build();
 
-		when(departmentRepositoryMock.findByNameAndBatchEntityId(DEPARTMENT_NAME, BATCH_ID))
+		when(departmentRepositoryMock.findByNameAndFolderNameAndBatchEntityId(DEPARTMENT_NAME, FOLDER_NAME, BATCH_ID))
 			.thenReturn(Optional.empty());
 		when(departmentRepositoryMock.save(any(DepartmentEntity.class))).thenReturn(expectedEntity);
 
-		final var result = departmentService.getOrCreateDepartment(DEPARTMENT_NAME, batchEntity);
+		final var result = departmentService.getOrCreateDepartment(DEPARTMENT_NAME, FOLDER_NAME, batchEntity);
 		assertThat(result.getName()).isEqualTo(DEPARTMENT_NAME);
 
 		final var captor = ArgumentCaptor.forClass(DepartmentEntity.class);

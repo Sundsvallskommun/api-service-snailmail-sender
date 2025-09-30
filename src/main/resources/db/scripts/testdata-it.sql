@@ -24,17 +24,20 @@ INSERT
         department(
             id,
             batch_id,
-            name
+            name,
+            folder_name
         )
     VALUES(
         1,
         '123e4567-e89b-12d3-a456-426614174000',
-        'A Department'
+        'A Department',
+        'Sundsvalls Kommun'
     ),
     (
         2,
         'fa0cc3d7-5002-404b-8675-758598d4221d',
-        'Another Department'
+        'Another Department',
+        'Kryptons Kommun'
     );
 
 INSERT

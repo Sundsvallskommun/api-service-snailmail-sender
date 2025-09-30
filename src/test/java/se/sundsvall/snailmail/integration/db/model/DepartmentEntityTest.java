@@ -25,18 +25,21 @@ class DepartmentEntityTest {
 		var request = RequestEntity.builder().build();
 		var batch = BatchEntity.builder().build();
 		var name = "departmentName";
+		var folderName = "folderName";
 
 		var department = DepartmentEntity.builder()
 			.withId(id)
 			.withName(name)
 			.withBatchEntity(batch)
 			.withRequestEntities(List.of(request))
+			.withFolderName(folderName)
 			.build();
 
 		assertThat(department).isNotNull().hasNoNullFieldsOrProperties();
 		assertThat(department.getId()).isEqualTo(id);
 		assertThat(department.getRequestEntities()).hasSize(1);
 		assertThat(department.getName()).isEqualTo(name);
+		assertThat(department.getFolderName()).isEqualTo(folderName);
 		assertThat(department.getBatchEntity()).isNotNull();
 	}
 

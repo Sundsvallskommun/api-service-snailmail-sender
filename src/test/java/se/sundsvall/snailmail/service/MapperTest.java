@@ -53,12 +53,14 @@ class MapperTest {
 	@Test
 	void toDepartmentShouldMapCorrectly() {
 		var departmentName = "DepartmentEntity Name";
+		var folderName = "Folder Name";
 		var batch = new BatchEntity();
 
-		var result = Mapper.toDepartment(departmentName, batch);
+		var result = Mapper.toDepartment(departmentName, folderName, batch);
 
 		assertThat(result).isNotNull();
 		assertThat(result.getName()).isEqualTo(departmentName);
+		assertThat(result.getFolderName()).isEqualTo(folderName);
 		assertThat(result.getBatchEntity()).isEqualTo(batch);
 	}
 
