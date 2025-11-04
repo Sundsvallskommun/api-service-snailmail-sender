@@ -6,7 +6,6 @@ import static se.sundsvall.snailmail.api.model.EnvelopeType.PLAIN;
 import static se.sundsvall.snailmail.api.model.EnvelopeType.WINDOWED;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -35,6 +34,7 @@ import se.sundsvall.snailmail.integration.db.model.RequestEntity;
 class SftpIntegrationTest {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SftpIntegrationTest.class);
+	private static final String SFTP_SEPARATOR = "/";
 
 	@Container
 	private static GenericContainer<?> sftpContainer = new GenericContainer<>("atmoz/sftp:latest")
@@ -58,27 +58,27 @@ class SftpIntegrationTest {
 
 	@Test
 	void testWriteBatchDataToSftp_PLAIN() throws Exception {
-		var sftpSession = sftpSessionFactory.getSession();
-		var batchEntity = createBatchEntity("attachment2.pdf", PLAIN);
+		final var sftpSession = sftpSessionFactory.getSession();
+		final var batchEntity = createBatchEntity("attachment2.pdf", PLAIN);
 
 		sftpIntegration.writeBatchDataToSftp(batchEntity);
 
-		var expectedCsvFile = "/upload/department1" + File.separator + "joe01doe_123" + File.separator + "sandlista-attachment2.csv";
+		final var expectedCsvFile = "/upload/department1" + SFTP_SEPARATOR + "joe01doe_123" + SFTP_SEPARATOR + "sandlista-attachment2.csv";
 		assertThat(sftpSession.exists(expectedCsvFile)).isTrue();
 
-		var expectedPdf = "/upload/department1" + File.separator + "joe01doe_123" + File.separator + "attachment2.pdf";
+		final var expectedPdf = "/upload/department1" + SFTP_SEPARATOR + "joe01doe_123" + SFTP_SEPARATOR + "attachment2.pdf";
 		assertThat(sftpSession.exists(expectedPdf)).isTrue();
 
-		var baos = new ByteArrayOutputStream();
+		final var baos = new ByteArrayOutputStream();
 		sftpSession.read(expectedCsvFile, baos);
-		var csvContent = baos.toString(StandardCharsets.ISO_8859_1);
+		final var csvContent = baos.toString(StandardCharsets.ISO_8859_1);
 		assertThat(csvContent)
 			.contains("namn,careOf,adress,lagenhet,postnummer,postort")// CSV header
 			.contains("John Doe,Bruce Wayne,123 Street,1001,12345,Gotham City"); // CSV rad
 		baos.reset();
 
 		sftpSession.read(expectedPdf, baos);
-		var pdfContent = baos.toString(StandardCharsets.ISO_8859_1);
+		final var pdfContent = baos.toString(StandardCharsets.ISO_8859_1);
 		assertThat(pdfContent)
 			.contains("base64");
 
@@ -89,20 +89,20 @@ class SftpIntegrationTest {
 
 	@Test
 	void testWriteBatchDataToSftp_WINDOWED() throws Exception {
-		var sftpSession = sftpSessionFactory.getSession();
-		var batchEntity = createBatchEntity("attachment123.pdf", WINDOWED);
+		final var sftpSession = sftpSessionFactory.getSession();
+		final var batchEntity = createBatchEntity("attachment123.pdf", WINDOWED);
 
 		sftpIntegration.writeBatchDataToSftp(batchEntity);
 
-		var expectedCsvFile = "/upload/department1" + File.separator + "joe01doe_123" + File.separator + "sandlista-attachment123.csv";
+		final var expectedCsvFile = "/upload/department1" + SFTP_SEPARATOR + "joe01doe_123" + SFTP_SEPARATOR + "sandlista-attachment123.csv";
 		assertThat(sftpSession.exists(expectedCsvFile)).isFalse(); // Test that the CSV file is not created for windowed envelopes
 
-		var expectedPdf = "/upload/department1" + File.separator + "joe01doe_123" + File.separator + "attachment123.pdf";
+		final var expectedPdf = "/upload/department1" + SFTP_SEPARATOR + "joe01doe_123" + SFTP_SEPARATOR + "attachment123.pdf";
 		assertThat(sftpSession.exists(expectedPdf)).isTrue();
 
-		var baos = new ByteArrayOutputStream();
+		final var baos = new ByteArrayOutputStream();
 		sftpSession.read(expectedPdf, baos);
-		var pdfContent = baos.toString(StandardCharsets.ISO_8859_1);
+		final var pdfContent = baos.toString(StandardCharsets.ISO_8859_1);
 		assertThat(pdfContent)
 			.contains("base64");
 
@@ -112,34 +112,34 @@ class SftpIntegrationTest {
 
 	@Test
 	void testAppendToExistingCsvFile() throws Exception {
-		var sftpSession = sftpSessionFactory.getSession();
-		var batchEntity = createBatchEntity("attachment1234.pdf", PLAIN);
+		final var sftpSession = sftpSessionFactory.getSession();
+		final var batchEntity = createBatchEntity("attachment1234.pdf", PLAIN);
 
 		// Writing initial data to SFTP
 		sftpIntegration.writeBatchDataToSftp(batchEntity);
 
-		var expectedCsvFile = "/upload/department1" + File.separator + "joe01doe_123" + File.separator + "sandlista-attachment1234.csv";
+		final var expectedCsvFile = "/upload/department1" + SFTP_SEPARATOR + "joe01doe_123" + SFTP_SEPARATOR + "sandlista-attachment1234.csv";
 		assertThat(sftpSession.exists(expectedCsvFile)).isTrue();
 
-		var outputStream = new ByteArrayOutputStream();
+		final var outputStream = new ByteArrayOutputStream();
 		sftpSession.read(expectedCsvFile, outputStream);
-		String initialFileContent = outputStream.toString(StandardCharsets.ISO_8859_1);
+		final String initialFileContent = outputStream.toString(StandardCharsets.ISO_8859_1);
 		outputStream.reset();
 
-		var batchEntity2 = createBatchEntity("attachment1234.pdf", PLAIN);
+		final var batchEntity2 = createBatchEntity("attachment1234.pdf", PLAIN);
 		sftpIntegration.writeBatchDataToSftp(batchEntity2);
 
 		sftpSession.read(expectedCsvFile, outputStream);
-		var updatedFileContent = outputStream.toString(StandardCharsets.ISO_8859_1);
+		final var updatedFileContent = outputStream.toString(StandardCharsets.ISO_8859_1);
 		outputStream.reset();
 
 		assertThat(updatedFileContent.length()).isGreaterThan(initialFileContent.length());
 		assertThat(updatedFileContent).contains("John Doe,Bruce Wayne,123 Street,1001,12345,Gotham City");
 		assertThat(updatedFileContent.split("\n")).hasSizeGreaterThan(initialFileContent.split("\n").length);
 
-		var expectedPdfFile = "/upload/department1" + File.separator + "joe01doe_123" + File.separator + "attachment1234.pdf";
+		final var expectedPdfFile = "/upload/department1" + SFTP_SEPARATOR + "joe01doe_123" + SFTP_SEPARATOR + "attachment1234.pdf";
 		sftpSession.read(expectedPdfFile, outputStream);
-		var pdfContent = outputStream.toString(StandardCharsets.ISO_8859_1);
+		final var pdfContent = outputStream.toString(StandardCharsets.ISO_8859_1);
 		assertThat(pdfContent).contains("base64");
 
 		LOGGER.info("Initial SFTP file content:\n{}", initialFileContent);
@@ -147,8 +147,41 @@ class SftpIntegrationTest {
 		sftpSession.close();
 	}
 
-	private BatchEntity createBatchEntity(String fileName, EnvelopeType envelopeType) {
-		var recipient = new RecipientEntity();
+	// Very similar to the first test but with folder name set in department entity
+	@Test
+	void testWriteBatchDataWithFolderToSftp() throws Exception {
+		final var sftpSession = sftpSessionFactory.getSession();
+		final var batchEntity = createBatchEntity("attachment2.pdf", PLAIN);
+		batchEntity.getDepartmentEntities().getFirst().setFolderName("folder1");
+
+		sftpIntegration.writeBatchDataToSftp(batchEntity);
+
+		final var expectedCsvFile = "/upload/folder1/department1" + SFTP_SEPARATOR + "joe01doe_123" + SFTP_SEPARATOR + "sandlista-attachment2.csv";
+		assertThat(sftpSession.exists(expectedCsvFile)).isTrue();
+
+		final var expectedPdf = "/upload/folder1/department1" + SFTP_SEPARATOR + "joe01doe_123" + SFTP_SEPARATOR + "attachment2.pdf";
+		assertThat(sftpSession.exists(expectedPdf)).isTrue();
+
+		final var baos = new ByteArrayOutputStream();
+		sftpSession.read(expectedCsvFile, baos);
+		final var csvContent = baos.toString(StandardCharsets.ISO_8859_1);
+		assertThat(csvContent)
+			.contains("namn,careOf,adress,lagenhet,postnummer,postort")// CSV header
+			.contains("John Doe,Bruce Wayne,123 Street,1001,12345,Gotham City"); // CSV rad
+		baos.reset();
+
+		sftpSession.read(expectedPdf, baos);
+		final var pdfContent = baos.toString(StandardCharsets.ISO_8859_1);
+		assertThat(pdfContent)
+			.contains("base64");
+
+		LOGGER.info("SFTP csv content: \n{}", csvContent);
+		LOGGER.info("SFTP pdf content: \n{}", pdfContent);
+		sftpSession.close();
+	}
+
+	private BatchEntity createBatchEntity(final String fileName, final EnvelopeType envelopeType) {
+		final var recipient = new RecipientEntity();
 		recipient.setGivenName("John");
 		recipient.setLastName("Doe");
 		recipient.setCareOf("Bruce Wayne");
@@ -157,21 +190,21 @@ class SftpIntegrationTest {
 		recipient.setPostalCode("12345");
 		recipient.setCity("Gotham City");
 
-		var attachmentEntity = new AttachmentEntity();
+		final var attachmentEntity = new AttachmentEntity();
 		attachmentEntity.setName(fileName);
 		attachmentEntity.setContent("base64");
 		attachmentEntity.setContentType("application/pdf");
 		attachmentEntity.setEnvelopeType(envelopeType);
 
-		var requestEntity = new RequestEntity();
+		final var requestEntity = new RequestEntity();
 		requestEntity.setRecipientEntity(recipient);
 		requestEntity.setAttachmentEntities(List.of(attachmentEntity));
 
-		var department = new DepartmentEntity();
+		final var department = new DepartmentEntity();
 		department.setName("department1");
 		department.setRequestEntities(List.of(requestEntity));
 
-		var batchEntity = new BatchEntity();
+		final var batchEntity = new BatchEntity();
 		batchEntity.setId("123");
 		batchEntity.setSentBy("joe01doe");
 		batchEntity.setDepartmentEntities(List.of(department));
