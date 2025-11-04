@@ -7,17 +7,18 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import jakarta.transaction.Transactional;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.integration.sftp.session.DefaultSftpSessionFactory;
@@ -39,6 +40,7 @@ public class SftpIntegration {
 	private static final String FILE_PREFIX = "sandlista-";
 	private static final String CSV_HEADER = "namn,careOf,adress,lagenhet,postnummer,postort";
 	private static final String CSV_FORMAT = "%s,%s,%s,%s,%s,%s%n";
+	private static final String SFTP_PATH_SEPARATOR = "/"; // SFTP paths always use "/" regardless of operating system
 
 	private final SftpProperties sftpProperties;
 	private final DefaultSftpSessionFactory sftpSessionFactory;
@@ -54,10 +56,10 @@ public class SftpIntegration {
 
 		this.sftpSession = sftpSessionFactory.getSession();
 		// HashMap<batchPath, filename>. where files should be saved.
-		Map<String, String> batchPathFileNameMap = new HashMap<>();
+		final Map<String, String> batchPathFileNameMap = new HashMap<>();
 
 		// HashMap<path, csv content list>. Where the csv content should be saved.
-		Map<String, List<String>> batchPathCsvMap = new HashMap<>();
+		final Map<String, List<String>> batchPathCsvMap = new HashMap<>();
 
 		// Create the department and batch folders
 		createDepartmentAndBatchFolders(batchEntity);
@@ -76,10 +78,10 @@ public class SftpIntegration {
 		LOGGER.info("Creating department and batch folders");
 		batchEntity.getDepartmentEntities().forEach(
 			department -> {
-				var departmentPath = getDepartmentPath(department);
+				final var departmentPath = getDepartmentPath(department);
 				createFolder(departmentPath);
 
-				var batchPath = getBatchPath(department, batchEntity);
+				final var batchPath = getBatchPath(department, batchEntity);
 				createFolder(batchPath);
 			});
 
@@ -87,35 +89,51 @@ public class SftpIntegration {
 
 	private String getBatchPath(final DepartmentEntity departmentEntity, final BatchEntity batchEntity) {
 		return ofNullable(batchEntity.getSentBy())
-			.map(sentBy -> getDepartmentPath(departmentEntity) + File.separator + sentBy + "_" + batchEntity.getId())
-			.orElse(getDepartmentPath(departmentEntity) + File.separator + batchEntity.getId());
+			.map(sentBy -> getDepartmentPath(departmentEntity) + SFTP_PATH_SEPARATOR + sentBy + "_" + batchEntity.getId())
+			.orElse(getDepartmentPath(departmentEntity) + SFTP_PATH_SEPARATOR + batchEntity.getId());
 	}
 
 	private String getDepartmentPath(final DepartmentEntity departmentEntity) {
 		if (departmentEntity.getFolderName() == null || departmentEntity.getFolderName().isBlank()) {
 			return sftpProperties.defaultPath() + departmentEntity.getName();
 		}
-		return sftpProperties.defaultPath() + departmentEntity.getFolderName() + File.separator + departmentEntity.getName();
+		return sftpProperties.defaultPath() + departmentEntity.getFolderName() + SFTP_PATH_SEPARATOR + departmentEntity.getName();
 	}
 
-	private void createFolder(final String folder) {
+	private void createFolder(final String fullPath) {
+		final var pathBuilder = new StringBuilder();
+
 		try {
-			if (!sftpSession.exists(folder)) {
-				LOGGER.info("Folder: {}, doesn't exist, creating it.", folder);
-				sftpSession.mkdir(folder);
-			} else {
-				LOGGER.info("Folder: {}, exits, not creating it", folder);
+			final var folders = getFolders(fullPath);
+
+			// Check if each folder exists, if not create it, needs to be done one by one otherwise the lstat-command will fail.
+			for (final String folder : folders) {
+				// Add each folder to the path builder and check if it exists.
+				pathBuilder.append(SFTP_PATH_SEPARATOR).append(folder);
+
+				if (!sftpSession.exists(pathBuilder.toString())) {
+					LOGGER.info("Folder: {}, doesn't exist, creating it.", pathBuilder);
+					sftpSession.mkdir(pathBuilder.toString());
+				}
 			}
-		} catch (Exception e) {
-			LOGGER.error("Failed to create folder {} on SFTP server", folder, e);
-			throw Problem.valueOf(INTERNAL_SERVER_ERROR, "Failed to create folder " + folder + " on SFTP server");
+
+			LOGGER.info("Done creating folder structure for path: {}", pathBuilder);
+		} catch (final Exception e) {
+			LOGGER.error("Failed to create folder: '{}' on SFTP server when trying to create full path: '{}'", pathBuilder, fullPath, e);
+			throw Problem.valueOf(INTERNAL_SERVER_ERROR, "Failed to create folder path " + fullPath + " on SFTP server");
 		}
+	}
+
+	private List<String> getFolders(final String fullPath) {
+		return Arrays.stream(fullPath.split(SFTP_PATH_SEPARATOR))
+			.filter(StringUtils::isNotEmpty)
+			.toList();
 	}
 
 	private void saveAttachments(final BatchEntity batchEntity, final Map<String, String> fileNameMap) {
 		batchEntity.getDepartmentEntities().forEach(
 			department -> {
-				var batchPath = getBatchPath(department, batchEntity);
+				final var batchPath = getBatchPath(department, batchEntity);
 				department.getRequestEntities()
 					.forEach(request -> {
 						LOGGER.info("Saving attachment for request");
@@ -130,16 +148,16 @@ public class SftpIntegration {
 			.map(name -> name.substring(0, Optional.of(name.lastIndexOf("."))
 				.filter(i -> i != -1)
 				.orElse(name.length())))
-			.map(name -> departmentPath + File.separator + FILE_PREFIX + name + ".csv")
+			.map(name -> departmentPath + SFTP_PATH_SEPARATOR + FILE_PREFIX + name + ".csv")
 			.orElseThrow(() -> Problem.valueOf(INTERNAL_SERVER_ERROR, "Attachment name is null"));
 	}
 
 	private void saveAttachment(final AttachmentEntity attachmentEntity, final String departmentPath) {
-		var attachmentFile = departmentPath + File.separator + attachmentEntity.getName();
+		final var attachmentFile = departmentPath + SFTP_PATH_SEPARATOR + attachmentEntity.getName();
 		try {
 			LOGGER.info("Saving attachment {} on SFTP server", attachmentFile);
 			sftpSession.write(new ByteArrayInputStream(attachmentEntity.getContent().getBytes()), attachmentFile);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			LOGGER.error("Failed to save attachment {} on SFTP server", attachmentFile, e);
 			throw Problem.valueOf(INTERNAL_SERVER_ERROR, "Failed to save attachment " + attachmentFile + " on SFTP server");
 		}
@@ -147,7 +165,7 @@ public class SftpIntegration {
 
 	private void createCsvContent(final BatchEntity batchEntity, final Map<String, List<String>> departmentBatchPathMap) {
 		batchEntity.getDepartmentEntities().forEach(department -> {
-			var batchPath = getBatchPath(department, batchEntity);
+			final var batchPath = getBatchPath(department, batchEntity);
 
 			department.getRequestEntities().forEach(request -> {
 				// Only save the request data if it's not a windowed envelope
@@ -162,7 +180,7 @@ public class SftpIntegration {
 						// If it doesn't exist, create a new list with the content
 						LOGGER.info("Creating new csv content");
 
-						List<String> csvContent = new ArrayList<>();
+						final List<String> csvContent = new ArrayList<>();
 						csvContent.add(createCsvRow(request));
 						departmentBatchPathMap.put(batchPath, csvContent);
 					}
@@ -179,16 +197,16 @@ public class SftpIntegration {
 	 */
 	private String createCsvRow(final RequestEntity request) {
 		LOGGER.info("Creating csv content");
-		var stringWriter = new StringWriter();
-		var printWriter = new PrintWriter(stringWriter);
-		var recipient = request.getRecipientEntity();
+		final var stringWriter = new StringWriter();
+		final var printWriter = new PrintWriter(stringWriter);
+		final var recipient = request.getRecipientEntity();
 
-		var name = recipient.getGivenName() + " " + recipient.getLastName();
-		var address = recipient.getAddress();
-		var postalCode = recipient.getPostalCode();
-		var city = recipient.getCity();
-		var careOf = ofNullable(recipient.getCareOf()).orElse(""); // If careOf is null, set it to empty string
-		var apartmentNumber = ofNullable(recipient.getApartmentNumber()).orElse(""); // If apartmentNumber is null, set it to empty string
+		final var name = recipient.getGivenName() + " " + recipient.getLastName();
+		final var address = recipient.getAddress();
+		final var postalCode = recipient.getPostalCode();
+		final var city = recipient.getCity();
+		final var careOf = ofNullable(recipient.getCareOf()).orElse(""); // If careOf is null, set it to empty string
+		final var apartmentNumber = ofNullable(recipient.getApartmentNumber()).orElse(""); // If apartmentNumber is null, set it to empty string
 
 		printWriter.printf(CSV_FORMAT, name, careOf, address, apartmentNumber, postalCode, city);
 		return stringWriter.toString();
@@ -204,20 +222,20 @@ public class SftpIntegration {
 		LOGGER.info("Starting to write csv content to SFTP server");
 		departmentBatchPathMap.forEach((departmentPath, contentList) -> {
 			try {
-				var remoteFilePath = fileNameMap.get(departmentPath);
-				var remoteDirectory = remoteFilePath.substring(0, remoteFilePath.lastIndexOf('/'));
+				final var remoteFilePath = fileNameMap.get(departmentPath);
+				final var remoteDirectory = remoteFilePath.substring(0, remoteFilePath.lastIndexOf('/'));
 
 				if (!sftpSession.exists(remoteDirectory)) {
 					sftpSession.mkdir(remoteDirectory);
 					LOGGER.debug("Created directory: {}", remoteDirectory);
 				}
 
-				boolean isNewFile = !sftpSession.exists(remoteFilePath);
-				var existingContent = readExistingContent(remoteFilePath, isNewFile);
+				final boolean isNewFile = !sftpSession.exists(remoteFilePath);
+				final var existingContent = readExistingContent(remoteFilePath, isNewFile);
 
-				try (var byteArrayOutputStream = new ByteArrayOutputStream();
-					var writer = new OutputStreamWriter(byteArrayOutputStream, StandardCharsets.ISO_8859_1);
-					var printWriter = new PrintWriter(writer, false)) {
+				try (final var byteArrayOutputStream = new ByteArrayOutputStream();
+					final var writer = new OutputStreamWriter(byteArrayOutputStream, StandardCharsets.ISO_8859_1);
+					final var printWriter = new PrintWriter(writer, false)) {
 
 					if (isNewFile) {
 						printWriter.println(CSV_HEADER);
@@ -232,7 +250,7 @@ public class SftpIntegration {
 					sftpSession.write(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()), remoteFilePath);
 					LOGGER.info("Successfully wrote CSV data to: {}", remoteFilePath);
 				}
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				LOGGER.error("Failed to write to SFTP server", e);
 				throw Problem.valueOf(INTERNAL_SERVER_ERROR, "Failed to write to SFTP server");
 			}
@@ -246,14 +264,14 @@ public class SftpIntegration {
 	 * @param  isNewFile      if the file is new
 	 * @return                the existing content of the file
 	 */
-	private String readExistingContent(final String remoteFilePath, boolean isNewFile) {
+	private String readExistingContent(final String remoteFilePath, final boolean isNewFile) {
 		if (isNewFile) {
 			return "";
 		}
-		try (var outputStream = new ByteArrayOutputStream()) {
+		try (final var outputStream = new ByteArrayOutputStream()) {
 			sftpSession.read(remoteFilePath, outputStream);
 			return outputStream.toString(StandardCharsets.ISO_8859_1);
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			LOGGER.warn("Failed to read existing file: {}. It may be empty.", remoteFilePath, e);
 			return "";
 		}
