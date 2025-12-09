@@ -25,24 +25,24 @@ public class SendSnailMailRequest {
 
 	@NotBlank
 	@ValidFolderName
-	@Schema(description = "DepartmentEntity and unit that should be billed", example = "SBK(Gatuavdelningen, Trafiksektionen)")
+	@Schema(description = "DepartmentEntity and unit that should be billed", examples = "SBK(Gatuavdelningen, Trafiksektionen)")
 	private String department;
 
 	@ValidFolderName(nullable = true)
-	@Schema(description = "Used to set the name of the organization folder in the share", example = "Sundsvalls Kommun", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+	@Schema(description = "Used to set the name of the organization folder in the share", examples = "Sundsvalls Kommun", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
 	private String folderName;
 
-	@Schema(description = "If the letter to send deviates from the standard", example = "A3 Ritning")
+	@Schema(description = "If the letter to send deviates from the standard", examples = "A3 Ritning")
 	private String deviation;
 
 	@NotBlank
-	@Schema(description = "BatchEntity id to be used for creating a csv-file", example = "6a5c3d04-412d-11ec-973a-0242ac130043")
+	@Schema(description = "BatchEntity id to be used for creating a csv-file", examples = "6a5c3d04-412d-11ec-973a-0242ac130043")
 	private String batchId;
 
-	@Schema(deprecated = true, description = "The issuer of the request. **DEPRECATED**: This parameter will be removed in a future version, use X-Sent-By instead.", example = "user123")
+	@Schema(deprecated = true, description = "The issuer of the request. **DEPRECATED**: This parameter will be removed in a future version, use X-Sent-By instead.", examples = "user123")
 	private String issuer;
 
-	@Schema(description = "The municipality id", example = "2281")
+	@Schema(description = "The municipality id", examples = "2281")
 	private String municipalityId;
 
 	@NotEmpty
@@ -60,20 +60,20 @@ public class SendSnailMailRequest {
 	public static class Attachment {
 
 		@ValidBase64
-		@Schema(description = "The attachment (file) content as a BASE64-encoded string", example = "aGVsbG8gd29ybGQK")
+		@Schema(description = "The attachment (file) content as a BASE64-encoded string", examples = "aGVsbG8gd29ybGQK")
 		private String content;
 
 		@NotBlank
-		@Schema(description = "The attachment filename", example = "test.pdf")
+		@Schema(description = "The attachment filename", examples = "test.pdf")
 		private String name;
 
 		@OneOf("application/pdf")
-		@Schema(description = "The attachment content type", example = "application/pdf", allowableValues = {
+		@Schema(description = "The attachment content type", examples = "application/pdf", allowableValues = {
 			"application/pdf"
 		})
 		private String contentType;
 
-		@Schema(description = "The envelope type for the letter", example = "WINDOWED")
+		@Schema(description = "The envelope type for the letter", examples = "WINDOWED")
 		private EnvelopeType envelopeType;
 	}
 
@@ -83,31 +83,31 @@ public class SendSnailMailRequest {
 	@Builder(setterPrefix = "with")
 	public static class Address {
 
-		@Schema(description = "The first name of the recipient", example = "John")
+		@Schema(description = "The first name of the recipient", examples = "John")
 		private String firstName;
 
-		@Schema(description = "The last name of the recipient", example = "Doe")
+		@Schema(description = "The last name of the recipient", examples = "Doe")
 		private String lastName;
 
-		@Schema(description = "The address", example = "Main Street 1")
+		@Schema(description = "The address", examples = "Main Street 1")
 		private String address;
 
-		@Schema(description = "The apartment number", example = "1101")
+		@Schema(description = "The apartment number", examples = "1101")
 		private String apartmentNumber;
 
-		@Schema(description = "The care of", example = "c/o John Doe")
+		@Schema(description = "The care of", examples = "c/o John Doe")
 		private String careOf;
 
-		@Schema(description = "The zip code", example = "12345")
+		@Schema(description = "The zip code", examples = "12345")
 		private String zipCode;
 
-		@Schema(description = "The city", example = "Main Street")
+		@Schema(description = "The city", examples = "Main Street")
 		private String city;
 
-		@Schema(description = "The country", example = "Sweden")
+		@Schema(description = "The country", examples = "Sweden")
 		private String country;
 
-		@Schema(description = "The organization number of the recipient", example = "123456-7890")
+		@Schema(description = "The organization number of the recipient", examples = "123456-7890")
 		private String organizationNumber;
 	}
 }
