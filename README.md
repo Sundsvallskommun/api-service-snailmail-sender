@@ -6,7 +6,7 @@ _A component within the messaging ecosystem responsible for the transmission of 
 
 ### Prerequisites
 
-- **Java 21 or higher**
+- **Java 25 or higher**
 - **Maven**
 - **MariaDB**
 - **Git**
