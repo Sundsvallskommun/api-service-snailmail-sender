@@ -1,10 +1,5 @@
 package se.sundsvall.snailmail.integration.sftp;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
-import static se.sundsvall.snailmail.api.model.EnvelopeType.PLAIN;
-import static se.sundsvall.snailmail.api.model.EnvelopeType.WINDOWED;
-
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -27,6 +22,11 @@ import se.sundsvall.snailmail.integration.db.model.BatchEntity;
 import se.sundsvall.snailmail.integration.db.model.DepartmentEntity;
 import se.sundsvall.snailmail.integration.db.model.RecipientEntity;
 import se.sundsvall.snailmail.integration.db.model.RequestEntity;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+import static se.sundsvall.snailmail.api.model.EnvelopeType.PLAIN;
+import static se.sundsvall.snailmail.api.model.EnvelopeType.WINDOWED;
 
 @ActiveProfiles("junit")
 @SpringBootTest(classes = Application.class, webEnvironment = RANDOM_PORT)

@@ -1,9 +1,5 @@
 package se.sundsvall.snailmail.service;
 
-import static jakarta.transaction.Transactional.TxType.REQUIRES_NEW;
-import static se.sundsvall.dept44.util.LogUtils.sanitizeForLogging;
-import static se.sundsvall.snailmail.service.Mapper.toBatchEntity;
-
 import jakarta.transaction.Transactional;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -14,6 +10,10 @@ import org.springframework.stereotype.Service;
 import se.sundsvall.snailmail.api.model.SendSnailMailRequest;
 import se.sundsvall.snailmail.integration.db.BatchRepository;
 import se.sundsvall.snailmail.integration.db.model.BatchEntity;
+
+import static jakarta.transaction.Transactional.TxType.REQUIRES_NEW;
+import static se.sundsvall.dept44.util.LogUtils.sanitizeForLogging;
+import static se.sundsvall.snailmail.service.Mapper.toBatchEntity;
 
 @Service
 public class BatchService {

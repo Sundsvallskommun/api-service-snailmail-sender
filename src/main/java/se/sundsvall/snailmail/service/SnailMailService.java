@@ -1,9 +1,5 @@
 package se.sundsvall.snailmail.service;
 
-import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
-import static se.sundsvall.snailmail.service.Mapper.toRecipient;
-import static se.sundsvall.snailmail.service.Mapper.toRequest;
-
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.concurrent.Semaphore;
@@ -19,6 +15,10 @@ import se.sundsvall.snailmail.integration.db.RequestRepository;
 import se.sundsvall.snailmail.integration.db.model.BatchEntity;
 import se.sundsvall.snailmail.integration.samba.SambaIntegration;
 import se.sundsvall.snailmail.integration.sftp.SftpIntegration;
+
+import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
+import static se.sundsvall.snailmail.service.Mapper.toRecipient;
+import static se.sundsvall.snailmail.service.Mapper.toRequest;
 
 @Service
 public class SnailMailService {

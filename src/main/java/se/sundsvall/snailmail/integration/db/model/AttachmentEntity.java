@@ -1,7 +1,5 @@
 package se.sundsvall.snailmail.integration.db.model;
 
-import static lombok.AccessLevel.PACKAGE;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -21,6 +19,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.With;
 import se.sundsvall.snailmail.api.model.EnvelopeType;
+
+import static lombok.AccessLevel.PACKAGE;
 
 @Getter
 @Setter

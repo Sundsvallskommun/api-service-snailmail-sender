@@ -1,8 +1,5 @@
 package se.sundsvall.snailmail.service;
 
-import static jakarta.transaction.Transactional.TxType.REQUIRES_NEW;
-import static se.sundsvall.snailmail.service.Mapper.toDepartment;
-
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +8,9 @@ import se.sundsvall.dept44.util.LogUtils;
 import se.sundsvall.snailmail.integration.db.DepartmentRepository;
 import se.sundsvall.snailmail.integration.db.model.BatchEntity;
 import se.sundsvall.snailmail.integration.db.model.DepartmentEntity;
+
+import static jakarta.transaction.Transactional.TxType.REQUIRES_NEW;
+import static se.sundsvall.snailmail.service.Mapper.toDepartment;
 
 @Service
 public class DepartmentService {

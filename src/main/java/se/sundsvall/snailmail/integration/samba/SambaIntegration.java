@@ -1,7 +1,5 @@
 package se.sundsvall.snailmail.integration.samba;
 
-import static java.util.Optional.ofNullable;
-
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import jakarta.transaction.Transactional;
 import java.io.File;
@@ -33,6 +31,8 @@ import se.sundsvall.snailmail.integration.db.model.AttachmentEntity;
 import se.sundsvall.snailmail.integration.db.model.BatchEntity;
 import se.sundsvall.snailmail.integration.db.model.DepartmentEntity;
 import se.sundsvall.snailmail.integration.db.model.RequestEntity;
+
+import static java.util.Optional.ofNullable;
 
 @Component
 @CircuitBreaker(name = "sambaIntegration")
