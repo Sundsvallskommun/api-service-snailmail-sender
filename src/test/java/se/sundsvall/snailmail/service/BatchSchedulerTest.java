@@ -1,14 +1,5 @@
 package se.sundsvall.snailmail.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.platform.commons.util.AnnotationUtils.findAnnotation;
-import static org.junit.platform.commons.util.ReflectionUtils.findMethod;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,6 +10,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import se.sundsvall.dept44.scheduling.Dept44Scheduled;
 import se.sundsvall.snailmail.config.BatchProperties;
 import se.sundsvall.snailmail.integration.db.model.BatchEntity;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.platform.commons.util.AnnotationUtils.findAnnotation;
+import static org.junit.platform.commons.util.ReflectionUtils.findMethod;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class BatchSchedulerTest {

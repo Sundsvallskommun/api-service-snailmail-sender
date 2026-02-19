@@ -1,8 +1,5 @@
 package se.sundsvall.snailmail.integration.db.model;
 
-import static lombok.AccessLevel.PACKAGE;
-import static org.hibernate.annotations.TimeZoneStorageType.NORMALIZE;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -21,6 +18,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.With;
 import org.hibernate.annotations.TimeZoneStorage;
+
+import static lombok.AccessLevel.PACKAGE;
+import static org.hibernate.annotations.TimeZoneStorageType.NORMALIZE;
 
 @Getter
 @Setter

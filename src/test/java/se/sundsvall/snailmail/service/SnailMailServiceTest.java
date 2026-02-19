@@ -1,16 +1,5 @@
 package se.sundsvall.snailmail.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-import static se.sundsvall.snailmail.TestDataFactory.buildSendSnailMailAddress;
-import static se.sundsvall.snailmail.TestDataFactory.buildSendSnailMailRequest;
-
 import java.util.Optional;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
@@ -29,6 +18,17 @@ import se.sundsvall.snailmail.integration.db.model.DepartmentEntity;
 import se.sundsvall.snailmail.integration.db.model.RequestEntity;
 import se.sundsvall.snailmail.integration.samba.SambaIntegration;
 import se.sundsvall.snailmail.integration.sftp.SftpIntegration;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+import static se.sundsvall.snailmail.TestDataFactory.buildSendSnailMailAddress;
+import static se.sundsvall.snailmail.TestDataFactory.buildSendSnailMailRequest;
 
 @ExtendWith(MockitoExtension.class)
 class SnailMailServiceTest {
