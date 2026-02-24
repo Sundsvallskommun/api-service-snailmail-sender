@@ -13,13 +13,13 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.zalando.problem.Problem;
+import se.sundsvall.dept44.problem.Problem;
 import se.sundsvall.snailmail.Application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
-import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static se.sundsvall.snailmail.TestDataFactory.getBatchEntity;
 
 @ActiveProfiles("junit")

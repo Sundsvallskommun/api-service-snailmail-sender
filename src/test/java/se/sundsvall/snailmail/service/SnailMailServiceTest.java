@@ -11,7 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.zalando.problem.Problem;
+import se.sundsvall.dept44.problem.Problem;
 import se.sundsvall.snailmail.integration.db.RequestRepository;
 import se.sundsvall.snailmail.integration.db.model.BatchEntity;
 import se.sundsvall.snailmail.integration.db.model.DepartmentEntity;
