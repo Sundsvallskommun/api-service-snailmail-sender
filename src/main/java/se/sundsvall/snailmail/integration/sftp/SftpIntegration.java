@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.integration.sftp.session.DefaultSftpSessionFactory;
 import org.springframework.integration.sftp.session.SftpSession;
 import org.springframework.stereotype.Component;
-import org.zalando.problem.Problem;
+import se.sundsvall.dept44.problem.Problem;
 import se.sundsvall.snailmail.api.model.EnvelopeType;
 import se.sundsvall.snailmail.integration.db.model.AttachmentEntity;
 import se.sundsvall.snailmail.integration.db.model.BatchEntity;
@@ -29,7 +29,7 @@ import se.sundsvall.snailmail.integration.db.model.DepartmentEntity;
 import se.sundsvall.snailmail.integration.db.model.RequestEntity;
 
 import static java.util.Optional.ofNullable;
-import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 @Component
 @CircuitBreaker(name = "sftpIntegration")

@@ -23,9 +23,9 @@ import jcifs.smb.SmbFileOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.zalando.problem.Problem;
-import org.zalando.problem.Status;
+import se.sundsvall.dept44.problem.Problem;
 import se.sundsvall.snailmail.api.model.EnvelopeType;
 import se.sundsvall.snailmail.integration.db.model.AttachmentEntity;
 import se.sundsvall.snailmail.integration.db.model.BatchEntity;
@@ -126,7 +126,7 @@ public class SambaIntegration {
 					printWriter.flush();    // Flush the content
 				}
 			} catch (final IOException e) {
-				throw Problem.valueOf(Status.INTERNAL_SERVER_ERROR, "Failed to write to Samba share");
+				throw Problem.valueOf(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to write to Samba share");
 			}
 		});
 	}
@@ -227,7 +227,7 @@ public class SambaIntegration {
 				}
 			}
 		} catch (final IOException e) {
-			throw Problem.valueOf(Status.INTERNAL_SERVER_ERROR, "Failed to write attachmentEntity to Samba share");
+			throw Problem.valueOf(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to write attachmentEntity to Samba share");
 		}
 	}
 
@@ -237,7 +237,7 @@ public class SambaIntegration {
 				.filter(i -> i != -1)
 				.orElse(name.length())))
 			.map(name -> departmentPath + File.separator + FILE_PREFIX + name + ".csv")
-			.orElseThrow(() -> Problem.valueOf(Status.INTERNAL_SERVER_ERROR, "AttachmentEntity name is null"));
+			.orElseThrow(() -> Problem.valueOf(HttpStatus.INTERNAL_SERVER_ERROR, "AttachmentEntity name is null"));
 	}
 
 	private void createFolder(final String folder) {
@@ -249,7 +249,7 @@ public class SambaIntegration {
 				LOGGER.info("Folder: {}, exits, not creating it", folderFile);
 			}
 		} catch (final SmbException | MalformedURLException e) {
-			throw Problem.valueOf(Status.INTERNAL_SERVER_ERROR, "Failed to create folder " + folder + " on Samba share");
+			throw Problem.valueOf(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to create folder " + folder + " on Samba share");
 		}
 	}
 
