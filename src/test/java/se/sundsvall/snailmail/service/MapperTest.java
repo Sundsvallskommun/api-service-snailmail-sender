@@ -76,6 +76,7 @@ class MapperTest {
 		var address = SendSnailMailRequest.Address.builder()
 			.withFirstName("givenName")
 			.withLastName("lastName")
+			.withOrganizationName("organizationName")
 			.withAddress("address")
 			.withApartmentNumber("apartmentNumber")
 			.withZipCode("postalCode")
@@ -87,6 +88,7 @@ class MapperTest {
 		assertThat(result).isNotNull();
 		assertThat(result.getGivenName()).isEqualTo(address.getFirstName());
 		assertThat(result.getLastName()).isEqualTo(address.getLastName());
+		assertThat(result.getOrganizationName()).isEqualTo(address.getOrganizationName());
 		assertThat(result.getAddress()).isEqualTo(address.getAddress());
 		assertThat(result.getApartmentNumber()).isEqualTo(address.getApartmentNumber());
 		assertThat(result.getPostalCode()).isEqualTo(address.getZipCode());

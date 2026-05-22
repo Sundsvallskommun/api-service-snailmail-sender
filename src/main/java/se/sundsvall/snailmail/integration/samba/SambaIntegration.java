@@ -31,6 +31,7 @@ import se.sundsvall.snailmail.integration.db.model.AttachmentEntity;
 import se.sundsvall.snailmail.integration.db.model.BatchEntity;
 import se.sundsvall.snailmail.integration.db.model.DepartmentEntity;
 import se.sundsvall.snailmail.integration.db.model.RequestEntity;
+import se.sundsvall.snailmail.util.RecipientFormatter;
 
 import static java.util.Optional.ofNullable;
 
@@ -177,7 +178,7 @@ public class SambaIntegration {
 		var printWriter = new PrintWriter(stringWriter);
 		var recipient = request.getRecipientEntity();
 
-		var name = recipient.getGivenName() + " " + recipient.getLastName();
+		var name = RecipientFormatter.formatName(recipient);
 		var address = recipient.getAddress();
 		var postalCode = recipient.getPostalCode();
 		var city = recipient.getCity();

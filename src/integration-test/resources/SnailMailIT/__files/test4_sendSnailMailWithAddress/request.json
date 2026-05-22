@@ -2,6 +2,7 @@
 	"address": {
 		"firstName": "John",
 		"lastName": "Doe",
+		"organizationName": "Acme AB",
 		"zipCode": "12345",
 		"country": "Sweden",
 		"address": "Test Street 123",

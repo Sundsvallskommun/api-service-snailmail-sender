@@ -134,6 +134,7 @@ class SnailMailIT extends AbstractAppTest {
 		assertThat(request.getRecipientEntity()).satisfies(recipient -> {
 			assertThat(recipient.getGivenName()).isEqualTo("John");
 			assertThat(recipient.getLastName()).isEqualTo("Doe");
+			assertThat(recipient.getOrganizationName()).isEqualTo("Acme AB");
 			assertThat(recipient.getCity()).isEqualTo("Test-Town");
 			assertThat(recipient.getApartmentNumber()).isEqualTo("1101");
 			assertThat(recipient.getAddress()).isEqualTo("Test Street 123");

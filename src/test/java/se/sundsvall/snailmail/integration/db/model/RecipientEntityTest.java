@@ -25,6 +25,7 @@ class RecipientEntityTest {
 		var careOf = "careOf";
 		var givenName = "givenName";
 		var lastName = "lastName";
+		var organizationName = "organizationName";
 		var address = "address";
 		var apartmentNumber = "apartmentNumber";
 		var postalCode = "postalCode";
@@ -36,6 +37,7 @@ class RecipientEntityTest {
 			.withCareOf(careOf)
 			.withGivenName(givenName)
 			.withLastName(lastName)
+			.withOrganizationName(organizationName)
 			.withAddress(address)
 			.withApartmentNumber(apartmentNumber)
 			.withPostalCode(postalCode)
@@ -48,6 +50,7 @@ class RecipientEntityTest {
 		assertThat(recipient.getCareOf()).isEqualTo(careOf);
 		assertThat(recipient.getGivenName()).isEqualTo(givenName);
 		assertThat(recipient.getLastName()).isEqualTo(lastName);
+		assertThat(recipient.getOrganizationName()).isEqualTo(organizationName);
 		assertThat(recipient.getAddress()).isEqualTo(address);
 		assertThat(recipient.getApartmentNumber()).isEqualTo(apartmentNumber);
 		assertThat(recipient.getPostalCode()).isEqualTo(postalCode);

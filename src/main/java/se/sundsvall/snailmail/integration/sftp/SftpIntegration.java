@@ -27,6 +27,7 @@ import se.sundsvall.snailmail.integration.db.model.AttachmentEntity;
 import se.sundsvall.snailmail.integration.db.model.BatchEntity;
 import se.sundsvall.snailmail.integration.db.model.DepartmentEntity;
 import se.sundsvall.snailmail.integration.db.model.RequestEntity;
+import se.sundsvall.snailmail.util.RecipientFormatter;
 
 import static java.util.Optional.ofNullable;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
@@ -201,7 +202,7 @@ public class SftpIntegration {
 		final var printWriter = new PrintWriter(stringWriter);
 		final var recipient = request.getRecipientEntity();
 
-		final var name = recipient.getGivenName() + " " + recipient.getLastName();
+		final var name = RecipientFormatter.formatName(recipient);
 		final var address = recipient.getAddress();
 		final var postalCode = recipient.getPostalCode();
 		final var city = recipient.getCity();
