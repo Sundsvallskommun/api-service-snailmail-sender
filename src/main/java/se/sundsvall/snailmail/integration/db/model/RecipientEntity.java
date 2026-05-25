@@ -37,6 +37,9 @@ public class RecipientEntity {
 	@Column(name = "last_name")
 	private String lastName;
 
+	@Column(name = "organization_name")
+	private String organizationName;
+
 	@Column(name = "care_of")
 	private String careOf;
 

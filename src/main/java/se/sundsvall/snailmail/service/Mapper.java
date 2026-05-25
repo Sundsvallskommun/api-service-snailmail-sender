@@ -55,9 +55,10 @@ public final class Mapper {
 	}
 
 	static RecipientEntity toRecipient(final SendSnailMailRequest.Address address) {
-		return Optional.ofNullable(address).map(notNull -> RecipientEntity.builder()
+		return Optional.ofNullable(address).map(_ -> RecipientEntity.builder()
 			.withGivenName(address.getFirstName())
 			.withLastName(address.getLastName())
+			.withOrganizationName(address.getOrganizationName())
 			.withAddress(address.getAddress())
 			.withApartmentNumber(address.getApartmentNumber())
 			.withPostalCode(address.getZipCode())

@@ -33,6 +33,7 @@
         city varchar(255),
         given_name varchar(255),
         last_name varchar(255),
+        organization_name varchar(255),
         postal_code varchar(255),
         primary key (id)
     ) engine=InnoDB;
