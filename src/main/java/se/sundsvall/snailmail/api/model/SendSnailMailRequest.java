@@ -14,7 +14,6 @@ import lombok.NoArgsConstructor;
 import lombok.With;
 import se.sundsvall.dept44.common.validators.annotation.OneOf;
 import se.sundsvall.dept44.common.validators.annotation.ValidBase64;
-import se.sundsvall.snailmail.api.validation.ValidAddress;
 import se.sundsvall.snailmail.api.validation.ValidFolderName;
 
 @Data
@@ -82,16 +81,15 @@ public class SendSnailMailRequest {
 	@NoArgsConstructor
 	@AllArgsConstructor(access = AccessLevel.PACKAGE)
 	@Builder(setterPrefix = "with")
-	@ValidAddress
 	public static class Address {
 
-		@Schema(description = "The first name of the recipient. Required together with lastName if organizationName is not provided.", examples = "John")
+		@Schema(description = "The first name of the recipient", examples = "John")
 		private String firstName;
 
-		@Schema(description = "The last name of the recipient. Required together with firstName if organizationName is not provided.", examples = "Doe")
+		@Schema(description = "The last name of the recipient", examples = "Doe")
 		private String lastName;
 
-		@Schema(description = "The organization name of the recipient. Required if firstName and lastName are not provided.", examples = "Acme AB")
+		@Schema(description = "The organization name of the recipient", examples = "Acme AB")
 		private String organizationName;
 
 		@Schema(description = "The address", examples = "Main Street 1")
