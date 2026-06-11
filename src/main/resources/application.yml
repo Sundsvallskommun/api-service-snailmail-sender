@@ -11,6 +11,9 @@ spring:
     hikari:
       maximum-pool-size: 20
       connection-timeout: 5000
+      # DepartmentService.getOrCreateDepartment relies on READ_COMMITTED: after losing an insert race it re-fetches,
+      # within the same transaction, the row the winning transaction just committed. Under REPEATABLE READ the
+      # snapshot taken by the first lookup would hide that row and the re-fetch would fail with a 500.
       transaction-isolation: TRANSACTION_READ_COMMITTED
   main:
     banner-mode: 'off'
@@ -29,3 +32,13 @@ logbook:
     json-Path:
       - key: '$.attachments[*].content'
         value: '[base64]'
+
+# A lost get-or-create race surfaces as a DataIntegrityViolationException thrown from inside the
+# circuit-breaker-wrapped repository save. It is an expected, benign outcome (the row already exists),
+# so exclude it from breaker accounting to avoid a burst of concurrent collisions tripping the breaker.
+resilience4j:
+  circuitbreaker:
+    instances:
+      departmentRepository:
+        ignore-exceptions:
+          - org.springframework.dao.DataIntegrityViolationException

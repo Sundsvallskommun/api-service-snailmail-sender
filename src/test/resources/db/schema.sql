@@ -53,7 +53,10 @@
     create index idx_department_name 
        on department (name);
 
-    alter table if exists request 
+    alter table if exists department
+       add constraint uq_department_batch_name_folder unique (batch_id, name, folder_name);
+
+    alter table if exists request
        add constraint uq_request_recipient unique (recipient_id);
 
     alter table if exists attachment 
