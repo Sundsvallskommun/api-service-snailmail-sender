@@ -65,6 +65,23 @@ class MapperTest {
 	}
 
 	@Test
+	void toBatchEntityShouldMapCorrectly() {
+		var request = SendSnailMailRequest.builder()
+			.withBatchId("batchId")
+			.withIssuer("issuer")
+			.withMunicipalityId("2281")
+			.build();
+
+		var result = Mapper.toBatchEntity(request);
+
+		assertThat(result).isNotNull();
+		assertThat(result.getId()).isEqualTo("batchId");
+		assertThat(result.getSentBy()).isEqualTo("issuer");
+		assertThat(result.getMunicipalityId()).isEqualTo("2281");
+		assertThat(result.getCreated()).isNotNull();
+	}
+
+	@Test
 	void toRecipientShouldMapCorrectlyForNullAddress() {
 		var result = Mapper.toRecipient(null);
 

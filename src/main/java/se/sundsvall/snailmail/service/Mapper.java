@@ -1,5 +1,7 @@
 package se.sundsvall.snailmail.service;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 import se.sundsvall.snailmail.api.model.SendSnailMailRequest;
@@ -73,6 +75,9 @@ public final class Mapper {
 			.withId(request.getBatchId())
 			.withSentBy(request.getIssuer())
 			.withMunicipalityId(request.getMunicipalityId())
+			// Set created here so the value is carried on the entity regardless of whether it is inserted (persist) or,
+			// in a lost-race edge case, updated (merge) — @PrePersist alone only fires on insert.
+			.withCreated(OffsetDateTime.now(ZoneId.systemDefault()))
 			.build();
 	}
 }

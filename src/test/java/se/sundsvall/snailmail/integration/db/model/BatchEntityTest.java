@@ -16,8 +16,18 @@ class BatchEntityTest {
 
 	@Test
 	void testNoDirtOnCreatedBean() {
-		assertThat(BatchEntity.builder().build()).hasAllNullFieldsOrProperties();
-		assertThat(new BatchEntity()).hasAllNullFieldsOrProperties();
+		// isNew defaults to true (it drives persist-vs-merge), so it is excluded from the all-null check.
+		assertThat(BatchEntity.builder().build()).hasAllNullFieldsOrPropertiesExcept("isNew");
+		assertThat(new BatchEntity()).hasAllNullFieldsOrPropertiesExcept("isNew");
+	}
+
+	@Test
+	void testIsNewLifecycle() {
+		final var batch = new BatchEntity();
+		assertThat(batch.isNew()).isTrue();
+
+		batch.markNotNew();
+		assertThat(batch.isNew()).isFalse();
 	}
 
 	@Test
@@ -26,7 +36,7 @@ class BatchEntityTest {
 		var sentBy = "jeo01doe";
 		var municipalityId = "municipalityId";
 		var department = DepartmentEntity.builder().build();
-		var created = OffsetDateTime.now();
+		var created = OffsetDateTime.parse("2026-01-01T00:00:00Z");
 
 		var batch = BatchEntity.builder()
 			.withId(id)

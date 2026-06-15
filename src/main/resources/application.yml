@@ -42,3 +42,6 @@ resilience4j:
       departmentRepository:
         ignore-exceptions:
           - org.springframework.dao.DataIntegrityViolationException
+      batchRepository:
+        ignore-exceptions:
+          - org.springframework.dao.DataIntegrityViolationException
