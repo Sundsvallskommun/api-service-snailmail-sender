@@ -6,12 +6,15 @@ import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import se.sundsvall.dept44.problem.Problem;
 import se.sundsvall.snailmail.api.model.SendSnailMailRequest;
 import se.sundsvall.snailmail.integration.db.BatchRepository;
 import se.sundsvall.snailmail.integration.db.model.BatchEntity;
 
 import static jakarta.transaction.Transactional.TxType.REQUIRES_NEW;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static se.sundsvall.dept44.util.LogUtils.sanitizeForLogging;
 import static se.sundsvall.snailmail.service.Mapper.toBatchEntity;
 
@@ -21,9 +24,11 @@ public class BatchService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(BatchService.class);
 
 	private final BatchRepository batchRepository;
+	private final BatchCreator batchCreator;
 
-	public BatchService(final BatchRepository batchRepository) {
+	public BatchService(final BatchRepository batchRepository, final BatchCreator batchCreator) {
 		this.batchRepository = batchRepository;
+		this.batchCreator = batchCreator;
 	}
 
 	public Optional<BatchEntity> findBatchByMunicipalityIdAndId(final String municipalityId, final String id) {
@@ -47,8 +52,18 @@ public class BatchService {
 		}
 
 		LOGGER.info("Creating new batch: {}", sanitizeForLogging(request.getBatchId()));
-		final var entity = toBatchEntity(request);
-		return batchRepository.save(entity);
+		try {
+			// Insert in its own (REQUIRES_NEW) transaction so a primary-key violation rolls back only the inner
+			// transaction, leaving this transaction/session usable for the re-fetch below.
+			return batchCreator.save(toBatchEntity(request));
+		} catch (final DataIntegrityViolationException e) {
+			// Lost the race: another thread/pod already inserted the same batch. Re-fetch the committed row.
+			// Relies on READ_COMMITTED isolation (see application.yml) so this query sees the row the winning
+			// transaction just committed; under REPEATABLE READ the first lookup's snapshot would still hide it.
+			LOGGER.info("Batch already created concurrently, re-fetching: {}", sanitizeForLogging(request.getBatchId()));
+			return batchRepository.findByMunicipalityIdAndId(request.getMunicipalityId(), request.getBatchId())
+				.orElseThrow(() -> Problem.valueOf(INTERNAL_SERVER_ERROR, "Batch could not be created or found after unique constraint violation"));
+		}
 	}
 
 	public void deleteBatch(final BatchEntity batchEntity) {

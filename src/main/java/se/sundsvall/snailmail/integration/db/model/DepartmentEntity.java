@@ -13,6 +13,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,7 +31,11 @@ import static lombok.AccessLevel.PACKAGE;
 @Builder(setterPrefix = "with")
 @With(PACKAGE)
 @Entity
-@Table(name = "department", indexes = @Index(name = "idx_department_name", columnList = "name"))
+@Table(name = "department",
+	indexes = @Index(name = "idx_department_name", columnList = "name"),
+	uniqueConstraints = @UniqueConstraint(name = "uq_department_batch_name_folder", columnNames = {
+		"batch_id", "name", "folder_name"
+	}))
 public class DepartmentEntity {
 
 	@Id
