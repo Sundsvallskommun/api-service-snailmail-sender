@@ -2,6 +2,7 @@ package se.sundsvall.snailmail.service;
 
 import java.time.Duration;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -35,7 +36,7 @@ public class BatchScheduler {
 		LOGGER.info("Checking for unhandled batches");
 
 		try {
-			final var outdatedBefore = OffsetDateTime.now().minus(Duration.parse(properties.getOutdatedAfter()));
+			final var outdatedBefore = OffsetDateTime.now(ZoneId.systemDefault()).minus(Duration.parse(properties.getOutdatedAfter()));
 			final var outdatedBatches = snailMailService.getUnhandledBatches(outdatedBefore);
 
 			if (!outdatedBatches.isEmpty()) {
