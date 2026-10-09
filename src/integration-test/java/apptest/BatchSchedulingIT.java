@@ -1,7 +1,5 @@
 package apptest;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.time.Duration;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +15,12 @@ import se.sundsvall.snailmail.Application;
 import se.sundsvall.snailmail.integration.db.BatchRepository;
 import se.sundsvall.snailmail.service.BatchScheduler;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 @WireMockAppTestSuite(files = "classpath:/SnailMailIT/", classes = Application.class)
-@Sql({"/db/scripts/truncate.sql", "/db/scripts/testdata-it.sql"})
+@Sql({
+	"/db/scripts/truncate.sql", "/db/scripts/testdata-it.sql"
+})
 @Testcontainers
 class BatchSchedulingIT extends AbstractAppTest {
 
@@ -42,10 +44,10 @@ class BatchSchedulingIT extends AbstractAppTest {
 
 	@Autowired
 	private BatchScheduler batchScheduler;
-	
+
 	@Autowired
 	private BatchRepository batchRepository;
-	
+
 	@Test
 	void test1_unhandledBatches_shouldBeSent() {
 		setupCall();

@@ -1,10 +1,5 @@
 package apptest;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.tuple;
-import static org.springframework.http.HttpMethod.POST;
-import static org.springframework.http.HttpStatus.OK;
-
 import java.time.Duration;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -22,8 +17,15 @@ import se.sundsvall.snailmail.integration.db.BatchRepository;
 import se.sundsvall.snailmail.integration.db.model.BatchEntity;
 import se.sundsvall.snailmail.integration.db.model.DepartmentEntity;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpStatus.OK;
+
 @WireMockAppTestSuite(files = "classpath:/SnailMailIT/", classes = Application.class)
-@Sql({ "/db/scripts/truncate.sql", "/db/scripts/testdata-it.sql" })
+@Sql({
+	"/db/scripts/truncate.sql", "/db/scripts/testdata-it.sql"
+})
 @Testcontainers
 class SnailMailIT extends AbstractAppTest {
 
@@ -73,7 +75,7 @@ class SnailMailIT extends AbstractAppTest {
 			.sendRequestAndVerifyResponse();
 	}
 
-	//Check that new batches with same department generates multiple batches
+	// Check that new batches with same department generates multiple batches
 	@Test
 	void test3_sendMultipleSnailMails() {
 
@@ -110,8 +112,7 @@ class SnailMailIT extends AbstractAppTest {
 				tuple("123e4567-e89b-12d3-a456-426614174000", MUNICIPALITY_ID, "joe01doe", List.of("A Department"), List.of("Sundsvalls Kommun")),
 				tuple("58f96da8-6d76-4fa6-bb92-64f71fdc6aa7", MUNICIPALITY_ID, "joe01doe", List.of("Dummy Department"), List.of("Kryptons Kommun")),
 				tuple("c895f6b2-3571-413a-a2f4-8d7780d6c6a5", MUNICIPALITY_ID, "joe01doe", List.of("McDummy Department"), List.of("Kryptons Kommun")),
-				tuple("fa0cc3d7-5002-404b-8675-758598d4221d", MUNICIPALITY_ID, "joe01doe", List.of("Another Department"), List.of("Kryptons Kommun"))
-			);
+				tuple("fa0cc3d7-5002-404b-8675-758598d4221d", MUNICIPALITY_ID, "joe01doe", List.of("Another Department"), List.of("Kryptons Kommun")));
 	}
 
 	@Test
